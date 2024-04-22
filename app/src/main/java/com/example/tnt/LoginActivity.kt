@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,8 +34,17 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(intent) // Iniciar la nueva actividad
             } else {
                 // Si no son correctos, mostrar un mensaje de error
-                Toast.makeText(this, "Nombre de usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+                mostrarMensajeError("El usuario y/o contraseña no son correctos")
             }
         }
+
     }
+
+    private fun mostrarMensajeError(mensaje: String) {
+        val rootView: View = findViewById(android.R.id.content)
+        val snack = Snackbar.make( rootView, mensaje, Snackbar.LENGTH_SHORT)
+        snack.show()
+
+    }
+
 }
