@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.trabajofinal2024.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_welcomeLogin"
+            app:destination="@id/welcomeLogin" />
+    </fragment>
+    <fragment
+        android:id="@+id/welcomeLogin"
+        android:name="com.example.trabajofinal2024.WelcomeLogin"
+        android:label="fragment_welcome_login"
+        tools:layout="@layout/fragment_welcome_login" >
+        <action
+            android:id="@+id/action_welcomeLogin_to_yogurtFragment"
+            app:destination="@id/yogurtFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/yogurtFragment"
+        android:name="com.example.trabajofinal2024.YogurtFragment"
+        android:label="YogurtFragment"
+        tools:layout="@layout/fragment_yogurt">
+        <action
+            android:id="@+id/action_yogurtFragment_to_welcomeLogin2"
+            app:destination="@id/welcomeLogin" />
+    </fragment>
+</navigation>

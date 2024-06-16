@@ -1,4 +1,4 @@
-package com.example.tnt
+package com.example.trabajofinal2024
 
 import org.junit.Test
 
