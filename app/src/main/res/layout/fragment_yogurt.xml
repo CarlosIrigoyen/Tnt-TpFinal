@@ -30,13 +30,8 @@
 
         <RadioGroup
             android:id="@+id/frecuenciaGroup"
-<<<<<<< HEAD
             android:layout_width="119dp"
             android:layout_height="230dp"
-=======
-            android:layout_width="124dp"
-            android:layout_height="175dp"
->>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
             android:layout_marginBottom="144dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -77,7 +72,6 @@
                 android:text="Anual"
                 tools:layout_editor_absoluteX="58dp"
                 tools:layout_editor_absoluteY="404dp" />
-<<<<<<< HEAD
 
             <RadioButton
                 android:id="@+id/nuncaId"
@@ -85,8 +79,6 @@
                 android:layout_height="32dp"
                 android:text="Nunca" />
 
-=======
->>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
         </RadioGroup>
 
 
@@ -195,11 +187,8 @@
             app:layout_constraintHorizontal_bias="0.464"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-<<<<<<< HEAD
             app:layout_constraintVertical_bias="0.898" />
-=======
-            app:layout_constraintVertical_bias="0.849" />
->>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

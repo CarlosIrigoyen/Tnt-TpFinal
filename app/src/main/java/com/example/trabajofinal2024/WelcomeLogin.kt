@@ -26,19 +26,6 @@ class WelcomeLogin : Fragment() {
         enableEdgeToEdge(rootView)
 
 
-<<<<<<< HEAD
-=======
-
-        // Obtener los argumentos del fragmento
-        val usuario = arguments?.getString("userExtra")
-
-        // Configurar el TextView con el mensaje de bienvenida
-        val bienvenido = rootView.findViewById<TextView>(R.id.bienvenidoid)
-        usuario?.let {
-            bienvenido.text = bienvenido.text.toString().replace("%USER%", it)
-        }
-
->>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
         // Configurar el botón de encuestas
         val encuestas = rootView.findViewById<Button>(R.id.encuestasid)
         encuestas.setOnClickListener {

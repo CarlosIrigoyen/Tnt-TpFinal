@@ -34,15 +34,8 @@ class LoginFragment : Fragment() {
             val usuario = editusuario.text.toString()
             val password = editpassword.text.toString()
             if (usuario == "admin" && password == "tnt2024") {
-<<<<<<< HEAD
 
                 findNavController().navigate(R.id.action_loginFragment_to_welcomeLogin)
-=======
-                val bundle = Bundle().apply {
-                    putString("userExtra", usuario)
-                }
-                findNavController().navigate(R.id.action_loginFragment_to_welcomeLogin,bundle)
->>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
             } else {
                 mostrarMensajeError(rootView, "El usuario y/o contraseña no son correctos")
             }
