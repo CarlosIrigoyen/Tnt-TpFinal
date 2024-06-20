@@ -2,7 +2,10 @@ package com.example.trabajofinal2024
 
 import android.os.Bundle
 import android.text.Editable
+<<<<<<< HEAD
 import android.text.InputFilter
+=======
+>>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
 import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -61,6 +64,7 @@ class YogurtFragment : Fragment() {
            binding.spinnerOpciones.setSelection(yogurtViewModel.cantidadList.indexOf(it))
        })
 
+<<<<<<< HEAD
         binding.increment.setOnClickListener {
             val valorActual = binding.numeroid.text.toString().toIntOrNull() ?: 0
             val nuevoValor = valorActual + 1
@@ -83,6 +87,8 @@ class YogurtFragment : Fragment() {
             }
         })
 
+=======
+>>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
     }
 
 
@@ -94,7 +100,10 @@ class YogurtFragment : Fragment() {
             "Semanal" -> binding.frecuenciaGroup.check(R.id.semanalId)
             "Mensual" -> binding.frecuenciaGroup.check(R.id.mensualId)
             "Anual" -> binding.frecuenciaGroup.check(R.id.anualId)
+<<<<<<< HEAD
             "Nunca" -> binding.frecuenciaGroup.check(R.id.nuncaId)
+=======
+>>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
         }
     }
 
@@ -125,7 +134,10 @@ class YogurtFragment : Fragment() {
                 R.id.semanalId -> "Semanal"
                 R.id.mensualId -> "Mensual"
                 R.id.anualId -> "Anual"
+<<<<<<< HEAD
                 R.id.nuncaId -> "Nunca"
+=======
+>>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
                 else -> ""
             }
             yogurtViewModel.setFrecuencia(frecuencia)
@@ -166,8 +178,13 @@ class YogurtFragment : Fragment() {
                     frecuencia_veces = yogurtViewModel.frecuencia.value ?:""
                 )
             )
+<<<<<<< HEAD
             Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
             NavHostFragment.findNavController(this).navigate(R.id.action_yogurtFragment_to_huevoFragment)
+=======
+            Toast.makeText(context, "Nueva encuesta creada", Toast.LENGTH_SHORT).show()
+            NavHostFragment.findNavController(this).navigate(R.id.action_yogurtFragment_to_welcomeLogin2)
+>>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
 
         }
     }

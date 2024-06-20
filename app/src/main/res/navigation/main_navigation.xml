@@ -13,6 +13,12 @@
         <action
             android:id="@+id/action_loginFragment_to_welcomeLogin"
             app:destination="@id/welcomeLogin" />
+<<<<<<< HEAD
+=======
+        <argument
+            android:name="userExtra"
+            app:argType="string" />
+>>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
     </fragment>
     <fragment
         android:id="@+id/welcomeLogin"
@@ -29,6 +35,7 @@
         android:label="YogurtFragment"
         tools:layout="@layout/fragment_yogurt">
         <action
+<<<<<<< HEAD
             android:id="@+id/action_yogurtFragment_to_huevoFragment"
             app:destination="@id/huevoFragment" />
     </fragment>
@@ -38,6 +45,9 @@
         android:label="HuevoFragment" >
         <action
             android:id="@+id/action_huevoFragment_to_welcomeLogin"
+=======
+            android:id="@+id/action_yogurtFragment_to_welcomeLogin2"
+>>>>>>> 5aaf67308dc380ce993edbe6eeb405291a12ebf3
             app:destination="@id/welcomeLogin" />
     </fragment>
 </navigation>
