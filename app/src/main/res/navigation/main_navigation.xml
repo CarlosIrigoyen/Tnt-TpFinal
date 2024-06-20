@@ -29,7 +29,15 @@
         android:label="YogurtFragment"
         tools:layout="@layout/fragment_yogurt">
         <action
-            android:id="@+id/action_yogurtFragment_to_welcomeLogin2"
+            android:id="@+id/action_yogurtFragment_to_huevoFragment"
+            app:destination="@id/huevoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/huevoFragment"
+        android:name="com.example.trabajofinal2024.HuevoFragment"
+        android:label="HuevoFragment" >
+        <action
+            android:id="@+id/action_huevoFragment_to_welcomeLogin"
             app:destination="@id/welcomeLogin" />
     </fragment>
 </navigation>

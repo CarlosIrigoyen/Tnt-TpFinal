@@ -17,25 +17,25 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment
-import com.example.trabajofinal2024.databinding.FragmentYogurtBinding
+import com.example.trabajofinal2024.databinding.FragmentHuevoBinding
 
-class YogurtFragment : Fragment() {
+class HuevoFragment : Fragment() {
 
-    private lateinit var binding: FragmentYogurtBinding
+    private lateinit var binding: FragmentHuevoBinding
 
     private val encuestaViewModel: EncuestaViewModel by viewModels() {
         EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
     }
 
-    val yogurtViewModel: YogurtViewModel by viewModels()
+    val huevoViewModel: HuevoViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_yogurt, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_huevo, container, false)
 
-        binding.yogurtviewmodel = yogurtViewModel
+        binding.huevoviewmodel = huevoViewModel
         binding.lifecycleOwner = this
 
         setupClickListeners(binding, encuestaViewModel)
@@ -52,14 +52,14 @@ class YogurtFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         configurarNumeroVeces()
         configurarSpinner()
-        yogurtViewModel.frecuencia.observe(viewLifecycleOwner, Observer {
+        huevoViewModel.frecuencia.observe(viewLifecycleOwner, Observer {
             actualizarRadioGroup()
         })
         configurarRadioGroup()
 
-       yogurtViewModel.cantidad.observe(viewLifecycleOwner, Observer {
-           binding.spinnerOpciones.setSelection(yogurtViewModel.cantidadList.indexOf(it))
-       })
+        huevoViewModel.cantidad.observe(viewLifecycleOwner, Observer {
+            binding.spinnerOpciones.setSelection(huevoViewModel.cantidadList.indexOf(it))
+        })
 
         binding.increment.setOnClickListener {
             val valorActual = binding.numeroid.text.toString().toIntOrNull() ?: 0
@@ -88,7 +88,7 @@ class YogurtFragment : Fragment() {
 
 
     fun actualizarRadioGroup() {
-        val frecuenciaSeleccionada = yogurtViewModel.frecuencia.value ?: ""
+        val frecuenciaSeleccionada = huevoViewModel.frecuencia.value ?: ""
         when(frecuenciaSeleccionada) {
             "Diaria" -> binding.frecuenciaGroup.check(R.id.diarioId)
             "Semanal" -> binding.frecuenciaGroup.check(R.id.semanalId)
@@ -112,7 +112,7 @@ class YogurtFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
-                    yogurtViewModel.setNumeroVeces(s.toString())
+                    huevoViewModel.setNumeroVeces(s.toString())
                 }
             }
         })
@@ -128,13 +128,13 @@ class YogurtFragment : Fragment() {
                 R.id.nuncaId -> "Nunca"
                 else -> ""
             }
-            yogurtViewModel.setFrecuencia(frecuencia)
+            huevoViewModel.setFrecuencia(frecuencia)
         }
     }
 
     fun configurarSpinner() {
         val spinner: Spinner = binding.spinnerOpciones
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, yogurtViewModel.cantidadList)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, huevoViewModel.cantidadList)
         spinner.adapter = adapter
 
         spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
@@ -146,7 +146,7 @@ class YogurtFragment : Fragment() {
             ) {
                 parent?.let {
                     val valorSeleccionado = parent.getItemAtPosition(position).toString()
-                    yogurtViewModel.setCantidad(valorSeleccionado)
+                    huevoViewModel.setCantidad(valorSeleccionado)
                 }
             }
 
@@ -156,18 +156,18 @@ class YogurtFragment : Fragment() {
         }
     }
 
-    private fun setupClickListeners(binding: FragmentYogurtBinding, viewModel: EncuestaViewModel){
+    private fun setupClickListeners(binding: FragmentHuevoBinding, viewModel: EncuestaViewModel){
         binding.enviar.setOnClickListener{
             viewModel.insert(
                 Encuesta(
-                    nombre_alimento = yogurtViewModel.alimento.value ?:"",
-                    cantidad_alimento = yogurtViewModel.cantidad.value ?:"",
-                    numero_veces = yogurtViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = yogurtViewModel.frecuencia.value ?:""
+                    nombre_alimento = huevoViewModel.alimento.value ?:"",
+                    cantidad_alimento = huevoViewModel.cantidad.value ?:"",
+                    numero_veces = huevoViewModel.numeroveces.value ?:"",
+                    frecuencia_veces = huevoViewModel.frecuencia.value ?:""
                 )
             )
             Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_yogurtFragment_to_huevoFragment)
+            NavHostFragment.findNavController(this).navigate(R.id.action_huevoFragment_to_welcomeLogin)
 
         }
     }
