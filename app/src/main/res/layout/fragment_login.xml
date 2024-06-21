@@ -78,8 +78,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/tnt"
-        android:layout_width="143dp"
-        android:layout_height="66dp"
+        android:layout_width="250dp"
+        android:layout_height="90dp"
         tools:layout_editor_absoluteX="123dp"
         tools:layout_editor_absoluteY="200dp" />
 

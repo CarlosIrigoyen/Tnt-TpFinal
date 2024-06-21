@@ -37,7 +37,63 @@
         android:name="com.example.trabajofinal2024.HuevoFragment"
         android:label="HuevoFragment" >
         <action
-            android:id="@+id/action_huevoFragment_to_welcomeLogin"
+            android:id="@+id/action_huevoFragment_to_huevoFragment2"
+            app:destination="@id/huevoFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/huevoFragment2"
+        android:name="com.example.trabajofinal2024.HuevoFragment2"
+        android:label="HuevoFragment2" >
+        <action
+            android:id="@+id/action_huevoFragment2_to_carnesFrescasFragment"
+            app:destination="@id/carnesFrescasFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/carnesFrescasFragment"
+        android:name="com.example.trabajofinal2024.CarnesFrescasFragment"
+        android:label="CarnesFrescasFragment" >
+        <action
+            android:id="@+id/action_carnesFrescasFragment_to_carnesFrescasFragment2"
+            app:destination="@id/carnesFrescasFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/carnesFrescasFragment2"
+        android:name="com.example.trabajofinal2024.CarnesFrescasFragment2"
+        android:label="CarnesFrescasFragment2" >
+        <action
+            android:id="@+id/action_carnesFrescasFragment2_to_carnesFrescasFragment3"
+            app:destination="@id/carnesFrescasFragment3" />
+    </fragment>
+    <fragment
+        android:id="@+id/carnesFrescasFragment3"
+        android:name="com.example.trabajofinal2024.CarnesFrescasFragment3"
+        android:label="CarnesFrescasFragment3" >
+        <action
+            android:id="@+id/action_carnesFrescasFragment3_to_bananaFragment"
+            app:destination="@id/bananaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/bananaFragment"
+        android:name="com.example.trabajofinal2024.BananaFragment"
+        android:label="BananaFragment" >
+        <action
+            android:id="@+id/action_bananaFragment_to_duraznoFragment"
+            app:destination="@id/duraznoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/duraznoFragment"
+        android:name="com.example.trabajofinal2024.DuraznoFragment"
+        android:label="DuraznoFragment" >
+        <action
+            android:id="@+id/action_duraznoFragment_to_manzanaFragment"
+            app:destination="@id/manzanaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/manzanaFragment"
+        android:name="com.example.trabajofinal2024.ManzanaFragment"
+        android:label="ManzanaFragment" >
+        <action
+            android:id="@+id/action_manzanaFragment_to_welcomeLogin"
             app:destination="@id/welcomeLogin" />
     </fragment>
 </navigation>

@@ -5,15 +5,15 @@
 
     <data>
         <variable
-            name="huevoviewmodel"
-            type="com.example.trabajofinal2024.HuevoViewModel" />
+            name="carnesfrescasviewmodel2"
+            type="com.example.trabajofinal2024.CarnesFrescasViewModel2" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/frameLayout3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".HuevoFragment">
+        tools:context=".CarnesFescasFragment2">
 
         <TextView
             android:id="@+id/frecuenciaTextId"
@@ -110,7 +110,7 @@
             android:id="@+id/alimento"
             android:layout_width="196dp"
             android:layout_height="92dp"
-            android:text="@{huevoviewmodel.alimento.toString()}"
+            android:text="@{carnesfrescasviewmodel2.alimento.toString()}"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -135,7 +135,7 @@
                 android:id="@+id/spinnerOpciones"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:entries = "@{huevoviewmodel.cantidadList}"/>
+                android:entries = "@{carnesfrescasviewmodel2.cantidadList}"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -143,7 +143,7 @@
             android:id="@+id/cantidadid"
             android:layout_width="137dp"
             android:layout_height="64dp"
-            android:text="Cantidad (unidades)"
+            android:text="Cantidad (en gramos)"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/litrosid"
@@ -174,7 +174,7 @@
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/litrosid"
-            android:text = "@{huevoviewmodel.numeroveces}"/>
+            android:text = "@{carnesfrescasviewmodel2.numeroveces}"/>
 
 
         <Button

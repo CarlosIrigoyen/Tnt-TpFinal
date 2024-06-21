@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class HuevoViewModel: ViewModel() {
+class BananaViewModel: ViewModel() {
     private val _cantidad = MutableLiveData<String>()
     private val _numeroVeces = MutableLiveData<String>()
     private val _eventoEnviar = MutableLiveData<Boolean>(false)
-    private val _alimento = MutableLiveData<String>("Huevo crudo/hervido/poche")
+    private val _alimento = MutableLiveData<String>("Banana")
     private val _frecuencia = MutableLiveData<String>()
 
     val eventoEnviar: LiveData<Boolean>
@@ -37,8 +37,8 @@ class HuevoViewModel: ViewModel() {
             "1",
             "2",
             "3",
-            "6",
-            "12"
+            "4",
+            "6"
         )
     }
 

@@ -17,25 +17,25 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment
-import com.example.trabajofinal2024.databinding.FragmentHuevoBinding
+import com.example.trabajofinal2024.databinding.FragmentDuraznoBinding
 
-class HuevoFragment : Fragment() {
+class DuraznoFragment : Fragment() {
 
-    private lateinit var binding: FragmentHuevoBinding
+    private lateinit var binding: FragmentDuraznoBinding
 
     private val encuestaViewModel: EncuestaViewModel by viewModels() {
         EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
     }
 
-    val huevoViewModel: HuevoViewModel by viewModels()
+    val duraznoViewModel: DuraznoViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_huevo, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_durazno, container, false)
 
-        binding.huevoviewmodel = huevoViewModel
+        binding.duraznoviewmodel = duraznoViewModel
         binding.lifecycleOwner = this
 
         setupClickListeners(binding, encuestaViewModel)
@@ -52,13 +52,13 @@ class HuevoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         configurarNumeroVeces()
         configurarSpinner()
-        huevoViewModel.frecuencia.observe(viewLifecycleOwner, Observer {
+        duraznoViewModel.frecuencia.observe(viewLifecycleOwner, Observer {
             actualizarRadioGroup()
         })
         configurarRadioGroup()
 
-        huevoViewModel.cantidad.observe(viewLifecycleOwner, Observer {
-            binding.spinnerOpciones.setSelection(huevoViewModel.cantidadList.indexOf(it))
+        duraznoViewModel.cantidad.observe(viewLifecycleOwner, Observer {
+            binding.spinnerOpciones.setSelection(duraznoViewModel.cantidadList.indexOf(it))
         })
 
         binding.increment.setOnClickListener {
@@ -88,7 +88,7 @@ class HuevoFragment : Fragment() {
 
 
     fun actualizarRadioGroup() {
-        val frecuenciaSeleccionada = huevoViewModel.frecuencia.value ?: ""
+        val frecuenciaSeleccionada = duraznoViewModel.frecuencia.value ?: ""
         when(frecuenciaSeleccionada) {
             "Diaria" -> binding.frecuenciaGroup.check(R.id.diarioId)
             "Semanal" -> binding.frecuenciaGroup.check(R.id.semanalId)
@@ -112,7 +112,7 @@ class HuevoFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
-                    huevoViewModel.setNumeroVeces(s.toString())
+                    duraznoViewModel.setNumeroVeces(s.toString())
                 }
             }
         })
@@ -128,13 +128,13 @@ class HuevoFragment : Fragment() {
                 R.id.nuncaId -> "Nunca"
                 else -> ""
             }
-            huevoViewModel.setFrecuencia(frecuencia)
+            duraznoViewModel.setFrecuencia(frecuencia)
         }
     }
 
     fun configurarSpinner() {
         val spinner: Spinner = binding.spinnerOpciones
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, huevoViewModel.cantidadList)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, duraznoViewModel.cantidadList)
         spinner.adapter = adapter
 
         spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
@@ -146,7 +146,7 @@ class HuevoFragment : Fragment() {
             ) {
                 parent?.let {
                     val valorSeleccionado = parent.getItemAtPosition(position).toString()
-                    huevoViewModel.setCantidad(valorSeleccionado)
+                    duraznoViewModel.setCantidad(valorSeleccionado)
                 }
             }
 
@@ -156,21 +156,22 @@ class HuevoFragment : Fragment() {
         }
     }
 
-    private fun setupClickListeners(binding: FragmentHuevoBinding, viewModel: EncuestaViewModel){
+    private fun setupClickListeners(binding: FragmentDuraznoBinding, viewModel: EncuestaViewModel){
         binding.enviar.setOnClickListener{
             viewModel.insert(
                 Encuesta(
-                    nombre_alimento = huevoViewModel.alimento.value ?:"",
-                    cantidad_alimento = huevoViewModel.cantidad.value ?:"",
-                    numero_veces = huevoViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = huevoViewModel.frecuencia.value ?:""
+                    nombre_alimento = duraznoViewModel.alimento.value ?:"",
+                    cantidad_alimento = duraznoViewModel.cantidad.value ?:"",
+                    numero_veces = duraznoViewModel.numeroveces.value ?:"",
+                    frecuencia_veces = duraznoViewModel.frecuencia.value ?:""
                 )
             )
             Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_huevoFragment_to_huevoFragment2)
+            NavHostFragment.findNavController(this).navigate(R.id.action_duraznoFragment_to_manzanaFragment)
 
         }
     }
+
 
 
 }

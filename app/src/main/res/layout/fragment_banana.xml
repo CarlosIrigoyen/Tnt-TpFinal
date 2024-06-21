@@ -5,15 +5,15 @@
 
     <data>
         <variable
-            name="huevoviewmodel"
-            type="com.example.trabajofinal2024.HuevoViewModel" />
+            name="bananaviewmodel"
+            type="com.example.trabajofinal2024.BananaViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/frameLayout3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".HuevoFragment">
+        tools:context=".BananaFragment">
 
         <TextView
             android:id="@+id/frecuenciaTextId"
@@ -109,8 +109,8 @@
         <TextView
             android:id="@+id/alimento"
             android:layout_width="196dp"
-            android:layout_height="92dp"
-            android:text="@{huevoviewmodel.alimento.toString()}"
+            android:layout_height="46dp"
+            android:text="@{bananaviewmodel.alimento.toString()}"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -135,7 +135,7 @@
                 android:id="@+id/spinnerOpciones"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:entries = "@{huevoviewmodel.cantidadList}"/>
+                android:entries = "@{bananaviewmodel.cantidadList}"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -174,7 +174,7 @@
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/litrosid"
-            android:text = "@{huevoviewmodel.numeroveces}"/>
+            android:text = "@{bananaviewmodel.numeroveces}"/>
 
 
         <Button
