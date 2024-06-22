@@ -7,7 +7,7 @@ class LicorViewModel : ViewModel() {
     private val _cantidad = MutableLiveData<String>()
     private val _numeroVeces = MutableLiveData<String>()
     private val _eventoEnviar = MutableLiveData<Boolean>(false)
-    private val _alimento = MutableLiveData<String>("Banana")
+    private val _alimento = MutableLiveData<String>("Licor")
     private val _frecuencia = MutableLiveData<String>()
 
     val eventoEnviar: LiveData<Boolean>

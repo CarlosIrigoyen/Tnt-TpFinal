@@ -2,12 +2,11 @@ package com.example.trabajofinal2024
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-
-class BlancaViewModel : ViewModel() {
+class PapasViewModel : ViewModel() {
     private val _cantidad = MutableLiveData<String>()
     private val _numeroVeces = MutableLiveData<String>()
     private val _eventoEnviar = MutableLiveData<Boolean>(false)
-    private val _alimento = MutableLiveData<String>("Bebidas Blancas")
+    private val _alimento = MutableLiveData<String>("Papas Fritas Caseras")
     private val _frecuencia = MutableLiveData<String>()
 
     val eventoEnviar: LiveData<Boolean>
@@ -33,13 +32,14 @@ class BlancaViewModel : ViewModel() {
 
     private fun elegirCantidad() {
         cantidadList = mutableListOf(
-            "250",
-            "500",
-            "750",
-            "1000",
-            "2000"
+            "1",
+            "2",
+            "3",
+            "4",
+            "6"
         )
     }
+
     init {
         elegirCantidad()
     }
