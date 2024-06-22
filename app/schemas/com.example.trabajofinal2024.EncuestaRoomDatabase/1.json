@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c17aa1c3cf47801e7c974f8d8b5d8d6b",
+    "identityHash": "0501cb740a260eef5d60e18ee0c5eafc",
     "entities": [
       {
         "tableName": "encuestas",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`encuestaId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alimento` TEXT NOT NULL, `cantidad` TEXT NOT NULL, `numero_veces` TEXT NOT NULL, `frecuencia` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`encuestaId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alimento` TEXT NOT NULL, `cantidad` TEXT NOT NULL, `numero_veces` TEXT NOT NULL, `frecuencia` TEXT NOT NULL, `categoria` TEXT NOT NULL, `subcategorias` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "encuestaId",
@@ -37,6 +37,18 @@
             "columnName": "frecuencia",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "categoria",
+            "columnName": "categoria",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subcategoria",
+            "columnName": "subcategorias",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -52,7 +64,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c17aa1c3cf47801e7c974f8d8b5d8d6b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0501cb740a260eef5d60e18ee0c5eafc')"
     ]
   }
 }

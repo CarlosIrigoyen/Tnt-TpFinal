@@ -19,6 +19,11 @@ data class Encuesta(
     var numero_veces: String,
 
     @ColumnInfo(name = "frecuencia")
-    var frecuencia_veces: String
+    var frecuencia_veces: String,
+
+    @ColumnInfo(name = "categoria")
+    var categoria: String,
+    @ColumnInfo(name = "subcategorias")
+    var subcategoria: String
 
 )
