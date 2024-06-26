@@ -20,10 +20,13 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.trabajofinal2024.databinding.FragmentCervezaBinding
 class CervezaFragment : Fragment() {
     private lateinit var binding: FragmentCervezaBinding
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
+
     val cervezaViewModel:CervezaViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -33,7 +36,10 @@ class CervezaFragment : Fragment() {
         binding.cervezaviewmodel = cervezaViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            cervezaViewModel.setEncuestaId(encuestaid)
+        }
 
 
         return binding.root
@@ -51,7 +57,7 @@ class CervezaFragment : Fragment() {
         })
         configurarRadioGroup()
 
-        bananaViewModel.cantidad.observe(viewLifecycleOwner, Observer {
+        cervezaViewModel.cantidad.observe(viewLifecycleOwner, Observer {
             binding.spinnerOpciones.setSelection(cervezaViewModel.cantidadList.indexOf(it))
         })
 
@@ -76,6 +82,9 @@ class CervezaFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+        setupClickListeners(binding, alimentoViewModel)
+
+
 
     }
     fun actualizarRadioGroup() {
@@ -144,19 +153,40 @@ class CervezaFragment : Fragment() {
             }
         }
     }
-    private fun setupClickListeners(binding: FragmentCervezaBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = cervezaViewModel.alimento.value ?:"",
-                    cantidad_alimento = cervezaViewModel.cantidad.value ?:"",
-                    numero_veces = cervezaViewModel.numeroveces.value ?:"",
-                    frecuencia_veces =cervezaViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentCervezaBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = cervezaViewModel.encuestaId,
+                        nombre_alimento = cervezaViewModel.alimento.value ?: "",
+                        categoria = cervezaViewModel.categoria.value ?: "",
+                        cantidad_alimento = cervezaViewModel.cantidad.value ?: "",
+                        numero_veces = cervezaViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = cervezaViewModel.frecuencia.value ?: "",
+                        gramos = cervezaViewModel.calcularGramosTotales(),
+                        kcal = cervezaViewModel.calcularKcal(),
+                        carbohidratos = cervezaViewModel.calcularCarbohidratos(),
+                        proteinas = cervezaViewModel.calcularProteinas(),
+                        grasas = cervezaViewModel.calcularGrasasTotales(),
+                        alcohol = cervezaViewModel.calcularAlcohol(),
+                        colesterol = cervezaViewModel.calcularColesterol(),
+                        fibra = cervezaViewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_cervezaFragment_to_licorFragment)
+            } catch (e: Exception) {
+                Log.e("CervezaFragment", "Error insertando alimento: ${e.message}")
+            }
+            val bundle = Bundle()
+            bundle.putInt("encuestaid", cervezaViewModel.encuestaId)
+            Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+            NavHostFragment.findNavController(this).navigate(R.id.action_cervezaFragment_to_licorFragment, bundle)
 
         }
+
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_cervezaFragment_to_encuestaFragment)
+        }
+
     }
 }

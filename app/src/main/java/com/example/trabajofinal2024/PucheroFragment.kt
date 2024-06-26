@@ -22,8 +22,8 @@ class PucheroFragment : Fragment() {
 
     private lateinit var binding: FragmentPucheroBinding
 
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
 
     val pucheroViewModel: PucheroViewModel by viewModels()
@@ -37,8 +37,10 @@ class PucheroFragment : Fragment() {
         binding.pucheroviewmodel = pucheroViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
-
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            pucheroViewModel.setEncuestaId(encuestaid)
+        }
 
         return binding.root
 
@@ -80,6 +82,9 @@ class PucheroFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+
+        setupClickListeners(binding, alimentoViewModel)
+
 
     }
 
@@ -151,19 +156,39 @@ class PucheroFragment : Fragment() {
         }
     }
 
-    private fun setupClickListeners(binding: FragmentPucheroBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = pucheroViewModel.alimento.value ?:"",
-                    cantidad_alimento = pucheroViewModel.cantidad.value ?:"",
-                    numero_veces = pucheroViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = pucheroViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentPucheroBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = pucheroViewModel.encuestaId,
+                        nombre_alimento = pucheroViewModel.alimento.value ?: "",
+                        categoria = pucheroViewModel.categoria.value ?: "",
+                        cantidad_alimento = pucheroViewModel.cantidad.value ?: "",
+                        numero_veces = pucheroViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = pucheroViewModel.frecuencia.value ?: "",
+                        gramos = pucheroViewModel.calcularGramosTotales(),
+                        kcal = pucheroViewModel.calcularKcal(),
+                        carbohidratos = pucheroViewModel.calcularCarbohidratos(),
+                        proteinas = pucheroViewModel.calcularProteinas(),
+                        grasas = pucheroViewModel.calcularGrasasTotales(),
+                        alcohol = pucheroViewModel.calcularAlcohol(),
+                        colesterol = pucheroViewModel.calcularColesterol(),
+                        fibra = pucheroViewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_pucheroFragment_to_welcomeLogin2)
+            }catch (e: Exception) {
+                Log.e("PucheroFragment", "Error insertando alimento: ${e.message}")
+            }
+            val bundle = Bundle()
+            bundle.putInt("encuestaid", pucheroViewModel.encuestaId)
 
+            Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+            NavHostFragment.findNavController(this).navigate(R.id.action_pucheroFragment_to_bananaFragment,bundle)
+
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_pucheroFragment_to_encuestaFragment)
         }
     }
 

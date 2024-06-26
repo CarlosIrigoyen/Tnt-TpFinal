@@ -22,9 +22,10 @@ class PapasFragment : Fragment() {
 
     private lateinit var binding: FragmentPapasBinding
 
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
+
     val papasViewModel: PapasViewModel by viewModels()
 
     override fun onCreateView(
@@ -33,10 +34,14 @@ class PapasFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_papas, container, false)
 
-        binding.papasviewmodel = papaViewModel
+        binding.papasviewmodel = papasViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            papasViewModel.setEncuestaId(encuestaid)
+        }
+
 
         return binding.root
 
@@ -78,6 +83,9 @@ class PapasFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+
+        setupClickListeners(binding, alimentoViewModel)
+
 
     }
     fun actualizarRadioGroup() {
@@ -144,19 +152,39 @@ class PapasFragment : Fragment() {
             }
         }
     }
-    private fun setupClickListeners(binding: FragmentPapasBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = papasViewModel.alimento.value ?:"",
-                    cantidad_alimento = papasViewModel.cantidad.value ?:"",
-                    numero_veces = papasViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = papasViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentPapasBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = papasViewModel.encuestaId,
+                        nombre_alimento = papasViewModel.alimento.value ?: "",
+                        categoria = papasViewModel.categoria.value ?: "",
+                        cantidad_alimento = papasViewModel.cantidad.value ?: "",
+                        numero_veces = papasViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = papasViewModel.frecuencia.value ?: "",
+                        gramos = papasViewModel.calcularGramosTotales(),
+                        kcal = papasViewModel.calcularKcal(),
+                        carbohidratos = papasViewModel.calcularCarbohidratos(),
+                        proteinas = papasViewModel.calcularProteinas(),
+                        grasas = papasViewModel.calcularGrasasTotales(),
+                        alcohol = papasViewModel.calcularAlcohol(),
+                        colesterol = papasViewModel.calcularColesterol(),
+                        fibra = papasViewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_papasFragment_to_pizzaFragment)
+                val bundle = Bundle()
+                bundle.putInt("encuestaid", papasViewModel.encuestaId)
+                Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+                NavHostFragment.findNavController(this).navigate(R.id.action_papasFragment_to_pizzaFragment,bundle)
 
+            }catch (e: Exception) {
+                Log.e("PapasFragment", "Error insertando alimento: ${e.message}")
+            }
+
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_papasFragment_to_encuestaFragment)
         }
     }
 

@@ -57,59 +57,57 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.legacy.support.v4)
-    implementation(libs.androidx.fragment.ktx)
     /*implementation(libs.androidx.room.common)
-       val nav_version = "2.7.7"
+    val nav_version = "2.7.7"
 
-       val roomVersion = "2.6.1"
-       // Java language implementation
-       implementation("androidx.navigation:navigation-fragment:$nav_version")
-       implementation("androidx.navigation:navigation-ui:$nav_version")
+    val roomVersion = "2.6.1"
+    // Java language implementation
+    implementation("androidx.navigation:navigation-fragment:$nav_version")
+    implementation("androidx.navigation:navigation-ui:$nav_version")
 
-       // Kotlin
-       implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
-       implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+    // Kotlin
+    implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
+    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
 
-       // Feature module Support
-       implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
+    // Feature module Support
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
 
-       // Testing Navigation
-       androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
+    // Testing Navigation
+    androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
 
-       // Jetpack Compose Integration
-       //implementation("androidx.navigation:navigation-compose:$nav_version")
-       implementation(libs.androidx.core.ktx)
-       implementation(libs.androidx.appcompat)
-       implementation(libs.material)
-       implementation(libs.androidx.activity)
-       implementation(libs.androidx.constraintlayout)
-       testImplementation(libs.junit)
-       androidTestImplementation(libs.androidx.junit)
-       androidTestImplementation(libs.androidx.espresso.core)
+    // Jetpack Compose Integration
+    //implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 
-       //implementation ("androidx.appcompat:appcompat:$rootProject.appCompatVersion")
-       //implementation ("androidx.activity:activity-ktx:$rootProject.activityVersion")
+    //implementation ("androidx.appcompat:appcompat:$rootProject.appCompatVersion")
+    //implementation ("androidx.activity:activity-ktx:$rootProject.activityVersion")
 
-       // Room components
-       implementation ("androidx.room:room-ktx:$roomVersion")
-       kapt ("androidx.room:room-compiler:$roomVersion")
-       //androidTestImplementation ("androidx.room:room-testing:$rootProject.roomVersion")
+    // Room components
+    implementation ("androidx.room:room-ktx:$roomVersion")
+    kapt ("androidx.room:room-compiler:$roomVersion")
+    //androidTestImplementation ("androidx.room:room-testing:$rootProject.roomVersion")
 
-       // Lifecycle components
-       implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion")
-       implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion")
-       implementation ("androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion")
+    // Lifecycle components
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion")
+    implementation ("androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion")
 
-       // Kotlin components
-       implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$nav_version")
-       api ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$rootProject.coroutines")
-       api ("org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutines")
+    // Kotlin components
+    implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$nav_version")
+    api ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$rootProject.coroutines")
+    api ("org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutines")
 
-       // UI
-       implementation ("androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion")
-       implementation ("com.google.android.material:material:$rootProject.materialVersion")
-   */
+    // UI
+    implementation ("androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion")
+    implementation ("com.google.android.material:material:$rootProject.materialVersion")
+*/
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")

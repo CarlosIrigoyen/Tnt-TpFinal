@@ -1,0 +1,52 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "fc2668fc98cf35bc08066405f336efa3",
+    "entities": [
+      {
+        "tableName": "encuestas",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`encuestaId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `completada` INTEGER NOT NULL, `domicilio` TEXT NOT NULL, `ciudad` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "encuestaId",
+            "columnName": "encuestaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completa",
+            "columnName": "completada",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "domicilio",
+            "columnName": "domicilio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ciudad",
+            "columnName": "ciudad",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "encuestaId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fc2668fc98cf35bc08066405f336efa3')"
+    ]
+  }
+}

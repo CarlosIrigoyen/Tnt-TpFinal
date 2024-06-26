@@ -23,8 +23,8 @@ class QuesoFragment : Fragment() {
 
     private lateinit var binding: FragmentQuesoBinding
 
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
 
     val quesoViewModel: QuesoViewModel by viewModels()
@@ -38,7 +38,11 @@ class QuesoFragment : Fragment() {
         binding.quesoviewmodel = quesoViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            quesoViewModel.setEncuestaId(encuestaid)
+        }
+
 
 
         return binding.root
@@ -80,6 +84,7 @@ class QuesoFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+        setupClickListeners(binding, alimentoViewModel)
 
     }
 
@@ -149,19 +154,38 @@ class QuesoFragment : Fragment() {
             }
         }
     }
-    private fun setupClickListeners(binding: FragmentQuesoBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = quesoViewModel.alimento.value ?:"",
-                    cantidad_alimento = quesoViewModel.cantidad.value ?:"",
-                    numero_veces = quesoViewModel.numeroveces.value ?:"",
-                    frecuencia_veces =quesoViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentQuesoBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = quesoViewModel.encuestaId,
+                        nombre_alimento = quesoViewModel.alimento.value ?: "",
+                        categoria = quesoViewModel.categoria.value ?: "",
+                        cantidad_alimento = quesoViewModel.cantidad.value ?: "",
+                        numero_veces = quesoViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = quesoViewModel.frecuencia.value ?: "",
+                        gramos = quesoViewModel.calcularGramosTotales(),
+                        kcal = quesoViewModel.calcularKcal(),
+                        carbohidratos = quesoViewModel.calcularCarbohidratos(),
+                        proteinas = quesoViewModel.calcularProteinas(),
+                        grasas = quesoViewModel.calcularGrasasTotales(),
+                        alcohol = quesoViewModel.calcularAlcohol(),
+                        colesterol = quesoViewModel.calcularColesterol(),
+                        fibra = quesoViewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_quesoFragment_to_quesoFragment2)
+                val bundle = Bundle()
+                bundle.putInt("encuestaid", quesoViewModel.encuestaId)
+                Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+                NavHostFragment.findNavController(this).navigate(R.id.action_quesoFragment_to_quesoFragment2, bundle)
 
+            }catch (e: Exception) {
+                Log.e("QuesoFragment", "Error insertando alimento: ${e.message}")
+            }
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_quesoFragment_to_encuestaFragment)
         }
     }
 

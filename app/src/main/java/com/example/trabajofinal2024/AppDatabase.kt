@@ -4,54 +4,67 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database (
-    entities = arrayOf(Encuesta::class),
+@Database(
+    entities = [Alimento::class, Encuesta::class],
     version = 1,
     exportSchema = true
 )
 
 
-public abstract class EncuestaRoomDatabase: RoomDatabase() {
-
+abstract class AppDatabase: RoomDatabase() {
     abstract fun encuestaDAO(): EncuestaDAO
+    abstract fun alimentoDAO(): AlimentoDAO
 
-    private class encuestaDatabaseCallBack(
+    private class DatabaseCallback(
         private val scope: CoroutineScope
-    ): RoomDatabase.Callback() {
+    ) : RoomDatabase.Callback() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-            INSTANCE?.let {
-                database -> scope.launch{
-                    var encuestaDAO = database.encuestaDAO()
+            INSTANCE?.let { database ->
+                scope.launch {
+                    val alimentoDAO = database.alimentoDAO()
+                    alimentoDAO.borrarTodos()
+                    val encuestaDAO = database.encuestaDAO()
                     encuestaDAO.borrarTodos()
-            }
+                }
             }
         }
     }
+
     companion object {
 
         @Volatile
-        private var INSTANCE: EncuestaRoomDatabase? = null
+        private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context, scope: CoroutineScope): EncuestaRoomDatabase {
+
+
+
+        fun getDatabase(context: Context, scope: CoroutineScope): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    EncuestaRoomDatabase::class.java,
-                    "encuesta_database"
+                    AppDatabase::class.java,
+                    "app_database"
                 )
-                    .addCallback(encuestaDatabaseCallBack(scope))
+                    .addCallback(AppDatabase.DatabaseCallback(scope))
                     .build();
                 INSTANCE = instance
                 instance
             }
         }
+
+
+
+
+
     }
+
 
 
 }

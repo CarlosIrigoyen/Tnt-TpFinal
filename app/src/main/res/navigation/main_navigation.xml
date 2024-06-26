@@ -20,16 +20,371 @@
         android:label="fragment_welcome_login"
         tools:layout="@layout/fragment_welcome_login" >
         <action
-            android:id="@+id/action_welcomeLogin_to_yogurtFragment"
-            app:destination="@id/yogurtFragment" />
+            android:id="@+id/action_welcomeLogin_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
     </fragment>
     <fragment
-        android:id="@+id/yogurtFragment"
-        android:name="com.example.trabajofinal2024.YogurtFragment"
-        android:label="YogurtFragment"
-        tools:layout="@layout/fragment_yogurt">
+        android:id="@+id/lechePolvoEntera"
+        android:name="com.example.trabajofinal2024.LechePolvoEnteraFragment"
+        android:label="LechePolvoEntera"
+        tools:layout="@layout/fragment_leche_polvo_entera">
         <action
-            android:id="@+id/action_yogurtFragment_to_welcomeLogin2"
-            app:destination="@id/welcomeLogin" />
+            android:id="@+id/action_lechePolvoEntera_to_lecheFluidaEntera"
+            app:destination="@id/lecheFluidaEntera" />
+        <action
+            android:id="@+id/action_lechePolvoEntera_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/lecheFluidaEntera"
+        android:name="com.example.trabajofinal2024.LecheFluidaEntera"
+        android:label="LecheFluidaEntera"
+        tools:layout="@layout/fragment_leche_fluida_entera"
+
+    >
+        <action
+            android:id="@+id/action_lecheFluidaEntera_to_quesoFragment"
+            app:destination="@id/quesoFragment" />
+        <action
+            android:id="@+id/action_lecheFluidaEntera_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/salchichaFragment"
+        android:name="com.example.trabajofinal2024.SalchichaFragment"
+        android:label="SalchichaFragment"
+        tools:layout="@layout/fragment_salchicha"
+        >
+        <action
+            android:id="@+id/action_salchichaFragment_to_salameFragment"
+            app:destination="@id/salameFragment" />
+        <action
+            android:id="@+id/action_salchichaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/salameFragment"
+        android:name="com.example.trabajofinal2024.SalameFragment"
+        android:label="SalameFragment"
+        tools:layout="@layout/fragment_salame"
+        >
+        <action
+            android:id="@+id/action_salameFragment_to_mortadelaFragment"
+            app:destination="@id/mortadelaFragment" />
+        <action
+            android:id="@+id/action_salameFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mortadelaFragment"
+        android:name="com.example.trabajofinal2024.MortadelaFragment"
+        android:label="MortadelaFragment"
+        tools:layout="@layout/fragment_mortadela">
+        <action
+            android:id="@+id/action_mortadelaFragment_to_papasFragment"
+            app:destination="@id/papasFragment" />
+        <action
+            android:id="@+id/action_mortadelaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/aguaSaborizadaFragment"
+        android:name="com.example.trabajofinal2024.AguaSaborizadaFragment"
+        android:label="AguaSaborizadaFragment"
+        tools:layout="@layout/fragment_agua_saborizada">
+        <action
+            android:id="@+id/action_aguaSaborizadaFragment_to_bebidasDeportivasFragment"
+            app:destination="@id/bebidasDeportivasFragment" />
+        <action
+            android:id="@+id/action_aguaSaborizadaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/bebidasDeportivasFragment"
+        android:name="com.example.trabajofinal2024.BebidasDeportivasFragment"
+        android:label="BebidasDeportivasFragment"
+        tools:layout="@layout/fragment_bebidas_deportivas">
+        <action
+            android:id="@+id/action_bebidasDeportivasFragment_to_gaseosaFragment"
+            app:destination="@id/gaseosaFragment" />
+        <action
+            android:id="@+id/action_bebidasDeportivasFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gaseosaFragment"
+        android:name="com.example.trabajofinal2024.GaseosaFragment"
+        android:label="GaseosaFragment"
+        tools:layout="@layout/fragment_gaseosa"><![CDATA[>
+        ]]>
+        <action
+            android:id="@+id/action_gaseosaFragment_to_vinoFragment"
+            app:destination="@id/vinoFragment" />
+        <action
+            android:id="@+id/action_gaseosaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/encuestaFragment"
+        android:name="com.example.trabajofinal2024.EncuestaFragment"
+        android:label="fragment_encuesta"
+        tools:layout="@layout/fragment_encuesta" >
+        <action
+            android:id="@+id/action_encuestaFragment_to_welcomeLogin"
+            app:destination="@id/welcomeLogin" />
+        <action
+            android:id="@+id/action_encuestaFragment_to_lechePolvoEntera"
+            app:destination="@id/lechePolvoEntera" />
+    </fragment>
+    <fragment
+        android:id="@+id/quesoFragment"
+        android:name="com.example.trabajofinal2024.QuesoFragment"
+        android:label="QuesoFragment"
+        tools:layout="@layout/fragment_queso">
+        <action
+            android:id="@+id/action_quesoFragment_to_quesoFragment2"
+            app:destination="@id/quesoFragment2" />
+        <action
+            android:id="@+id/action_quesoFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/quesoFragment2"
+        android:name="com.example.trabajofinal2024.QuesoFragment2"
+        android:label="QuesoFragment2"
+        tools:layout="@layout/fragment_queso2">
+        <action
+            android:id="@+id/action_quesoFragment2_to_mantecaFragment"
+            app:destination="@id/mantecaFragment" />
+        <action
+            android:id="@+id/action_quesoFragment2_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mantecaFragment"
+        android:name="com.example.trabajofinal2024.MantecaFragment"
+        android:label="MantecaFragment"
+        tools:layout="@layout/fragment_manteca">
+        <action
+            android:id="@+id/action_mantecaFragment_to_huevoFragment"
+            app:destination="@id/huevoFragment" />
+        <action
+            android:id="@+id/action_mantecaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/huevoFragment"
+        android:name="com.example.trabajofinal2024.HuevoFragment"
+        android:label="HuevoFragment"
+        tools:layout="@layout/fragment_huevo">
+        <action
+            android:id="@+id/action_huevoFragment_to_huevoFragment2"
+            app:destination="@id/huevoFragment2" />
+        <action
+            android:id="@+id/action_huevoFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/huevoFragment2"
+        android:name="com.example.trabajofinal2024.HuevoFragment2"
+        android:label="HuevoFragment2"
+        tools:layout="@layout/fragment_huevo2">
+        <action
+            android:id="@+id/action_huevoFragment2_to_carnesFrescasFragment"
+            app:destination="@id/carnesFrescasFragment" />
+        <action
+            android:id="@+id/action_huevoFragment2_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/carnesFrescasFragment"
+        android:name="com.example.trabajofinal2024.CarnesFrescasFragment"
+        android:label="CarnesFrescasFragment"
+        tools:layout="@layout/fragment_carnes_frescas">
+        <action
+            android:id="@+id/action_carnesFrescasFragment_to_carnesFrescasFragment2"
+            app:destination="@id/carnesFrescasFragment2" />
+        <action
+            android:id="@+id/action_carnesFrescasFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/carnesFrescasFragment2"
+        android:name="com.example.trabajofinal2024.CarnesFrescasFragment2"
+        android:label="CarnesFrescasFragment2"
+        tools:layout="@layout/fragment_carnes_frescas2">
+        <action
+            android:id="@+id/action_carnesFrescasFragment2_to_carnesFrescasFragment3"
+            app:destination="@id/carnesFrescasFragment3" />
+        <action
+            android:id="@+id/action_carnesFrescasFragment2_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/carnesFrescasFragment3"
+        android:name="com.example.trabajofinal2024.CarnesFrescasFragment3"
+        android:label="CarnesFrescasFragment3"
+        tools:layout="@layout/fragment_carnes_frescas3">
+        <action
+            android:id="@+id/action_carnesFrescasFragment3_to_salchichaFragment"
+            app:destination="@id/salchichaFragment" />
+        <action
+            android:id="@+id/action_carnesFrescasFragment3_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/papasFragment"
+        android:name="com.example.trabajofinal2024.PapasFragment"
+        android:label="PapasFragment"
+        tools:layout="@layout/fragment_papas">
+        <action
+            android:id="@+id/action_papasFragment_to_pizzaFragment"
+            app:destination="@id/pizzaFragment" />
+        <action
+            android:id="@+id/action_papasFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pizzaFragment"
+        android:name="com.example.trabajofinal2024.PizzaFragment"
+        android:label="PizzaFragment"
+        tools:layout="@layout/fragment_pizza">
+        <action
+            android:id="@+id/action_pizzaFragment_to_empanadaFragment"
+            app:destination="@id/empanadaFragment" />
+        <action
+            android:id="@+id/action_pizzaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/empanadaFragment"
+        android:name="com.example.trabajofinal2024.EmpanadaFragment"
+        android:label="EmpanadaFragment"
+        tools:layout="@layout/fragment_empanada">
+        <action
+            android:id="@+id/action_empanadaFragment_to_empanadaFragment2"
+            app:destination="@id/empanadaFragment2" />
+        <action
+            android:id="@+id/action_empanadaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/empanadaFragment2"
+        android:name="com.example.trabajofinal2024.EmpanadaFragment2"
+        android:label="EmpanadaFragment2"
+        tools:layout="@layout/fragment_empanada2">
+        <action
+            android:id="@+id/action_empanadaFragment2_to_pastelFragment"
+            app:destination="@id/pastelFragment" />
+        <action
+            android:id="@+id/action_empanadaFragment2_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pastelFragment"
+        android:name="com.example.trabajofinal2024.PastelFragment"
+        android:label="PastelFragment"
+        tools:layout="@layout/fragment_pastel">
+        <action
+            android:id="@+id/action_pastelFragment_to_pucheroFragment"
+            app:destination="@id/pucheroFragment" />
+        <action
+            android:id="@+id/action_pastelFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pucheroFragment"
+        android:name="com.example.trabajofinal2024.PucheroFragment"
+        android:label="PucheroFragment"
+        tools:layout="@layout/fragment_puchero">
+        <action
+            android:id="@+id/action_pucheroFragment_to_bananaFragment"
+            app:destination="@id/bananaFragment" />
+        <action
+            android:id="@+id/action_pucheroFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/bananaFragment"
+        android:name="com.example.trabajofinal2024.BananaFragment"
+        android:label="BananaFragment"
+        tools:layout="@layout/fragment_banana">
+        <action
+            android:id="@+id/action_bananaFragment_to_duraznoFragment"
+            app:destination="@id/duraznoFragment" />
+        <action
+            android:id="@+id/action_bananaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/duraznoFragment"
+        android:name="com.example.trabajofinal2024.DuraznoFragment"
+        android:label="DuraznoFragment"
+        tools:layout="@layout/fragment_durazno">
+        <action
+            android:id="@+id/action_duraznoFragment_to_manzanaFragment"
+            app:destination="@id/manzanaFragment" />
+        <action
+            android:id="@+id/action_duraznoFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/manzanaFragment"
+        android:name="com.example.trabajofinal2024.ManzanaFragment"
+        android:label="ManzanaFragment"
+        tools:layout="@layout/fragment_manzana">
+        <action
+            android:id="@+id/action_manzanaFragment_to_aguaSaborizadaFragment"
+            app:destination="@id/aguaSaborizadaFragment" />
+        <action
+            android:id="@+id/action_manzanaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/vinoFragment"
+        android:name="com.example.trabajofinal2024.VinoFragment"
+        android:label="VinoFragment"
+        tools:layout="@layout/fragment_vino">
+        <action
+            android:id="@+id/action_vinoFragment_to_cervezaFragment"
+            app:destination="@id/cervezaFragment" />
+        <action
+            android:id="@+id/action_vinoFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cervezaFragment"
+        android:name="com.example.trabajofinal2024.CervezaFragment"
+        android:label="CervezaFragment"
+        tools:layout="@layout/fragment_cerveza">
+        <action
+            android:id="@+id/action_cervezaFragment_to_licorFragment"
+            app:destination="@id/licorFragment" />
+        <action
+            android:id="@+id/action_cervezaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/licorFragment"
+        android:name="com.example.trabajofinal2024.LicorFragment"
+        android:label="LicorFragment"
+        tools:layout="@layout/fragment_licor">
+        <action
+            android:id="@+id/action_licorFragment_to_blancaFragment"
+            app:destination="@id/blancaFragment" />
+        <action
+            android:id="@+id/action_licorFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/blancaFragment"
+        android:name="com.example.trabajofinal2024.BlancaFragment"
+        android:label="BlancaFragment"
+        tools:layout="@layout/fragment_blanca">
+        <action
+            android:id="@+id/action_blancaFragment_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+    </fragment>
+    />
+
 </navigation>

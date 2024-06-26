@@ -21,8 +21,9 @@ import com.example.trabajofinal2024.databinding.FragmentPizzaBinding
 
 class PizzaFragment : Fragment() {
     private lateinit var binding: FragmentPizzaBinding
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
     val pizzaViewModel: PizzaViewModel by viewModels()
 
@@ -35,7 +36,10 @@ class PizzaFragment : Fragment() {
         binding.pizzaviewmodel = pizzaViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            pizzaViewModel.setEncuestaId(encuestaid)
+        }
 
         return binding.root
 
@@ -46,7 +50,7 @@ class PizzaFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         configurarNumeroVeces()
         configurarSpinner()
-        bananaViewModel.frecuencia.observe(viewLifecycleOwner, Observer {
+        pizzaViewModel.frecuencia.observe(viewLifecycleOwner, Observer {
             actualizarRadioGroup()
         })
         configurarRadioGroup()
@@ -76,6 +80,9 @@ class PizzaFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+
+        setupClickListeners(binding, alimentoViewModel)
+
 
     }
 
@@ -147,19 +154,37 @@ class PizzaFragment : Fragment() {
         }
     }
 
-    private fun setupClickListeners(binding: FragmentPizzaBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = pizzaViewModel.alimento.value ?:"",
-                    cantidad_alimento = pizzaViewModel.cantidad.value ?:"",
-                    numero_veces = pizzaViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = pizzaViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentPizzaBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = pizzaViewModel.encuestaId,
+                        nombre_alimento = pizzaViewModel.alimento.value ?: "",
+                        categoria = pizzaViewModel.categoria.value ?: "",
+                        cantidad_alimento = pizzaViewModel.cantidad.value ?: "",
+                        numero_veces = pizzaViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = pizzaViewModel.frecuencia.value ?: "",
+                        gramos = pizzaViewModel.calcularGramosTotales(),
+                        kcal = pizzaViewModel.calcularKcal(),
+                        carbohidratos = pizzaViewModel.calcularCarbohidratos(),
+                        proteinas = pizzaViewModel.calcularProteinas(),
+                        grasas = pizzaViewModel.calcularGrasasTotales(),
+                        alcohol = pizzaViewModel.calcularAlcohol(),
+                        colesterol = pizzaViewModel.calcularColesterol(),
+                        fibra = pizzaViewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_pizzaFragment_to_empandaFragment)
-
+            }catch (e: Exception) {
+                Log.e("PizzaFragment", "Error insertando alimento: ${e.message}")
+            }
+            val bundle = Bundle()
+            bundle.putInt("encuestaid", pizzaViewModel.encuestaId)
+            Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+            NavHostFragment.findNavController(this).navigate(R.id.action_pizzaFragment_to_empanadaFragment,bundle)
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_pizzaFragment_to_encuestaFragment)
         }
     }
 

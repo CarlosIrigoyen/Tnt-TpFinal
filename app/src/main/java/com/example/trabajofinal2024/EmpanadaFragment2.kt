@@ -20,10 +20,10 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.trabajofinal2024.databinding.FragmentEmpanada2Binding
 
 class EmpanadaFragment2 : Fragment() {
-    private lateinit var binding: FragmentHuevo2Binding
+    private lateinit var binding: FragmentEmpanada2Binding
 
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
 
     val empanadaViewModel2: EmpanadaViewModel2 by viewModels()
@@ -37,8 +37,10 @@ class EmpanadaFragment2 : Fragment() {
         binding.empanadaviewmodel2 = empanadaViewModel2
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
-
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            empanadaViewModel2.setEncuestaId(encuestaid)
+        }
 
         return binding.root
     }
@@ -78,6 +80,8 @@ class EmpanadaFragment2 : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+        setupClickListeners(binding, alimentoViewModel)
+
 
     }
 
@@ -148,19 +152,38 @@ class EmpanadaFragment2 : Fragment() {
             }
         }
     }
-    private fun setupClickListeners(binding: FragmentEmpanada2Binding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = empanadaViewModel2.alimento.value ?:"",
-                    cantidad_alimento = empanadaViewModel2.cantidad.value ?:"",
-                    numero_veces = empanadaViewModel2.numeroveces.value ?:"",
-                    frecuencia_veces = empanadaViewModel2.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentEmpanada2Binding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = empanadaViewModel2.encuestaId,
+                        nombre_alimento = empanadaViewModel2.alimento.value ?: "",
+                        categoria = empanadaViewModel2.categoria.value ?: "",
+                        cantidad_alimento = empanadaViewModel2.cantidad.value ?: "",
+                        numero_veces = empanadaViewModel2.numeroveces.value ?: "",
+                        frecuencia_veces = empanadaViewModel2.frecuencia.value ?: "",
+                        gramos = empanadaViewModel2.calcularGramosTotales(),
+                        kcal = empanadaViewModel2.calcularKcal(),
+                        carbohidratos = empanadaViewModel2.calcularCarbohidratos(),
+                        proteinas = empanadaViewModel2.calcularProteinas(),
+                        grasas = empanadaViewModel2.calcularGrasasTotales(),
+                        alcohol = empanadaViewModel2.calcularAlcohol(),
+                        colesterol = empanadaViewModel2.calcularColesterol(),
+                        fibra = empanadaViewModel2.calcularFibra()
+                    )
                 )
-            )
+            }catch (e: Exception) {
+                Log.e("EmpanadaFragment2", "Error insertando alimento: ${e.message}")
+            }
+            val bundle = Bundle()
+            bundle.putInt("encuestaid", empanadaViewModel2.encuestaId)
             Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_empanadaFragment2_to_pasetelFragment)
+            NavHostFragment.findNavController(this).navigate(R.id.action_empanadaFragment2_to_pastelFragment, bundle)
 
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_empanadaFragment2_to_encuestaFragment)
         }
     }
 

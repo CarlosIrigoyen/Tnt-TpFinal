@@ -108,8 +108,8 @@
 
         <TextView
             android:id="@+id/alimento"
-            android:layout_width="196dp"
-            android:layout_height="46dp"
+            android:layout_width="259dp"
+            android:layout_height="79dp"
             android:text="@{vinoviewmodel.alimento.toString()}"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -178,16 +178,28 @@
 
 
         <Button
-            android:id="@+id/enviar"
+            android:id="@+id/cancelar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enviar datos"
+            android:text="Cancelar encuesta"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.464"
+            app:layout_constraintHorizontal_bias="0.065"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.898" />
+            app:layout_constraintVertical_bias="0.894" />
+
+        <Button
+            android:id="@+id/siguiente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Siguiente alimento"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.885"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.894" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -20,8 +20,9 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.trabajofinal2024.databinding.FragmentMantecaBinding
 class MantecaFragment : Fragment() {
     private lateinit var binding: FragmentMantecaBinding
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
     val mantecaViewModel: MantecaViewModel by viewModels()
     override fun onCreateView(
@@ -33,7 +34,10 @@ class MantecaFragment : Fragment() {
         binding.mantecaviewmodel = mantecaViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            mantecaViewModel.setEncuestaId(encuestaid)
+        }
 
 
         return binding.root
@@ -75,6 +79,9 @@ class MantecaFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+
+        setupClickListeners(binding, alimentoViewModel)
+
 
     }
     fun actualizarRadioGroup() {
@@ -141,19 +148,41 @@ class MantecaFragment : Fragment() {
             }
         }
     }
-    private fun setupClickListeners(binding: FragmentMantecaBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = mantecaViewModel.alimento.value ?:"",
-                    cantidad_alimento = mantecaViewModel.cantidad.value ?:"",
-                    numero_veces = mantecaViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = mantecaViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentMantecaBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = mantecaViewModel.encuestaId,
+                        nombre_alimento = mantecaViewModel.alimento.value ?: "",
+                        categoria = mantecaViewModel.categoria.value ?: "",
+                        cantidad_alimento = mantecaViewModel.cantidad.value ?: "",
+                        numero_veces = mantecaViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = mantecaViewModel.frecuencia.value ?: "",
+                        gramos = mantecaViewModel.calcularGramosTotales(),
+                        kcal = mantecaViewModel.calcularKcal(),
+                        carbohidratos = mantecaViewModel.calcularCarbohidratos(),
+                        proteinas = mantecaViewModel.calcularProteinas(),
+                        grasas = mantecaViewModel.calcularGrasasTotales(),
+                        alcohol = mantecaViewModel.calcularAlcohol(),
+                        colesterol = mantecaViewModel.calcularColesterol(),
+                        fibra = mantecaViewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_mantecaFragment_to_welcomeLogin2)
+                val bundle = Bundle()
+                bundle.putInt("encuestaid", mantecaViewModel.encuestaId)
 
+                Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+                NavHostFragment.findNavController(this).navigate(R.id.action_mantecaFragment_to_huevoFragment, bundle)
+
+            }catch (e: Exception) {
+                Log.e("MantecaFragment", "Error insertando alimento: ${e.message}")
+            }
+
+
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_mantecaFragment_to_encuestaFragment)
         }
     }
 

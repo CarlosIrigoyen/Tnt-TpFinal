@@ -18,12 +18,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment
+import com.example.trabajofinal2024.databinding.FragmentQueso2Binding
 import com.example.trabajofinal2024.databinding.FragmentQuesoBinding
 
 class QuesoFragment2 : Fragment() {
     private lateinit var binding: FragmentQueso2Binding
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
     val quesoViewModel2: QuesoViewModel2 by viewModels()
     override fun onCreateView(
@@ -35,7 +37,10 @@ class QuesoFragment2 : Fragment() {
         binding.quesoviewmodel2 = quesoViewModel2
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            quesoViewModel2.setEncuestaId(encuestaid)
+        }
 
 
         return binding.root
@@ -44,6 +49,9 @@ class QuesoFragment2 : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        setupClickListeners(binding, alimentoViewModel)
+
 
         super.onViewCreated(view, savedInstanceState)
         configurarNumeroVeces()
@@ -78,6 +86,8 @@ class QuesoFragment2 : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+
+
 
     }
     fun actualizarRadioGroup() {
@@ -144,19 +154,39 @@ class QuesoFragment2 : Fragment() {
             }
         }
     }
-    private fun setupClickListeners(binding: FragmentQuesoBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = quesoViewModel2.alimento.value ?:"",
-                    cantidad_alimento = quesoViewModel2.cantidad.value ?:"",
-                    numero_veces = quesoViewModel2.numeroveces.value ?:"",
-                    frecuencia_veces = quesoViewModel2.frecuencia.value ?:""
-                )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_quesoFragment2_to_mantecaFragment)
+    private fun setupClickListeners(binding: FragmentQueso2Binding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = quesoViewModel2.encuestaId,
+                        nombre_alimento = quesoViewModel2.alimento.value ?: "",
+                        categoria = quesoViewModel2.categoria.value ?: "",
+                        cantidad_alimento = quesoViewModel2.cantidad.value ?: "",
+                        numero_veces = quesoViewModel2.numeroveces.value ?: "",
+                        frecuencia_veces = quesoViewModel2.frecuencia.value ?: "",
+                        gramos = quesoViewModel2.calcularGramosTotales(),
+                        kcal = quesoViewModel2.calcularKcal(),
+                        carbohidratos = quesoViewModel2.calcularCarbohidratos(),
+                        proteinas = quesoViewModel2.calcularProteinas(),
+                        grasas = quesoViewModel2.calcularGrasasTotales(),
+                        alcohol = quesoViewModel2.calcularAlcohol(),
+                        colesterol = quesoViewModel2.calcularColesterol(),
+                        fibra = quesoViewModel2.calcularFibra()
+                    )
 
+                )
+                val bundle = Bundle()
+                bundle.putInt("encuestaid", quesoViewModel2.encuestaId)
+                Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+                NavHostFragment.findNavController(this).navigate(R.id.action_quesoFragment2_to_mantecaFragment, bundle)
+
+            }catch (e: Exception) {
+                Log.e("QuesoFragment2", "Error insertando alimento: ${e.message}")
+            }
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_quesoFragment2_to_encuestaFragment)
         }
     }
 

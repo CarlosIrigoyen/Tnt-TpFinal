@@ -23,19 +23,31 @@ import com.example.trabajofinal2024.databinding.FragmentVinoBinding
 class VinoFragment : Fragment() {
 
     private lateinit var binding: FragmentVinoBinding
-    private val encuestaViewModel:EncuestaViewModel by viewModel(){
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
     private val vinoviewModel: VinoViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_vino, container, false)
+    ): View? {
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_vino,
+            container,
+            false
+        )
         binding.vinoviewmodel=vinoviewModel
         binding.lifecycleOwner = this
-        setupClickListeners(binding, encuestaViewModel)
+
+
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            vinoviewModel.setEncuestaId(encuestaid)
+        }
+
         return binding.root
 
     }
@@ -48,7 +60,7 @@ class VinoFragment : Fragment() {
             actualizarRadioGroup()
         })
         configurarRadioGroup()
-        vinoViewModel.cantidad.observe(viewLifecycleOwner, Observer {
+        vinoviewModel.cantidad.observe(viewLifecycleOwner, Observer {
             binding.spinnerOpciones.setSelection(vinoviewModel.cantidadList.indexOf(it))
         })
 
@@ -71,6 +83,8 @@ class VinoFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+        setupClickListeners(binding, alimentoViewModel)
+
 
     }
     fun actualizarRadioGroup() {
@@ -138,20 +152,41 @@ class VinoFragment : Fragment() {
             }
         }
     }
-    private fun setupClickListeners(binding: FragmentVinoBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = vinoviewModel.alimento.value ?:"",
-                    cantidad_alimento = vinoviewModel.cantidad.value ?:"",
-                    numero_veces = vinoviewModel.numeroveces.value ?:"",
-                    frecuencia_veces = vinoviewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentVinoBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = vinoviewModel.encuestaId,
+                        nombre_alimento = vinoviewModel.alimento.value ?: "",
+                        categoria = vinoviewModel.categoria.value ?: "",
+                        cantidad_alimento = vinoviewModel.cantidad.value ?: "",
+                        numero_veces = vinoviewModel.numeroveces.value ?: "",
+                        frecuencia_veces = vinoviewModel.frecuencia.value ?: "",
+                        gramos = vinoviewModel.calcularGramosTotales(),
+                        kcal = vinoviewModel.calcularKcal(),
+                        carbohidratos = vinoviewModel.calcularCarbohidratos(),
+                        proteinas = vinoviewModel.calcularProteinas(),
+                        grasas = vinoviewModel.calcularGrasasTotales(),
+                        alcohol = vinoviewModel.calcularAlcohol(),
+                        colesterol = vinoviewModel.calcularColesterol(),
+                        fibra = vinoviewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_vinoFragment_to_cervezaFragment)
+            } catch (e: Exception) {
+                Log.e("VinoFragment", "Error insertando alimento: ${e.message}")
+            }
+            val bundle = Bundle()
+            bundle.putInt("encuestaid", vinoviewModel.encuestaId)
+
+            Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+            NavHostFragment.findNavController(this).navigate(R.id.action_vinoFragment_to_cervezaFragment, bundle)
 
         }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_vinoFragment_to_encuestaFragment)
+        }
+
     }
 
 

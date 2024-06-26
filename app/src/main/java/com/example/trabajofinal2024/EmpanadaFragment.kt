@@ -21,10 +21,12 @@ import com.example.trabajofinal2024.databinding.FragmentEmpanadaBinding
 
 
 class EmpanadaFragment : Fragment() {
-    private lateinit var binding: FragmentBananaBinding
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+    private lateinit var binding: FragmentEmpanadaBinding
+
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
+
     val empanadaViewModel: EmpanadaViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,8 +37,10 @@ class EmpanadaFragment : Fragment() {
         binding.empanadaviewmodel = empanadaViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
-
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            empanadaViewModel.setEncuestaId(encuestaid)
+        }
 
         return binding.root
 
@@ -78,6 +82,9 @@ class EmpanadaFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+
+        setupClickListeners(binding, alimentoViewModel)
+
 
     }
 
@@ -148,19 +155,38 @@ class EmpanadaFragment : Fragment() {
             }
         }
     }
-    private fun setupClickListeners(binding: FragmentEmpanadaBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = empanadaViewModel.alimento.value ?:"",
-                    cantidad_alimento = empanadaViewModel.cantidad.value ?:"",
-                    numero_veces = empanadaViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = empanadaViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentEmpanadaBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = empanadaViewModel.encuestaId,
+                        nombre_alimento = empanadaViewModel.alimento.value ?: "",
+                        categoria = empanadaViewModel.categoria.value ?: "",
+                        cantidad_alimento = empanadaViewModel.cantidad.value ?: "",
+                        numero_veces = empanadaViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = empanadaViewModel.frecuencia.value ?: "",
+                        gramos = empanadaViewModel.calcularGramosTotales(),
+                        kcal = empanadaViewModel.calcularKcal(),
+                        carbohidratos = empanadaViewModel.calcularCarbohidratos(),
+                        proteinas = empanadaViewModel.calcularProteinas(),
+                        grasas = empanadaViewModel.calcularGrasasTotales(),
+                        alcohol = empanadaViewModel.calcularAlcohol(),
+                        colesterol = empanadaViewModel.calcularColesterol(),
+                        fibra = empanadaViewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_empanadaFragment_to_empanadaFragment2)
+            }catch (e: Exception) {
+                Log.e("EmpanadaFragment", "Error insertando alimento: ${e.message}")
+            }
+            val bundle = Bundle()
+            bundle.putInt("encuestaid", empanadaViewModel.encuestaId)
+            Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+            NavHostFragment.findNavController(this).navigate(R.id.action_empanadaFragment_to_empanadaFragment2,bundle)
 
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_empanadaFragment_to_encuestaFragment)
         }
     }
 

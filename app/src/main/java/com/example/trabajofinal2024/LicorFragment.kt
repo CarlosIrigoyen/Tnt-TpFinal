@@ -22,9 +22,10 @@ class LicorFragment : Fragment() {
 
     private lateinit var binding: FragmentLicorBinding
 
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
+
     val licorViewModel: LicorViewModel by viewModels()
 
     override fun onCreateView(
@@ -36,7 +37,10 @@ class LicorFragment : Fragment() {
         binding.licorviewmodel = licorViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            licorViewModel.setEncuestaId(encuestaid)
+        }
 
 
         return binding.root
@@ -77,6 +81,9 @@ class LicorFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+        setupClickListeners(binding, alimentoViewModel)
+
+
 
     }
     fun actualizarRadioGroup() {
@@ -143,19 +150,38 @@ class LicorFragment : Fragment() {
             }
         }
     }
-    private fun setupClickListeners(binding: FragmentLicorBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = licorViewModel.alimento.value ?:"",
-                    cantidad_alimento = licorViewModel.cantidad.value ?:"",
-                    numero_veces = licorViewModel.numeroveces.value ?:"",
-                    frecuencia_veces =  licorViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentLicorBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = licorViewModel.encuestaId,
+                        nombre_alimento = licorViewModel.alimento.value ?: "",
+                        categoria = licorViewModel.categoria.value ?: "",
+                        cantidad_alimento = licorViewModel.cantidad.value ?: "",
+                        numero_veces = licorViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = licorViewModel.frecuencia.value ?: "",
+                        gramos = licorViewModel.calcularGramosTotales(),
+                        kcal = licorViewModel.calcularKcal(),
+                        carbohidratos = licorViewModel.calcularCarbohidratos(),
+                        proteinas = licorViewModel.calcularProteinas(),
+                        grasas = licorViewModel.calcularGrasasTotales(),
+                        alcohol = licorViewModel.calcularAlcohol(),
+                        colesterol = licorViewModel.calcularColesterol(),
+                        fibra = licorViewModel.calcularFibra()
+                    )
                 )
-            )
+            } catch (e: Exception) {
+                Log.e("LicorFragment", "Error insertando alimento: ${e.message}")
+            }
+            val bundle = Bundle()
+            bundle.putInt("encuestaid", licorViewModel.encuestaId)
             Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_licorFragment_to_blancaFragment)
+            NavHostFragment.findNavController(this).navigate(R.id.action_licorFragment_to_blancaFragment,bundle)
 
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_licorFragment_to_encuestaFragment)
         }
     }
 

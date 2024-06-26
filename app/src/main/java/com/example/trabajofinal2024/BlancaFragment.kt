@@ -1,6 +1,5 @@
 package com.example.trabajofinal2024
 
-package com.example.trabajofinal2024
 
 import android.os.Bundle
 import android.text.Editable
@@ -23,9 +22,15 @@ import com.example.trabajofinal2024.databinding.FragmentBlancaBinding
 class BlancaFragment : Fragment() {
     private lateinit var binding: FragmentBlancaBinding
 
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
+
+    private val encuestaViewModel: EncuestaViewModel by viewModels() {
+        EncuestaViewModel.EncuestaViewModelFactory((activity?.application as App).encuestaRepositorio)
+    }
+
+
     val blancaViewModel: BlancaViewModel by viewModels()
 
     override fun onCreateView(
@@ -37,8 +42,10 @@ class BlancaFragment : Fragment() {
         binding.blancaviewmodel = blancaViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
-
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            blancaViewModel.setEncuestaId(encuestaid)
+        }
 
         return binding.root
 
@@ -79,6 +86,9 @@ class BlancaFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+        setupClickListeners(binding, alimentoViewModel, encuestaViewModel)
+
+
 
     }
 
@@ -146,42 +156,43 @@ class BlancaFragment : Fragment() {
             }
         }
     }
-    fun configurarSpinner() {
-        val spinner: Spinner = binding.spinnerOpciones
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, blancaViewModel.cantidadList)
-        spinner.adapter = adapter
 
-        spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                parent?.let {
-                    val valorSeleccionado = parent.getItemAtPosition(position).toString()
-                    blancaViewModel.setCantidad(valorSeleccionado)
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                TODO("Not yet implemented")
-            }
-        }
-    }
-    private fun setupClickListeners(binding: FragmentBlancaBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = blancaViewModel.alimento.value ?:"",
-                    cantidad_alimento = blancaViewModel.cantidad.value ?:"",
-                    numero_veces = blancaViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = blancaViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentBlancaBinding, viewModel: AlimentoViewModel, encuestaViewModel: EncuestaViewModel){
+        binding.finalizar.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = blancaViewModel.encuestaId,
+                        nombre_alimento = blancaViewModel.alimento.value ?: "",
+                        categoria = blancaViewModel.categoria.value ?: "",
+                        cantidad_alimento = blancaViewModel.cantidad.value ?: "",
+                        numero_veces = blancaViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = blancaViewModel.frecuencia.value ?: "",
+                        gramos = blancaViewModel.calcularGramosTotales(),
+                        kcal = blancaViewModel.calcularKcal(),
+                        carbohidratos = blancaViewModel.calcularCarbohidratos(),
+                        proteinas = blancaViewModel.calcularProteinas(),
+                        grasas = blancaViewModel.calcularGrasasTotales(),
+                        alcohol = blancaViewModel.calcularAlcohol(),
+                        colesterol = blancaViewModel.calcularColesterol(),
+                        fibra = blancaViewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_blancaFragment_to_welcomeLogin2)
 
+                encuestaViewModel.getEncuestaById(blancaViewModel.encuestaId).observe(viewLifecycleOwner) { encuesta ->
+                    encuesta?.let {
+                        encuesta.completa = true
+                        encuestaViewModel.update(encuesta)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("BlancaFragment", "Error insertando alimento: ${e.message}")
+            }
+            Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+            NavHostFragment.findNavController(this).navigate(R.id.action_blancaFragment_to_encuestaFragment)
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_blancaFragment_to_encuestaFragment)
         }
     }
 

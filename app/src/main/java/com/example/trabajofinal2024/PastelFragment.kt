@@ -20,10 +20,12 @@ import com.example.trabajofinal2024.databinding.FragmentPastelBinding
 class PastelFragment : Fragment() {
     private lateinit var binding: FragmentPastelBinding
 
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+    private val alimentoViewModel: AlimentoViewModel by viewModels() {
+        AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
+
     val pastelViewModel: PastelViewModel by viewModels()
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -33,8 +35,10 @@ class PastelFragment : Fragment() {
         binding.pastelviewmodel = pastelViewModel
         binding.lifecycleOwner = this
 
-        setupClickListeners(binding, encuestaViewModel)
-
+        val encuestaid = arguments?.getInt("encuestaid")
+        if (encuestaid != null) {
+            pastelViewModel.setEncuestaId(encuestaid)
+        }
 
         return binding.root
 
@@ -76,6 +80,9 @@ class PastelFragment : Fragment() {
                 "" // No permitir la entrada (eliminar el texto ingresado)
             }
         })
+
+        setupClickListeners(binding, alimentoViewModel)
+
 
     }
 
@@ -146,19 +153,38 @@ class PastelFragment : Fragment() {
         }
     }
 
-    private fun setupClickListeners(binding: FragmentPastelBinding, viewModel: EncuestaViewModel){
-        binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = pastelViewModel.alimento.value ?:"",
-                    cantidad_alimento = pastelViewModel.cantidad.value ?:"",
-                    numero_veces = pastelViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = pastelViewModel.frecuencia.value ?:""
+    private fun setupClickListeners(binding: FragmentPastelBinding, viewModel: AlimentoViewModel){
+        binding.siguiente.setOnClickListener{
+            try {
+                viewModel.insert(
+                    Alimento(
+                        encuestaId = pastelViewModel.encuestaId,
+                        nombre_alimento = pastelViewModel.alimento.value ?: "",
+                        categoria = pastelViewModel.categoria.value ?: "",
+                        cantidad_alimento = pastelViewModel.cantidad.value ?: "",
+                        numero_veces = pastelViewModel.numeroveces.value ?: "",
+                        frecuencia_veces = pastelViewModel.frecuencia.value ?: "",
+                        gramos = pastelViewModel.calcularGramosTotales(),
+                        kcal = pastelViewModel.calcularKcal(),
+                        carbohidratos = pastelViewModel.calcularCarbohidratos(),
+                        proteinas = pastelViewModel.calcularProteinas(),
+                        grasas = pastelViewModel.calcularGrasasTotales(),
+                        alcohol = pastelViewModel.calcularAlcohol(),
+                        colesterol = pastelViewModel.calcularColesterol(),
+                        fibra = pastelViewModel.calcularFibra()
+                    )
                 )
-            )
-            Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_pastelFragment_to_pucheroFragment)
+            }catch (e: Exception) {
+                Log.e("PastelFragment", "Error insertando alimento: ${e.message}")
+            }
+            val bundle = Bundle()
+            bundle.putInt("encuestaid", pastelViewModel.encuestaId)
+            Toast.makeText(context, "Alimento cargado", Toast.LENGTH_SHORT).show()
+            NavHostFragment.findNavController(this).navigate(R.id.action_pastelFragment_to_pucheroFragment,bundle)
 
+        }
+        binding.cancelar.setOnClickListener{
+            NavHostFragment.findNavController(this).navigate(R.id.action_pastelFragment_to_encuestaFragment)
         }
     }
 
