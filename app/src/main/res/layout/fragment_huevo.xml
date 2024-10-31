@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="huevoviewmodel"
+            type="com.example.trabajofinal2024.HuevoViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/frameLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".HuevoFragment">
+
+        <TextView
+            android:id="@+id/frecuenciaTextId"
+            android:layout_width="118dp"
+            android:layout_height="42dp"
+            android:text="Frecuencia"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.047"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.467" />
+
+        <RadioGroup
+            android:id="@+id/frecuenciaGroup"
+            android:layout_width="119dp"
+            android:layout_height="230dp"
+            android:layout_marginBottom="144dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.052"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/frecuenciaTextId"
+            app:layout_constraintVertical_bias="0.0">
+
+            <RadioButton
+                android:id="@+id/diarioId"
+                android:layout_width="108dp"
+                android:layout_height="wrap_content"
+                android:text="Diaria"
+                tools:layout_editor_absoluteX="58dp"
+                tools:layout_editor_absoluteY="404dp" />
+
+            <RadioButton
+                android:id="@+id/semanalId"
+                android:layout_width="109dp"
+                android:layout_height="wrap_content"
+                android:text="Semanal"
+                tools:layout_editor_absoluteX="58dp"
+                tools:layout_editor_absoluteY="469dp" />
+
+            <RadioButton
+                android:id="@+id/mensualId"
+                android:layout_width="109dp"
+                android:layout_height="wrap_content"
+                android:text="Mensual"
+                tools:layout_editor_absoluteX="58dp"
+                tools:layout_editor_absoluteY="532dp" />
+
+            <RadioButton
+                android:id="@+id/anualId"
+                android:layout_width="107dp"
+                android:layout_height="32dp"
+                android:text="Anual"
+                tools:layout_editor_absoluteX="58dp"
+                tools:layout_editor_absoluteY="404dp" />
+
+            <RadioButton
+                android:id="@+id/nuncaId"
+                android:layout_width="107dp"
+                android:layout_height="32dp"
+                android:text="Nunca" />
+
+        </RadioGroup>
+
+
+        <Button
+            android:id="@+id/increment"
+            android:layout_width="61dp"
+            android:layout_height="49dp"
+            android:text="+"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.705"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.328" />
+
+        <Button
+            android:id="@+id/decrement"
+            android:layout_width="61dp"
+            android:layout_height="49dp"
+            android:text="-"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.705"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.4" />
+
+        <TextView
+            android:id="@+id/alimento"
+            android:layout_width="196dp"
+            android:layout_height="92dp"
+            android:text="@{huevoviewmodel.alimento.toString()}"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.52"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.087" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/litrosid"
+            android:layout_width="222dp"
+            android:layout_height="31dp"
+            android:hint="Selecciona una opcion"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.936"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.235">
+
+            <Spinner
+                android:id="@+id/spinnerOpciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries = "@{huevoviewmodel.cantidadList}"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/cantidadid"
+            android:layout_width="137dp"
+            android:layout_height="64dp"
+            android:text="Cantidad (unidades)"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/litrosid"
+            app:layout_constraintHorizontal_bias="0.571"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.234" />
+
+        <TextView
+            android:id="@+id/vecesid"
+            android:layout_width="139dp"
+            android:layout_height="31dp"
+            android:text="Numero de veces"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.059"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.346" />
+
+        <EditText
+            android:id="@+id/numeroid"
+            android:layout_width="56dp"
+            android:layout_height="39dp"
+            android:layout_marginTop="44dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/litrosid"
+            android:text = "@{huevoviewmodel.numeroveces}"/>
+
+
+        <Button
+            android:id="@+id/cancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelar encuesta"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.065"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.894" />
+
+        <Button
+            android:id="@+id/siguiente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Siguiente alimento"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.885"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.894" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

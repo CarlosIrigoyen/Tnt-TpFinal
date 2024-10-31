@@ -24,7 +24,7 @@ class YogurtFragment : Fragment() {
     private lateinit var binding: FragmentYogurtBinding
 
     private val encuestaViewModel: EncuestaViewModel by viewModels() {
-        EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
+        EncuestaViewModel.EncuestaViewModelFactory((activity?.application as EncuestaApp).repositorio)
     }
 
     val yogurtViewModel: YogurtViewModel by viewModels()
@@ -158,19 +158,21 @@ class YogurtFragment : Fragment() {
 
     private fun setupClickListeners(binding: FragmentYogurtBinding, viewModel: EncuestaViewModel){
         binding.enviar.setOnClickListener{
-            viewModel.insert(
-                Encuesta(
-                    nombre_alimento = yogurtViewModel.alimento.value ?:"",
-                    cantidad_alimento = yogurtViewModel.cantidad.value ?:"",
-                    numero_veces = yogurtViewModel.numeroveces.value ?:"",
-                    frecuencia_veces = yogurtViewModel.frecuencia.value ?:""
+            try {
+                viewModel.insert(
+                    Encuesta(
+                        domicilio = "Avenida siempre viva 23",
+                        ciudad = "Rawson"
+                    )
                 )
-            )
+            } catch(e:Exception) {
+                Log.e("YogurtFragment", "Error insertando encuesta: ${e.message}")
+        }
             Toast.makeText(context, "Encuesta completada", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this).navigate(R.id.action_yogurtFragment_to_welcomeLogin2)
 
         }
     }
+
 
 
 

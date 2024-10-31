@@ -1,0 +1,112 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "95d96835165e8057dffd388950c04541",
+    "entities": [
+      {
+        "tableName": "encuestas",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`encuestaId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alimento` TEXT NOT NULL, `categoria` TEXT NOT NULL, `cantidad` TEXT NOT NULL, `numero_veces` TEXT NOT NULL, `frecuencia` TEXT NOT NULL, `gramos` REAL NOT NULL, `kcal_totales` REAL NOT NULL, `carbohidratos` REAL NOT NULL, `proteinas` REAL NOT NULL, `grasas_totales` REAL NOT NULL, `alcohol` REAL NOT NULL, `colesterol` REAL NOT NULL, `fibra` REAL NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "encuestaId",
+            "columnName": "encuestaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre_alimento",
+            "columnName": "alimento",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoria",
+            "columnName": "categoria",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cantidad_alimento",
+            "columnName": "cantidad",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numero_veces",
+            "columnName": "numero_veces",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frecuencia_veces",
+            "columnName": "frecuencia",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gramos",
+            "columnName": "gramos",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kcal",
+            "columnName": "kcal_totales",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "carbohidratos",
+            "columnName": "carbohidratos",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "proteinas",
+            "columnName": "proteinas",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "grasas",
+            "columnName": "grasas_totales",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alcohol",
+            "columnName": "alcohol",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "colesterol",
+            "columnName": "colesterol",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fibra",
+            "columnName": "fibra",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "encuestaId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '95d96835165e8057dffd388950c04541')"
+    ]
+  }
+}

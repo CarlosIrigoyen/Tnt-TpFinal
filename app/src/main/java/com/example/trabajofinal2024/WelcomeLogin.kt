@@ -29,7 +29,7 @@ class WelcomeLogin : Fragment() {
         // Configurar el botón de encuestas
         val encuestas = rootView.findViewById<Button>(R.id.encuestasid)
         encuestas.setOnClickListener {
-            findNavController().navigate(R.id.action_welcomeLogin_to_yogurtFragment)
+            findNavController().navigate(R.id.action_welcomeLogin_to_encuestaFragment)
         }
 
         return rootView

@@ -9,16 +9,13 @@ data class Encuesta(
     @PrimaryKey( autoGenerate = true)
     var encuestaId: Int = 0,
 
-    @ColumnInfo(name = "alimento")
-    var nombre_alimento: String,
+    @ColumnInfo (name = "completada")
+    var completa: Boolean = false,
 
-    @ColumnInfo(name = "cantidad")
-    var cantidad_alimento: String,
+    @ColumnInfo (name = "domicilio")
+    var domicilio: String,
 
-    @ColumnInfo(name = "numero_veces")
-    var numero_veces: String,
-
-    @ColumnInfo(name = "frecuencia")
-    var frecuencia_veces: String
+    @ColumnInfo (name = "ciudad")
+    var ciudad: String
 
 )

@@ -1,6 +1,7 @@
 package com.example.trabajofinal2024
 
 import androidx.annotation.WorkerThread
+import androidx.room.Dao
 import kotlinx.coroutines.flow.Flow
 
 class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO) {
@@ -9,7 +10,17 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(encuesta:Encuesta){
-        encuestaDAO.insertar(encuesta)
+    suspend fun insert(encuesta:Encuesta): Long{
+        return encuestaDAO.insertar(encuesta)
     }
+
+    suspend fun update(encuesta: Encuesta) {
+        encuestaDAO.update(encuesta)
+    }
+
+    fun getEncuestaById(id: Int): Flow<Encuesta> {
+        return encuestaDAO.getEncuestaById(id)
+    }
+
+
 }
