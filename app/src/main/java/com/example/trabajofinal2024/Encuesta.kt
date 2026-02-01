@@ -5,7 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity( tableName = "encuestas")
-data class Encuesta(
+data class
+Encuesta(
     @PrimaryKey( autoGenerate = true)
     var encuestaId: Int = 0,
 

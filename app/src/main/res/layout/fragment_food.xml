@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="foodItem" type="com.example.trabajofinal2024.FoodItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/frameLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".FoodFragment">
+
+        <TextView
+            android:id="@+id/frecuenciaTextId"
+            android:layout_width="118dp"
+            android:layout_height="42dp"
+            android:text="Frecuencia"
+            android:textSize="20sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <RadioGroup
+            android:id="@+id/frecuenciaGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/frecuenciaTextId"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <RadioButton android:id="@+id/diarioId" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Diaria" />
+            <RadioButton android:id="@+id/semanalId" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Semanal" />
+            <RadioButton android:id="@+id/mensualId" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mensual" />
+            <RadioButton android:id="@+id/anualId" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Anual" />
+            <RadioButton android:id="@+id/nuncaId" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nunca" />
+        </RadioGroup>
+
+        <Button android:id="@+id/increment" android:layout_width="61dp" android:layout_height="49dp" android:text="+" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"/>
+        <Button android:id="@+id/decrement" android:layout_width="61dp" android:layout_height="49dp" android:text="-" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@id/increment"/>
+
+        <TextView
+            android:id="@+id/alimento"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{foodItem.alimentoNombre}"
+            android:textSize="24sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/frecuenciaGroup"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/litrosid"
+            android:layout_width="222dp"
+            android:layout_height="wrap_content"
+            android:hint="Selecciona una opcion"
+            app:layout_constraintTop_toBottomOf="@id/alimento"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <Spinner
+                android:id="@+id/spinnerOpciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView android:id="@+id/cantidadid" android:layout_width="137dp" android:layout_height="wrap_content" android:text="Cantidad (unidades)" app:layout_constraintTop_toBottomOf="@id/litrosid" app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView android:id="@+id/vecesid" android:layout_width="139dp" android:layout_height="wrap_content" android:text="Número de veces" app:layout_constraintTop_toBottomOf="@id/litrosid" app:layout_constraintStart_toEndOf="@id/cantidadid"/>
+
+        <EditText
+            android:id="@+id/numeroid"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:text="@={foodItem.numeroveces}"
+            android:inputType="number"
+            app:layout_constraintTop_toBottomOf="@id/vecesid"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <Button android:id="@+id/cancelar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cancelar encuesta" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"/>
+
+        <Button android:id="@+id/siguiente" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Siguiente alimento" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
