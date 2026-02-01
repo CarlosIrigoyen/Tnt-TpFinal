@@ -2,74 +2,74 @@ package com.example.trabajofinal2024
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.NavHostFragment
-import kotlinx.coroutines.launch
+import androidx.navigation.fragment.findNavController
 
+class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
 
-class EncuestaFragment : Fragment() {
-
-    private val encuestaViewModel: EncuestaViewModel by viewModels() {
+    private val encuestaViewModel: EncuestaViewModel by viewModels {
         EncuestaViewModel.EncuestaViewModelFactory((activity?.application as App).encuestaRepositorio)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_encuesta, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         val domicilioInput: EditText = view.findViewById(R.id.domicilioInput)
         val ciudadInput: EditText = view.findViewById(R.id.ciudadInput)
-
-        // Configurar el click listener para el botón
         val comenzarButton: Button = view.findViewById(R.id.comenzar)
+        val volverButton: Button = view.findViewById(R.id.volver)
+
         comenzarButton.setOnClickListener {
-            val domicilio = domicilioInput.text.toString()
-            val ciudad = ciudadInput.text.toString()
+            val domicilio = domicilioInput.text.toString().trim()
+            val ciudad = ciudadInput.text.toString().trim()
 
-
-                try {
-                    encuestaViewModel.insert(
-                        Encuesta(domicilio = domicilio,
-                            ciudad = ciudad
-                        )
-                    )
-                    Toast.makeText(context, "Encuesta creada", Toast.LENGTH_SHORT).show()
-
-                    encuestaViewModel.encuestaId.observe(viewLifecycleOwner) { encuestaid ->
-                        if (encuestaid != null) {
-                            val bundle = Bundle()
-                            bundle.putInt("encuestaid", encuestaid)
-                            NavHostFragment.findNavController(this)
-                                .navigate(R.id.action_encuestaFragment_to_lechePolvoEntera, bundle)
-
-                        }else {
-                            Log.e("EncuestaFragment", "Error: ID de encuesta nula")
-                        }
-                    }
-                }catch (e:Exception) {
-                    Log.e("EncuestaFragment", "Error insertando la encuesta: ${e.message}")
-                }
-
+            if (domicilio.isBlank() || ciudad.isBlank()) {
+                Toast.makeText(requireContext(), "Completá domicilio y ciudad", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-        val volverButton: Button = view.findViewById(R.id.volver)
+            // Evitar doble click
+            comenzarButton.isEnabled = false
+
+            try {
+                // Insertar encuesta (se actualizará encuestaId en el ViewModel)
+                encuestaViewModel.insert(
+                    Encuesta(
+                        domicilio = domicilio,
+                        ciudad = ciudad
+                    )
+                )
+
+                Toast.makeText(context, "Creando encuesta...", Toast.LENGTH_SHORT).show()
+
+                // Observador: una vez que tengamos el id navegamos y removemos observers
+                encuestaViewModel.encuestaId.observe(viewLifecycleOwner) { encuestaid ->
+                    if (encuestaid != null && encuestaid > 0) {
+                        // evitamos que se active de nuevo
+                        encuestaViewModel.encuestaId.removeObservers(viewLifecycleOwner)
+
+                        val bundle = Bundle().apply { putInt("encuestaid", encuestaid) }
+
+                        // Navegar al único FoodFragment (no fragment por alimento)
+                        findNavController().navigate(R.id.action_encuestaFragment_to_foodFragment, bundle)
+                    } else {
+                        // si id es 0 o nulo - reactivar botón para reintento
+                        comenzarButton.isEnabled = true
+                        Log.e("EncuestaFragment", "ID de encuesta inválida: $encuestaid")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("EncuestaFragment", "Error insertando la encuesta: ${e.message}")
+                Toast.makeText(context, "Error creando encuesta", Toast.LENGTH_SHORT).show()
+                comenzarButton.isEnabled = true
+            }
+        }
+
         volverButton.setOnClickListener {
-            NavHostFragment.findNavController(this).navigate(R.id.action_encuestaFragment_to_welcomeLogin)
+            findNavController().navigate(R.id.welcomeLogin)
         }
     }
-
 }
