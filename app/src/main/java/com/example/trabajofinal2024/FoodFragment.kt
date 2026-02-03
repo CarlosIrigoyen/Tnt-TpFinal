@@ -5,33 +5,32 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.trabajofinal2024.databinding.FragmentFoodBinding
 import kotlinx.coroutines.launch
 
-class FoodFragment : Fragment() {
+class FoodFragment : Fragment(R.layout.fragment_food) {
 
     private lateinit var binding: FragmentFoodBinding
     private val alimentoViewModel: AlimentoViewModel by viewModels {
         AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
+    private val encuestaViewModel: EncuestaViewModel by viewModels {
+        EncuestaViewModel.EncuestaViewModelFactory((activity?.application as App).encuestaRepositorio)
+    }
 
     private var encuestaId: Int = 0
     private var currentIndex: Int = 0
     private var foodItem: FoodItem? = null
+    private var encuestaCompletada: Boolean = false
 
-    // Opciones para el spinner de cantidad
     private val cantidadOpciones = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500")
 
     companion object {
@@ -48,6 +47,40 @@ class FoodFragment : Fragment() {
         if (total == 0) currentIndex = 0
         if (currentIndex < 0) currentIndex = 0
         if (currentIndex >= total) currentIndex = 0
+
+        if (encuestaId > 0) {
+            encuestaViewModel.getEncuestaById(encuestaId).observe(this) { encuesta ->
+                encuesta?.let {
+                    encuestaCompletada = it.completa
+
+                    if (it.completa) {
+                        // Encuesta ya completada
+                        Toast.makeText(
+                            requireContext(),
+                            "Esta encuesta ya fue completada.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        findNavController().popBackStack()
+                        return@observe
+                    }
+
+                    // Si está abandonada, mostramos mensaje
+                    if (!it.activa) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Reanudando encuesta abandonada...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    currentIndex = it.currentIndex.coerceIn(0, FoodCatalog.ALL.size)
+                    setFoodAtIndex(currentIndex)
+
+                    // Mostrar progreso
+                    binding.progresoText.text = "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
+                }
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -55,7 +88,7 @@ class FoodFragment : Fragment() {
         outState.putInt(STATE_INDEX, currentIndex)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup?, savedInstanceState: Bundle?): android.view.View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_food, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         setFoodAtIndex(currentIndex)
@@ -73,20 +106,16 @@ class FoodFragment : Fragment() {
         foodItem = FoodItem(template)
         binding.foodItem = foodItem
 
-        // Configurar el valor inicial en el EditText
         binding.vecesInput.setText(foodItem?.numeroveces?.value ?: "1")
 
-        // Configurar spinner con opciones de cantidad
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, cantidadOpciones)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerOpciones.adapter = adapter
 
-        // Seleccionar la cantidad guardada si existe (por defecto 100)
         val cantidadGuardada = foodItem?.cantidad?.value
         val posicion = if (cantidadGuardada != null) {
             cantidadOpciones.indexOf(cantidadGuardada).coerceAtLeast(0)
         } else {
-            // Por defecto 100 (posición 1 en el array)
             1
         }
         binding.spinnerOpciones.setSelection(posicion)
@@ -95,10 +124,12 @@ class FoodFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Inicializar texto de progreso
+        binding.progresoText.text = "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
+
         configurarNumeroVeces()
         configurarSpinner()
 
-        // Increment / Decrement manejan selección del spinner
         binding.increment.setOnClickListener {
             val current = binding.spinnerOpciones.selectedItemPosition
             val next = (current + 1).coerceAtMost(cantidadOpciones.size - 1)
@@ -111,7 +142,6 @@ class FoodFragment : Fragment() {
             binding.spinnerOpciones.setSelection(prev)
         }
 
-        // RadioGroup frecuencia
         binding.frecuenciaGroup.setOnCheckedChangeListener { _, checkedId ->
             val f = when (checkedId) {
                 R.id.radioDiaria -> "Diaria"
@@ -125,34 +155,47 @@ class FoodFragment : Fragment() {
         }
 
         binding.siguienteAlimento.setOnClickListener { saveCurrentAlimentoAndAdvance() }
+
         binding.cancelarEncuesta.setOnClickListener {
-            // Vuelve a welcome/login
-            findNavController().navigate(R.id.welcomeLogin)
+            // Solo regresa sin abandonar
+            findNavController().popBackStack()
+        }
+
+        binding.abandonarEncuesta.setOnClickListener {
+            if (encuestaId > 0) {
+                lifecycleScope.launch {
+                    encuestaViewModel.abandonEncuesta(encuestaId)
+                    Toast.makeText(
+                        requireContext(),
+                        "Encuesta abandonada. Puedes reanudarla más tarde desde la lista.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    findNavController().popBackStack()
+                }
+            }
         }
     }
 
     private fun configurarNumeroVeces() {
         binding.vecesInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 foodItem?.numeroveces?.value = s?.toString() ?: "1"
             }
         })
-
-        // permitir solo dígitos
         binding.vecesInput.filters = arrayOf(InputFilter { source, _, _, _, _, _ ->
             if (source.all { it.isDigit() }) null else ""
         })
     }
 
     private fun configurarSpinner() {
-        binding.spinnerOpciones.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        binding.spinnerOpciones.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
                 val valor = parent?.getItemAtPosition(position)?.toString() ?: "100"
                 foodItem?.cantidad?.value = valor
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) { }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
         }
     }
 
@@ -168,7 +211,6 @@ class FoodFragment : Fragment() {
         val colesterol = item.calcularColesterol()
         val fibra = item.calcularFibra()
 
-        // Inserción en DB: tu ViewModel insert() usa viewModelScope.launch internamente.
         lifecycleScope.launch {
             try {
                 alimentoViewModel.insert(
@@ -189,20 +231,35 @@ class FoodFragment : Fragment() {
                         fibra = fibra
                     )
                 )
+
+                currentIndex += 1
+                // Actualizar progreso
+                encuestaViewModel.updateProgress(encuestaId, currentIndex)
+
+                // Actualizar texto de progreso
+                binding.progresoText.text = "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
+
+                if (currentIndex >= FoodCatalog.ALL.size) {
+                    // Encuesta completada
+                    encuestaViewModel.markCompleted(encuestaId, currentIndex)
+                    Toast.makeText(
+                        context,
+                        "¡Encuesta completada! Has registrado todos los alimentos.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    findNavController().popBackStack()
+                    return@launch
+                } else {
+                    // Continuar con siguiente alimento
+                    setFoodAtIndex(currentIndex)
+                    binding.frecuenciaGroup.clearCheck()
+                    // Mantener el foco en el siguiente alimento
+                    binding.vecesInput.requestFocus()
+                }
             } catch (e: Exception) {
                 Log.e("FoodFragment", "Error insertando alimento: ${e.message}")
+                Toast.makeText(context, "Error al guardar el alimento", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        // avanzar
-        currentIndex += 1
-        if (currentIndex < FoodCatalog.ALL.size) {
-            setFoodAtIndex(currentIndex)
-            binding.frecuenciaGroup.clearCheck()
-        } else {
-            Toast.makeText(context, "Encuesta finalizada: todos los alimentos cargados", Toast.LENGTH_LONG).show()
-            // aquí decides a dónde volver; por ahora volvemos al welcome/login
-            findNavController().navigate(R.id.welcomeLogin)
         }
     }
 }

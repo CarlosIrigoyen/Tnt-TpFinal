@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragmentRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- TÍTULO -->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Encuestas"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- BOTONES SUPERIORES -->
+    <LinearLayout
+        android:id="@+id/navButtonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/titleText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btnMapa"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="Mapa" />
+
+        <Button
+            android:id="@+id/btnEstadisticas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="Estadísticas" />
+    </LinearLayout>
+
+    <!-- LISTADO DE ENCUESTAS -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerEncuestas"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="96dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_encuesta"
+        app:layout_constraintTop_toBottomOf="@id/navButtonsLayout"
+        app:layout_constraintBottom_toTopOf="@id/btnNuevaEncuesta"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- TEXTO CUANDO NO HAY ENCUESTAS -->
+    <TextView
+        android:id="@+id/textEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="No hay encuestas cargadas"
+        android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/navButtonsLayout"
+        app:layout_constraintBottom_toTopOf="@id/btnNuevaEncuesta"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- BOTÓN INFERIOR -->
+    <Button
+        android:id="@+id/btnNuevaEncuesta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="Iniciar nueva encuesta"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,43 +7,31 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Database(
     entities = [Alimento::class, Encuesta::class],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
-
-
-abstract class AppDatabase: RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
+    // Esto DEBE devolver EncuestaDAO (la interfaz)
     abstract fun encuestaDAO(): EncuestaDAO
+
+    // Esto DEBE devolver AlimentoDAO (la interfaz)
     abstract fun alimentoDAO(): AlimentoDAO
 
-    private class DatabaseCallback(
-        private val scope: CoroutineScope
-    ) : RoomDatabase.Callback() {
-
-        override fun onCreate(db: SupportSQLiteDatabase) {
-            super.onCreate(db)
-            INSTANCE?.let { database ->
-                scope.launch {
-                    val alimentoDAO = database.alimentoDAO()
-                    alimentoDAO.borrarTodos()
-                    val encuestaDAO = database.encuestaDAO()
-                    encuestaDAO.borrarTodos()
-                }
-            }
-        }
-    }
-
     companion object {
-
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-
-
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE encuestas ADD COLUMN user_uid TEXT DEFAULT ''")
+                database.execSQL("ALTER TABLE encuestas ADD COLUMN current_index INTEGER DEFAULT 0")
+                database.execSQL("ALTER TABLE encuestas ADD COLUMN activa INTEGER DEFAULT 1")
+                database.execSQL("ALTER TABLE encuestas ADD COLUMN updated_at INTEGER")
+            }
+        }
 
         fun getDatabase(context: Context, scope: CoroutineScope): AppDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -52,19 +40,11 @@ abstract class AppDatabase: RoomDatabase() {
                     AppDatabase::class.java,
                     "app_database"
                 )
-                    .addCallback(AppDatabase.DatabaseCallback(scope))
-                    .build();
+                    .addMigrations(MIGRATION_1_2)
+                    .build()
                 INSTANCE = instance
                 instance
             }
         }
-
-
-
-
-
     }
-
-
-
 }

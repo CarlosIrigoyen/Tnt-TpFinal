@@ -7,12 +7,12 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface  AlimentoDAO {
+interface AlimentoDAO {
     @Query("SELECT * from alimentos ORDER BY alimentoid ASC")
     fun getAlimentos(): Flow<List<Alimento>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertar(alimento:Alimento)
+    suspend fun insertar(alimento: Alimento)
 
     @Query("DELETE FROM alimentos")
     suspend fun borrarTodos()
@@ -20,5 +20,6 @@ interface  AlimentoDAO {
     @Query("SELECT * FROM alimentos WHERE encuesta = :encuestaId")
     suspend fun obtenerAlimentosPorEncuesta(encuestaId: Int): List<Alimento>
 
-
+    @Query("DELETE FROM alimentos WHERE encuesta = :encuestaId")
+    suspend fun borrarPorEncuesta(encuestaId: Int)
 }

@@ -10,23 +10,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.snackbar.Snackbar
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavHost
 import androidx.navigation.fragment.findNavController
 
 class LoginFragment : Fragment() {
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflar el diseño para este fragmento
         val rootView = inflater.inflate(R.layout.fragment_login, container, false)
-
-        // Configurar los bordes del sistema
         enableEdgeToEdge(rootView)
 
-        // Encontrar y configurar el botón de ingreso
         val ingresarDatos = rootView.findViewById<Button>(R.id.ingresarid)
         ingresarDatos.setOnClickListener {
             val editusuario = rootView.findViewById<EditText>(R.id.usuariotext)
@@ -34,8 +28,8 @@ class LoginFragment : Fragment() {
             val usuario = editusuario.text.toString()
             val password = editpassword.text.toString()
             if (usuario == "admin" && password == "tnt2024") {
-
-                findNavController().navigate(R.id.action_loginFragment_to_welcomeLogin)
+                // Navegar al listado de encuestas (nuevo)
+                findNavController().navigate(R.id.action_loginFragment_to_encuestasListFragment)
             } else {
                 mostrarMensajeError(rootView, "El usuario y/o contraseña no son correctos")
             }

@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.trabajofinal2024.R.id.encuestasListFragment
 
 
 class WelcomeLogin : Fragment() {
@@ -29,7 +30,7 @@ class WelcomeLogin : Fragment() {
         // Configurar el botón de encuestas
         val encuestas = rootView.findViewById<Button>(R.id.encuestasid)
         encuestas.setOnClickListener {
-            findNavController().navigate(R.id.action_welcomeLogin_to_encuestaFragment)
+            findNavController().navigate(encuestasListFragment)
         }
 
         return rootView

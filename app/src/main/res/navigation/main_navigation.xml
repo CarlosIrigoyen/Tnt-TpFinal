@@ -1,39 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_navigation"
     app:startDestination="@id/loginFragment">
 
+    <!-- LOGIN -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.trabajofinal2024.LoginFragment"
-        tools:layout="@layout/fragment_login" >
-        <action android:id="@+id/action_loginFragment_to_welcomeLogin"
-            app:destination="@id/welcomeLogin"/>
+        tools:layout="@layout/fragment_login">
+
+        <!-- Login SIEMPRE lleva al listado -->
+        <action
+            android:id="@+id/action_loginFragment_to_encuestasListFragment"
+            app:destination="@id/encuestasListFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 
+    <!-- LISTADO DE ENCUESTAS (HUB) -->
     <fragment
-        android:id="@+id/welcomeLogin"
-        android:name="com.example.trabajofinal2024.WelcomeLogin"
-        tools:layout="@layout/fragment_welcome_login">
-        <action android:id="@+id/action_welcomeLogin_to_encuestaFragment"
-            app:destination="@id/encuestaFragment"/>
+        android:id="@+id/encuestasListFragment"
+        android:name="com.example.trabajofinal2024.EncuestasListFragment"
+        tools:layout="@layout/fragment_encuestas_list">
+
+        <!-- Iniciar nueva encuesta -->
+        <action
+            android:id="@+id/action_encuestasList_to_encuestaFragment"
+            app:destination="@id/encuestaFragment" />
+
+        <!-- Reanudar encuesta -->
+        <action
+            android:id="@+id/action_encuestasList_to_foodFragment"
+            app:destination="@id/foodFragment" />
+
+        <!-- Navegar a Mapa -->
+        <action
+            android:id="@+id/action_encuestasList_to_mapFragment"
+            app:destination="@id/mapFragment" />
+
+        <!-- Navegar a Estadísticas -->
+        <action
+            android:id="@+id/action_encuestasList_to_statsFragment"
+            app:destination="@id/statsFragment" />
+
     </fragment>
 
+    <!-- DATOS INICIALES DE ENCUESTA -->
     <fragment
         android:id="@+id/encuestaFragment"
         android:name="com.example.trabajofinal2024.EncuestaFragment"
         tools:layout="@layout/fragment_encuesta">
-        <action android:id="@+id/action_encuestaFragment_to_foodFragment"
-            app:destination="@id/foodFragment"/>
+
+        <action
+            android:id="@+id/action_encuestaFragment_to_foodFragment"
+            app:destination="@id/foodFragment" />
     </fragment>
 
+    <!-- CARGA DE ALIMENTOS -->
     <fragment
         android:id="@+id/foodFragment"
         android:name="com.example.trabajofinal2024.FoodFragment"
         tools:layout="@layout/fragment_food">
-        <argument android:name="encuestaid" app:argType="integer" android:defaultValue="0"/>
+
+        <argument
+            android:name="encuestaid"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
+
+    <!-- MAPA -->
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.trabajofinal2024.MapFragment"
+        tools:layout="@layout/fragment_map" />
+
+    <!-- ESTADÍSTICAS -->
+    <fragment
+        android:id="@+id/statsFragment"
+        android:name="com.example.trabajofinal2024.StatsFragment"
+        tools:layout="@layout/fragment_stats" />
 
 </navigation>

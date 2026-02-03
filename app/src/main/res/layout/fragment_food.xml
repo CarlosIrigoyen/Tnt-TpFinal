@@ -9,195 +9,252 @@
             type="com.example.trabajofinal2024.FoodItem" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/frameLayout4"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".FoodFragment">
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/frecuenciaTextId"
-            android:layout_width="118dp"
-            android:layout_height="42dp"
-            android:text="Frecuencia"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.047"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.467" />
-
-        <RadioGroup
-            android:id="@+id/frecuenciaGroup"
-            android:layout_width="119dp"
-            android:layout_height="230dp"
-            android:layout_marginBottom="144dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.052"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/frecuenciaTextId"
-            app:layout_constraintVertical_bias="0.0">
-
-            <RadioButton
-                android:id="@+id/radioDiaria"
-                android:layout_width="108dp"
-                android:layout_height="wrap_content"
-                android:text="Diaria"
-                tools:layout_editor_absoluteX="58dp"
-                tools:layout_editor_absoluteY="404dp" />
-
-            <RadioButton
-                android:id="@+id/radioSemanal"
-                android:layout_width="109dp"
-                android:layout_height="wrap_content"
-                android:text="Semanal"
-                tools:layout_editor_absoluteX="58dp"
-                tools:layout_editor_absoluteY="469dp" />
-
-            <RadioButton
-                android:id="@+id/radioMensual"
-                android:layout_width="109dp"
-                android:layout_height="wrap_content"
-                android:text="Mensual"
-                tools:layout_editor_absoluteX="58dp"
-                tools:layout_editor_absoluteY="532dp" />
-
-            <RadioButton
-                android:id="@+id/radioAnual"
-                android:layout_width="107dp"
-                android:layout_height="32dp"
-                android:text="Anual"
-                tools:layout_editor_absoluteX="58dp"
-                tools:layout_editor_absoluteY="404dp" />
-
-            <RadioButton
-                android:id="@+id/radioNunca"
-                android:layout_width="107dp"
-                android:layout_height="32dp"
-                android:text="Nunca" />
-
-        </RadioGroup>
-
-        <Button
-            android:id="@+id/increment"
-            android:layout_width="61dp"
-            android:layout_height="49dp"
-            android:text="+"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.705"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.328" />
-
-        <Button
-            android:id="@+id/decrement"
-            android:layout_width="61dp"
-            android:layout_height="49dp"
-            android:text="-"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.705"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.4" />
-
-        <TextView
-            android:id="@+id/alimentoNombre"
-            android:layout_width="219dp"
-            android:layout_height="67dp"
-            android:text="@{foodItem.alimentoNombre}"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.52"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.087" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/cantidadInputLayout"
-            android:layout_width="222dp"
-            android:layout_height="31dp"
-            android:hint="Selecciona una opción"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.936"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.235">
-
-            <Spinner
-                android:id="@+id/spinnerOpciones"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/cantidadText"
-            android:layout_width="137dp"
-            android:layout_height="64dp"
-            android:text="Cantidad (en gramos o ml)"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/cantidadInputLayout"
-            app:layout_constraintHorizontal_bias="0.571"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.234" />
-
-        <TextView
-            android:id="@+id/vecesText"
-            android:layout_width="139dp"
-            android:layout_height="31dp"
-            android:text="Número de veces"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.059"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.346" />
-
-        <EditText
-            android:id="@+id/vecesInput"
-            android:layout_width="56dp"
-            android:layout_height="39dp"
-            android:layout_marginTop="44dp"
-            android:inputType="number"
-            android:text="@={foodItem.numeroveces}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cantidadInputLayout" />
-
-        <Button
-            android:id="@+id/cancelarEncuesta"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/frameLayout4"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cancelar encuesta"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.065"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.894" />
+            tools:context=".FoodFragment"
+            android:padding="16dp">
 
-        <Button
-            android:id="@+id/siguienteAlimento"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Siguiente"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.885"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.894" />
+            <!-- Indicador de progreso -->
+            <TextView
+                android:id="@+id/progresoText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Alimento 1 de 35"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:padding="12dp"
+                android:background="@android:color/holo_blue_dark"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Nombre del alimento (ocupando todo el ancho encima de las dos columnas) -->
+            <TextView
+                android:id="@+id/alimentoNombre"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{foodItem.alimentoNombre}"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:ellipsize="none"
+                android:maxLines="2"
+                android:layout_marginBottom="24dp"
+                app:layout_constraintTop_toBottomOf="@id/progresoText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- GUIDELINE vertical para dividir columnas -->
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintGuide_percent="0.42"
+                android:orientation="vertical" />
+
+            <!-- COLUMNA IZQUIERDA: Frecuencia -->
+            <TextView
+                android:id="@+id/frecuenciaTextId"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Frecuencia"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/alimentoNombre"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/guideline"/>
+
+            <RadioGroup
+                android:id="@+id/frecuenciaGroup"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/frecuenciaTextId"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/guideline"
+                app:layout_constraintHorizontal_bias="0">
+
+                <RadioButton
+                    android:id="@+id/radioDiaria"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Diaria"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <RadioButton
+                    android:id="@+id/radioSemanal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Semanal"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <RadioButton
+                    android:id="@+id/radioMensual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mensual"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <RadioButton
+                    android:id="@+id/radioAnual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Anual"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <RadioButton
+                    android:id="@+id/radioNunca"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nunca"
+                    android:textSize="16sp"/>
+            </RadioGroup>
+
+            <!-- COLUMNA DERECHA: Cantidad -->
+            <TextView
+                android:id="@+id/cantidadText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Cantidad"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/alimentoNombre"
+                app:layout_constraintStart_toEndOf="@id/guideline"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:id="@+id/cantidadUnidadText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="(en gramos o ml)"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"
+                app:layout_constraintTop_toBottomOf="@id/cantidadText"
+                app:layout_constraintStart_toStartOf="@id/cantidadText"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <LinearLayout
+                android:id="@+id/cantidadLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/cantidadUnidadText"
+                app:layout_constraintStart_toStartOf="@id/cantidadText"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <Button
+                    android:id="@+id/decrement"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="-"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="8dp"/>
+
+                <Spinner
+                    android:id="@+id/spinnerOpciones"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/increment"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="+"
+                    android:textSize="20sp"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
+
+            <!-- Sección de número de veces -->
+            <TextView
+                android:id="@+id/vecesText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Número de veces:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="32dp"
+                app:layout_constraintTop_toBottomOf="@id/frecuenciaGroup"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/vecesInput"/>
+
+            <EditText
+                android:id="@+id/vecesInput"
+                android:layout_width="80dp"
+                android:layout_height="48dp"
+                android:inputType="number"
+                android:text="@={foodItem.numeroveces}"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_marginStart="16dp"
+                app:layout_constraintTop_toTopOf="@id/vecesText"
+                app:layout_constraintBottom_toBottomOf="@id/vecesText"
+                app:layout_constraintStart_toEndOf="@id/vecesText"/>
+
+            <!-- Botones inferiores -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="48dp"
+                app:layout_constraintTop_toBottomOf="@id/vecesText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:paddingBottom="24dp">
+
+                <Button
+                    android:id="@+id/cancelarEncuesta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Volver"
+                    android:textSize="16sp"
+                    android:padding="12dp"/>
+
+                <Button
+                    android:id="@+id/abandonarEncuesta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Abandonar"
+                    android:textSize="16sp"
+                    android:padding="12dp"/>
+
+                <Button
+                    android:id="@+id/siguienteAlimento"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Siguiente"
+                    android:textSize="16sp"
+                    android:padding="12dp"/>
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </layout>

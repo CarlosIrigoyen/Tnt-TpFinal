@@ -31,32 +31,31 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
                 return@setOnClickListener
             }
 
-            // Evitar doble click
             comenzarButton.isEnabled = false
 
             try {
-                // Insertar encuesta (se actualizará encuestaId en el ViewModel)
-                encuestaViewModel.insert(
-                    Encuesta(
-                        domicilio = domicilio,
-                        ciudad = ciudad
-                    )
+                val currentUserUid = "admin" // FUTURO: FirebaseAuth.getInstance().currentUser?.uid
+
+                val nuevaEncuesta = Encuesta(
+                    domicilio = domicilio,
+                    ciudad = ciudad,
+                    userUid = currentUserUid,
+                    currentIndex = 0,
+                    activa = true,
+                    completa = false,
+                    updatedAt = System.currentTimeMillis()
                 )
+
+                encuestaViewModel.insert(nuevaEncuesta)
 
                 Toast.makeText(context, "Creando encuesta...", Toast.LENGTH_SHORT).show()
 
-                // Observador: una vez que tengamos el id navegamos y removemos observers
                 encuestaViewModel.encuestaId.observe(viewLifecycleOwner) { encuestaid ->
                     if (encuestaid != null && encuestaid > 0) {
-                        // evitamos que se active de nuevo
                         encuestaViewModel.encuestaId.removeObservers(viewLifecycleOwner)
-
                         val bundle = Bundle().apply { putInt("encuestaid", encuestaid) }
-
-                        // Navegar al único FoodFragment (no fragment por alimento)
                         findNavController().navigate(R.id.action_encuestaFragment_to_foodFragment, bundle)
                     } else {
-                        // si id es 0 o nulo - reactivar botón para reintento
                         comenzarButton.isEnabled = true
                         Log.e("EncuestaFragment", "ID de encuesta inválida: $encuestaid")
                     }
@@ -69,7 +68,8 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
         }
 
         volverButton.setOnClickListener {
-            findNavController().navigate(R.id.welcomeLogin)
+            findNavController().navigate(R.id.encuestasListFragment)
+
         }
     }
 }
