@@ -26,6 +26,10 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
         repositorio.update(encuesta)
     }
 
+    fun getEncuestas() =
+        repositorio.getEncuestas().asLiveData()
+
+
     fun getEncuestaById(id: Int) = repositorio.getEncuestaById(id).asLiveData()
 
     fun getEncuestasPorUsuario(uid: String) = repositorio.getEncuestasPorUsuario(uid).asLiveData()

@@ -18,6 +18,8 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO) {
         encuestaDAO.update(encuesta)
     }
 
+    fun getEncuestas() = encuestaDAO.getEncuestas()
+
     fun getEncuestaById(id: Int): Flow<Encuesta> {
         return encuestaDAO.getEncuestaById(id)
     }

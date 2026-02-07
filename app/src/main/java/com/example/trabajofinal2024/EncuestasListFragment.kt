@@ -7,9 +7,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 
 class EncuestasListFragment : Fragment(R.layout.fragment_encuestas_list) {
 
@@ -20,7 +22,8 @@ class EncuestasListFragment : Fragment(R.layout.fragment_encuestas_list) {
     }
 
     private lateinit var adapter: EncuestaAdapter
-    private val currentUserUid = "admin"
+    val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -29,6 +32,7 @@ class EncuestasListFragment : Fragment(R.layout.fragment_encuestas_list) {
         val textEmpty = view.findViewById<TextView>(R.id.textEmpty)
         val btnNuevaEncuesta = view.findViewById<Button>(R.id.btnNuevaEncuesta)
         val btnMapa = view.findViewById<Button>(R.id.btnMapa)
+        val btnCerrarSesion = view.findViewById<Button>(R.id.btnCerrarSesion)
         val btnEstadisticas = view.findViewById<Button>(R.id.btnEstadisticas)
 
         adapter = EncuestaAdapter(
@@ -84,11 +88,29 @@ class EncuestasListFragment : Fragment(R.layout.fragment_encuestas_list) {
             findNavController().navigate(R.id.action_encuestasList_to_statsFragment)
         }
 
+        btnCerrarSesion.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+
+            // 2. Volver al login y limpiar backstack
+            findNavController().navigate(
+                R.id.loginFragment,
+                null,
+                NavOptions.Builder()
+                    .setPopUpTo(R.id.main_navigation, true)
+                    .build())
+        }
+
+
         // BOTÓN NUEVA ENCUESTA
         btnNuevaEncuesta.setOnClickListener {
             findNavController().navigate(
                 R.id.action_encuestasList_to_encuestaFragment
             )
+        }
+
+        if (currentUserUid == null) {
+            findNavController().navigate(R.id.loginFragment)
+            return
         }
 
         // OBSERVAR ENCUESTAS DEL USUARIO

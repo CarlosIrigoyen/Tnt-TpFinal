@@ -18,6 +18,12 @@ data class Encuesta(
     @ColumnInfo(name = "ciudad")
     var ciudad: String = "",
 
+    @ColumnInfo(name= "longitud")
+    var lon: Double = 0.0,
+
+    @ColumnInfo(name = "latitud")
+    var lan: Double = 0.0,
+
     // UID del usuario (soporte para Firebase Auth futuro)
     @ColumnInfo(name = "user_uid")
     var userUid: String = "",

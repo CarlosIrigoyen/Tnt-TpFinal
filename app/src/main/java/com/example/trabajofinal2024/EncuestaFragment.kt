@@ -1,5 +1,7 @@
 package com.example.trabajofinal2024
 
+import android.content.Context
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,8 +11,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseAuth
+import java.util.Locale
 
 class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
+
+    private  val CIUDAD_FIJA = "Trelew"
+    private  val PROVINCIA_FIJA = "Chubut"
+    private  val PAIS_FIJO = "Argentina"
 
     private val encuestaViewModel: EncuestaViewModel by viewModels {
         EncuestaViewModel.EncuestaViewModelFactory((activity?.application as App).encuestaRepositorio)
@@ -24,6 +32,19 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
 
         comenzarButton.setOnClickListener {
             val domicilio = domicilioInput.text.toString().trim()
+            val domicilioCompleto = "$domicilio, $CIUDAD_FIJA, $PROVINCIA_FIJA, $PAIS_FIJO"
+            val coords = geocodificarDireccion(requireContext(), domicilioCompleto)
+            if (coords == null) {
+                Toast.makeText(
+                    requireContext(),
+                    "No se pudo ubicar la dirección",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            val(lan,lon) = coords
+
             val ciudad = ciudadInput.text.toString().trim()
 
             if (domicilio.isBlank() || ciudad.isBlank()) {
@@ -33,12 +54,20 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
 
             comenzarButton.isEnabled = false
 
-            try {
-                val currentUserUid = "admin" // FUTURO: FirebaseAuth.getInstance().currentUser?.uid
+            val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
 
+            if (currentUserUid == null) {
+                findNavController().navigate(R.id.loginFragment)
+                return@setOnClickListener
+            }
+
+
+            try {
                 val nuevaEncuesta = Encuesta(
                     domicilio = domicilio,
                     ciudad = ciudad,
+                    lon = lon,
+                    lan = lan,
                     userUid = currentUserUid,
                     currentIndex = 0,
                     activa = true,
@@ -72,4 +101,25 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
 
         }
     }
+
+    private fun geocodificarDireccion(
+        context: Context,
+        direccion: String
+    ): Pair<Double, Double>? {
+
+        return try {
+            val geocoder = Geocoder(context, Locale.getDefault())
+            val results = geocoder.getFromLocationName(direccion, 1)
+
+            if (!results.isNullOrEmpty()) {
+                val location = results[0]
+                Pair(location.latitude, location.longitude)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 }

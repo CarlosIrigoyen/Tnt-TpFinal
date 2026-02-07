@@ -39,12 +39,15 @@
         <!-- Navegar a Mapa -->
         <action
             android:id="@+id/action_encuestasList_to_mapFragment"
-            app:destination="@id/mapFragment" />
+            app:destination="@id/mapaFragment" />
 
         <!-- Navegar a Estadísticas -->
         <action
             android:id="@+id/action_encuestasList_to_statsFragment"
             app:destination="@id/statsFragment" />
+        <action
+            android:id="@+id/action_encuestasListFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
 
     </fragment>
 
@@ -72,15 +75,20 @@
     </fragment>
 
     <!-- MAPA -->
-    <fragment
-        android:id="@+id/mapFragment"
-        android:name="com.example.trabajofinal2024.MapFragment"
-        tools:layout="@layout/fragment_map" />
 
     <!-- ESTADÍSTICAS -->
     <fragment
         android:id="@+id/statsFragment"
         android:name="com.example.trabajofinal2024.StatsFragment"
         tools:layout="@layout/fragment_stats" />
+    <fragment
+        android:id="@+id/mapaFragment"
+        android:name="com.example.trabajofinal2024.MapaFragment"
+        android:label="fragment_mapa"
+        tools:layout="@layout/fragment_mapa" >
+        <action
+            android:id="@+id/action_mapaFragment_to_encuestasListFragment"
+            app:destination="@id/encuestasListFragment" />
+    </fragment>
 
 </navigation>
