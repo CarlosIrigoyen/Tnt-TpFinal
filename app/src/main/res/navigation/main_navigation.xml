@@ -12,7 +12,6 @@
         android:name="com.example.trabajofinal2024.LoginFragment"
         tools:layout="@layout/fragment_login">
 
-        <!-- Login SIEMPRE lleva al listado -->
         <action
             android:id="@+id/action_loginFragment_to_encuestasListFragment"
             app:destination="@id/encuestasListFragment"
@@ -31,7 +30,7 @@
             android:id="@+id/action_encuestasList_to_encuestaFragment"
             app:destination="@id/encuestaFragment" />
 
-        <!-- Reanudar encuesta -->
+        <!-- Reanudar encuesta -> foodFragment -->
         <action
             android:id="@+id/action_encuestasList_to_foodFragment"
             app:destination="@id/foodFragment" />
@@ -45,10 +44,10 @@
         <action
             android:id="@+id/action_encuestasList_to_statsFragment"
             app:destination="@id/statsFragment" />
+
         <action
             android:id="@+id/action_encuestasListFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
-
     </fragment>
 
     <!-- DATOS INICIALES DE ENCUESTA -->
@@ -75,20 +74,19 @@
     </fragment>
 
     <!-- MAPA -->
-
-    <!-- ESTADÍSTICAS -->
-    <fragment
-        android:id="@+id/statsFragment"
-        android:name="com.example.trabajofinal2024.StatsFragment"
-        tools:layout="@layout/fragment_stats" />
     <fragment
         android:id="@+id/mapaFragment"
         android:name="com.example.trabajofinal2024.MapaFragment"
-        android:label="fragment_mapa"
+        android:label="Mapa"
         tools:layout="@layout/fragment_mapa" >
         <action
             android:id="@+id/action_mapaFragment_to_encuestasListFragment"
             app:destination="@id/encuestasListFragment" />
     </fragment>
 
+    <!-- ESTADÍSTICAS -->
+    <fragment
+        android:id="@+id/statsFragment"
+        android:name="com.example.trabajofinal2024.StatsFragment"
+        tools:layout="@layout/fragment_stats" />
 </navigation>
