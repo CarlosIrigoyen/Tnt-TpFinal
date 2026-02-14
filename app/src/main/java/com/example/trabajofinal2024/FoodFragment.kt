@@ -6,6 +6,7 @@ import android.text.InputFilter
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -91,35 +92,137 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
     override fun onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup?, savedInstanceState: Bundle?): android.view.View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_food, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        setFoodAtIndex(currentIndex)
         return binding.root
     }
 
     private fun setFoodAtIndex(index: Int) {
-        val list = FoodCatalog.ALL
-        if (list.isEmpty()) {
-            Toast.makeText(context, "Catálogo vacío", Toast.LENGTH_LONG).show()
-            return
+        val template = FoodCatalog.ALL[index]
+
+        lifecycleScope.launch {
+            val alimentoGuardado = alimentoViewModel.getAlimento(encuestaId, template.nombre)
+
+            val item = if (alimentoGuardado != null) {
+                FoodItem(template).apply {
+                    numeroveces.value = alimentoGuardado.numero_veces
+                    cantidad.value = alimentoGuardado.cantidad_alimento
+                    frecuencia.value = alimentoGuardado.frecuencia_veces
+                }.also {
+                    // ⚡ Restaurar UI solo si hay valores guardados
+                    foodItem = it
+                    binding.foodItem = foodItem
+                    restaurarUI()
+                }
+            } else {
+                foodItem = FoodItem(template)
+                binding.foodItem = foodItem
+            }
+
+            actualizarBotones()
         }
-        val safeIndex = index.coerceIn(0, list.size - 1)
-        val template = list[safeIndex]
-        foodItem = FoodItem(template)
-        binding.foodItem = foodItem
+    }
 
+
+
+    private fun restaurarUI() {
+        // Restaurar frecuencia
+        when (foodItem?.frecuencia?.value) {
+            "Diaria" -> binding.radioDiaria.isChecked = true
+            "Semanal" -> binding.radioSemanal.isChecked = true
+            "Mensual" -> binding.radioMensual.isChecked = true
+            "Anual" -> binding.radioAnual.isChecked = true
+            "Nunca" -> binding.radioNunca.isChecked = true
+        }
+
+        // Restaurar cantidad del Spinner
+        val cantidadBD = foodItem?.cantidad?.value ?: cantidadOpciones[0]
+        val cantidadNormalizada = cantidadBD.trim().removeSuffix(".0")
+        foodItem?.cantidad?.value = cantidadNormalizada
+
+        val pos = cantidadOpciones.indexOf(cantidadNormalizada).coerceAtLeast(0)
+        // ⚡ Solo setSelection, no reconfigurar listener
+        binding.spinnerOpciones.setSelection(pos, false)
+
+        // Restaurar número de veces
         binding.vecesInput.setText(foodItem?.numeroveces?.value ?: "1")
+    }
 
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, cantidadOpciones)
+    private fun actualizarBotones() {
+
+        binding.anteriorAlimento.isEnabled = currentIndex > 0
+        binding.anteriorAlimento.alpha =
+            if (currentIndex > 0) 1f else 0.3f
+
+        binding.cancelarEncuesta.visibility =
+            if (currentIndex > 0) View.VISIBLE else View.GONE
+    }
+
+    private fun construirAlimentoDesdeUI(): Alimento? {
+        val currentFood = foodItem ?: return null
+
+        val cantidadSeleccionada = currentFood.cantidad.value ?: cantidadOpciones[0]
+        val veces = currentFood.numeroveces.value?.toIntOrNull() ?: 1
+        val frecuencia = currentFood.frecuencia.value ?: "Nunca"
+
+        val alimentoBase = Alimento(
+            encuestaId = encuestaId,
+            nombre_alimento = currentFood.alimentoNombre,
+            categoria = currentFood.categoria,
+            cantidad_alimento = cantidadSeleccionada,
+            numero_veces = veces.toString(),
+            frecuencia_veces = frecuencia,
+            gramos = currentFood.template.gramosPorUnidad,
+            kcal = currentFood.template.kcalPorUnidad,
+            carbohidratos = currentFood.template.carbohidratosPorUnidad,
+            proteinas = currentFood.template.proteinasPorUnidad,
+            grasas = currentFood.template.grasasPorUnidad,
+            alcohol = currentFood.template.alcoholPorUnidad,
+            colesterol = currentFood.template.colesterolPorUnidad,
+            fibra = currentFood.template.fibraPorUnidad
+        )
+
+        // Luego calculas valores nutricionales
+        val alimentoCalculado = alimentoViewModel.calcularValoresNutricionalesCompletos(
+            alimentoBase,
+            cantidadSeleccionada.toDoubleOrNull() ?: 0.0,
+            veces,
+            when (frecuencia) {
+                "Diaria" -> R.id.radioDiaria
+                "Semanal" -> R.id.radioSemanal
+                "Mensual" -> R.id.radioMensual
+                "Anual" -> R.id.radioAnual
+                else -> R.id.radioNunca
+            }
+        )
+
+        alimentoCalculado.frecuencia_veces = frecuencia
+        alimentoCalculado.numero_veces = veces.toString()
+
+        return alimentoCalculado
+    }
+
+
+    private fun configurarSpinner() {
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            cantidadOpciones
+        )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerOpciones.adapter = adapter
 
-        val cantidadGuardada = foodItem?.cantidad?.value
-        val posicion = if (cantidadGuardada != null) {
-            cantidadOpciones.indexOf(cantidadGuardada).coerceAtLeast(0)
-        } else {
-            1
-        }
-        binding.spinnerOpciones.setSelection(posicion)
+        binding.spinnerOpciones.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?, view: View?, position: Int, id: Long
+                ) {
+                    foodItem?.cantidad?.value = cantidadOpciones[position]
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
     }
+
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -129,12 +232,14 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
 
         configurarNumeroVeces()
         configurarSpinner()
-
+        setFoodAtIndex(currentIndex)
         binding.increment.setOnClickListener {
             val current = binding.spinnerOpciones.selectedItemPosition
             val next = (current + 1).coerceAtMost(cantidadOpciones.size - 1)
             binding.spinnerOpciones.setSelection(next)
         }
+
+
 
         binding.decrement.setOnClickListener {
             val current = binding.spinnerOpciones.selectedItemPosition
@@ -154,7 +259,65 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
             foodItem?.frecuencia?.value = f
         }
 
-        binding.siguienteAlimento.setOnClickListener { saveCurrentAlimentoAndAdvance() }
+
+        binding.anteriorAlimento.setOnClickListener {
+
+            if (currentIndex > 0) {
+
+                lifecycleScope.launch {
+
+                    val alimento = construirAlimentoDesdeUI()
+                    Log.d("Alimento", alimento?.encuestaId.toString())
+                    if (alimento != null) {
+                        guardarAlimento(alimento) // update si existe, insert si no
+                    }
+
+                    currentIndex--
+
+                    encuestaViewModel.updateProgress(encuestaId, currentIndex)
+
+                    binding.progresoText.text =
+                        "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
+
+                    setFoodAtIndex(currentIndex)
+                }
+            }
+        }
+
+        binding.siguienteAlimento.setOnClickListener {
+
+            lifecycleScope.launch {
+
+                val alimento = construirAlimentoDesdeUI() ?: return@launch
+
+                guardarAlimento(alimento)
+
+                currentIndex++
+
+                encuestaViewModel.updateProgress(encuestaId, currentIndex)
+
+                if (currentIndex >= FoodCatalog.ALL.size) {
+
+                    encuestaViewModel.markCompleted(encuestaId, currentIndex)
+
+                    Toast.makeText(
+                        requireContext(),
+                        "¡Encuesta completada!",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    findNavController().popBackStack()
+
+                } else {
+
+                    binding.progresoText.text =
+                        "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
+
+                    setFoodAtIndex(currentIndex)
+
+                }
+            }
+        }
 
         binding.cancelarEncuesta.setOnClickListener {
             // Solo regresa sin abandonar
@@ -189,77 +352,23 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
         })
     }
 
-    private fun configurarSpinner() {
-        binding.spinnerOpciones.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
-                val valor = parent?.getItemAtPosition(position)?.toString() ?: "100"
-                foodItem?.cantidad?.value = valor
-            }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+
+    private suspend fun guardarAlimento(alimento: Alimento) {
+
+        val existente =
+            alimentoViewModel.getAlimento(encuestaId, alimento.nombre_alimento)
+
+        if (existente != null) {
+            alimento.alimentoid = existente.alimentoid
+            alimentoViewModel.update(alimento)
+        } else {
+            alimentoViewModel.insert(alimento)
         }
     }
 
-    private fun saveCurrentAlimentoAndAdvance() {
-        val item = foodItem ?: return
 
-        val gramos = item.calcularGramosTotales()
-        val kcal = item.calcularKcal()
-        val carbo = item.calcularCarbohidratos()
-        val prote = item.calcularProteinas()
-        val grasas = item.calcularGrasasTotales()
-        val alcohol = item.calcularAlcohol()
-        val colesterol = item.calcularColesterol()
-        val fibra = item.calcularFibra()
 
-        lifecycleScope.launch {
-            try {
-                alimentoViewModel.insert(
-                    Alimento(
-                        encuestaId = encuestaId,
-                        nombre_alimento = item.alimentoNombre,
-                        categoria = item.categoria,
-                        cantidad_alimento = item.cantidad.value ?: "100",
-                        numero_veces = item.numeroveces.value ?: "1",
-                        frecuencia_veces = item.frecuencia.value ?: "",
-                        gramos = gramos,
-                        kcal = kcal,
-                        carbohidratos = carbo,
-                        proteinas = prote,
-                        grasas = grasas,
-                        alcohol = alcohol,
-                        colesterol = colesterol,
-                        fibra = fibra
-                    )
-                )
 
-                currentIndex += 1
-                // Actualizar progreso
-                encuestaViewModel.updateProgress(encuestaId, currentIndex)
 
-                // Actualizar texto de progreso
-                binding.progresoText.text = "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
 
-                if (currentIndex >= FoodCatalog.ALL.size) {
-                    // Encuesta completada
-                    encuestaViewModel.markCompleted(encuestaId, currentIndex)
-                    Toast.makeText(
-                        context,
-                        "¡Encuesta completada! Has registrado todos los alimentos.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    findNavController().popBackStack()
-                    return@launch
-                } else {
-                    // Continuar con siguiente alimento
-                    setFoodAtIndex(currentIndex)
-                    binding.frecuenciaGroup.clearCheck()
-                    // Mantener el foco en el siguiente alimento
-                    binding.vecesInput.requestFocus()
-                }
-            } catch (e: Exception) {
-                Log.e("FoodFragment", "Error insertando alimento: ${e.message}")
-                Toast.makeText(context, "Error al guardar el alimento", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 }

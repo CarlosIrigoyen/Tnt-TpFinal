@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,11 +16,18 @@ interface AlimentoDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertar(alimento: Alimento)
 
+
     @Query("DELETE FROM alimentos")
     suspend fun borrarTodos()
 
+    @Query("SELECT * FROM alimentos WHERE encuesta = :encuestaId AND alimento = :nombre LIMIT 1")
+    suspend fun getAlimento(encuestaId: Int, nombre: String): Alimento?
+
     @Query("SELECT * FROM alimentos WHERE encuesta = :encuestaId")
     suspend fun obtenerAlimentosPorEncuesta(encuestaId: Int): List<Alimento>
+
+    @Update
+    suspend fun update(alimento: Alimento)
 
     @Query("DELETE FROM alimentos WHERE encuesta = :encuestaId")
     suspend fun borrarPorEncuesta(encuestaId: Int)
