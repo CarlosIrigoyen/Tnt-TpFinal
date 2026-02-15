@@ -1,5 +1,7 @@
 package com.example.trabajofinal2024
 
+import androidx.lifecycle.LiveData
+import com.example.trabajofinal2024.AlimentoDAO.DailySurveyStats
 import kotlinx.coroutines.flow.Flow
 
 class RepositorioAlimentos(private val alimentoDAO: AlimentoDAO) {
@@ -31,4 +33,7 @@ class RepositorioAlimentos(private val alimentoDAO: AlimentoDAO) {
 
     // Nuevo: expone la query de estadísticas
     fun getStatsAveragesForUser(uid: String) = alimentoDAO.getAveragesPerCompletedEncuestaByUser(uid)
+
+    fun getDailyTotalsByUser(uid: String) = alimentoDAO.getDailyTotalsByUser(uid)
+
 }

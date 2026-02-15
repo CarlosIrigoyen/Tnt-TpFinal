@@ -12,6 +12,7 @@ class StatsViewModel(private val repositorioAlimentos: RepositorioAlimentos) : V
      */
     fun getAveragesForUser(uid: String) = repositorioAlimentos.getStatsAveragesForUser(uid).asLiveData()
 
+    fun getDailyTotals(uid: String) = repositorioAlimentos.getDailyTotalsByUser(uid)
     class Factory(private val repositorioAlimentos: RepositorioAlimentos) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(StatsViewModel::class.java)) {

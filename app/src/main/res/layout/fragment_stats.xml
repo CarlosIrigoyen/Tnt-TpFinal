@@ -94,14 +94,130 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <TextView
+        android:id="@+id/tvAvgGrasas"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Grasas totales promedio: —"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvAvgFibra"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvAvgAlcohol"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Alcohol promedio: —"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvAvgGrasas"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvAvgGramos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Gramos promedio: —"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvAvgAlcohol"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupNutrientes"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:layout_constraintTop_toBottomOf="@id/tvAvgGramos"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipProteinas"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Proteínas"
+            android:checked="true"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipCarbs"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Carbohidratos"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFibra"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fibra"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipKcal"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kcal"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipColesterol"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Colesterol"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipGrasas"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Grasas totales"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipGramosTotales"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gramos totales"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAlcohol"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alcohol"/>
+
+    </com.google.android.material.chip.ChipGroup>
+
+
+    <com.github.mikephil.charting.charts.ScatterChart
+        android:id="@+id/scatterChartProteinas"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/chipGroupNutrientes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <Button
         android:id="@+id/backButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Volver"
         android:layout_marginTop="24dp"
-        app:layout_constraintTop_toBottomOf="@id/tvAvgFibra"
+        app:layout_constraintTop_toBottomOf="@id/scatterChartProteinas"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

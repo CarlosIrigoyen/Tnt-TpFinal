@@ -159,4 +159,12 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+    //MPAndroidChart
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    //ChipGroup
+    implementation("com.google.android.material:material:1.11.0")
+
+
 }
