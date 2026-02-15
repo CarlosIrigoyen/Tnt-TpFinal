@@ -9,13 +9,13 @@
     android:fitsSystemWindows="true"
     tools:context=".MapaFragment">
 
-    <!-- ================= MAPA ================= -->
+    <!-- MAPA (OSMDroid) -->
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- ================= BOTÓN VOLVER ================= -->
+    <!-- BOTÓN VOLVER (esquina superior izquierda) -->
     <ImageButton
         android:id="@+id/btnVolver"
         android:layout_width="56dp"
@@ -28,9 +28,9 @@
         android:src="@android:drawable/ic_media_previous"
         android:contentDescription="@string/volver"
         app:tint="@android:color/white"
-        android:elevation="6dp" />
+        android:elevation="8dp" />
 
-    <!-- ================= LEYENDA ================= -->
+    <!-- LEYENDA (esquina superior derecha) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardLeyenda"
         android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
         android:layout_gravity="top|end"
         app:cardCornerRadius="14dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="#CCFFFFFF">
+        app:cardBackgroundColor="#E6FFFFFF">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -47,7 +47,6 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <!-- Título -->
             <TextView
                 android:id="@+id/tvLeyendaTitulo"
                 android:layout_width="wrap_content"
@@ -60,72 +59,83 @@
 
             <!-- COMPLETADAS -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
                 <View
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
                     android:layout_marginEnd="8dp"
                     android:background="#4CAF50" />
 
                 <TextView
-                    android:id="@+id/tvCompletadasLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Completadas:"
+                    android:layout_weight="1"
+                    android:text="Completadas"
                     android:textSize="14sp"
                     android:textColor="@android:color/black"/>
 
-                <!-- valor dinámico -->
                 <TextView
                     android:id="@+id/tvCompletadasValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    android:textSize="14sp"
+                    android:text="-"
                     android:textStyle="bold"
-                    android:layout_marginStart="8dp"
+                    android:textSize="14sp"
                     android:textColor="@android:color/black"/>
             </LinearLayout>
 
             <!-- PAUSADAS -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
                 <View
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
                     android:layout_marginEnd="8dp"
                     android:background="#FF5722" />
 
                 <TextView
-                    android:id="@+id/tvPausadasLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Pausadas:"
+                    android:layout_weight="1"
+                    android:text="Pausadas"
                     android:textSize="14sp"
                     android:textColor="@android:color/black"/>
 
-                <!-- valor dinámico -->
                 <TextView
                     android:id="@+id/tvPausadasValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    android:textSize="14sp"
+                    android:text="-"
                     android:textStyle="bold"
-                    android:layout_marginStart="8dp"
+                    android:textSize="14sp"
                     android:textColor="@android:color/black"/>
             </LinearLayout>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <!-- (Opcional) botón centrar - descomentá si lo necesitás -->
+    <!--
+    <ImageButton
+        android:id="@+id/btnRecentrar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom|end"
+        android:background="@drawable/bg_circle"
+        android:padding="10dp"
+        android:src="@drawable/ic_my_location"
+        android:contentDescription="@string/recentrar"
+        app:tint="@android:color/white"/>
+    -->
 
 </FrameLayout>
