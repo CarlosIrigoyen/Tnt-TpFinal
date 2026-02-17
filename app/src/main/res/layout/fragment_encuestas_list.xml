@@ -61,29 +61,13 @@
             android:text="Estadísticas" />
     </LinearLayout>
 
-    <!-- LISTADO DE ENCUESTAS -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerEncuestas"
+    <!-- LISTADO DE ENCUESTAS -> ahora ComposeView -->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeList"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:paddingBottom="96dp"
-        android:clipToPadding="false"
-        tools:listitem="@layout/item_encuesta"
-        app:layout_constraintTop_toBottomOf="@id/navButtonsLayout"
-        app:layout_constraintBottom_toTopOf="@id/btnNuevaEncuesta"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- TEXTO CUANDO NO HAY ENCUESTAS -->
-    <TextView
-        android:id="@+id/textEmpty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="No hay encuestas cargadas"
-        android:textSize="18sp"
-        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/navButtonsLayout"
         app:layout_constraintBottom_toTopOf="@id/btnNuevaEncuesta"
         app:layout_constraintStart_toStartOf="parent"

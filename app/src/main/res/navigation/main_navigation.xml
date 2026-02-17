@@ -19,11 +19,11 @@
             app:popUpToInclusive="true"/>
     </fragment>
 
-    <!-- LISTADO DE ENCUESTAS (AHORA EN COMPOSE) -->
+    <!-- LISTADO DE ENCUESTAS (HUB) -->
     <fragment
         android:id="@+id/encuestasListFragment"
-        android:name="com.example.trabajofinal2024.EncuestasListComposeFragment"
-        tools:layout="@layout/fragment_placeholder_compose">
+        android:name="com.example.trabajofinal2024.EncuestasListFragment"
+        tools:layout="@layout/fragment_encuestas_list">
 
         <!-- Iniciar nueva encuesta -->
         <action
@@ -45,7 +45,6 @@
             android:id="@+id/action_encuestasList_to_statsFragment"
             app:destination="@id/statsFragment" />
 
-        <!-- Volver al login (cerrar sesión) -->
         <action
             android:id="@+id/action_encuestasListFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
