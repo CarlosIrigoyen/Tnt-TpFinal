@@ -9,6 +9,9 @@ data class Encuesta(
     @PrimaryKey(autoGenerate = true)
     var encuestaId: Int = 0,
 
+    @ColumnInfo(name = "firestore_id")
+    var firestoreId: String? = null,
+
     @ColumnInfo(name = "completada")
     var completa: Boolean = false,
 

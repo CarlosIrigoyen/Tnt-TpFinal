@@ -10,8 +10,12 @@ class App: Application() {
 
     //Encuestas
     val encuestaDatabase by lazy { AppDatabase.getDatabase(this, applicationScope)}
-    val encuestaRepositorio by lazy { RepositorioEncuestas(encuestaDatabase.encuestaDAO())}
-
+    val encuestaRepositorio by lazy {
+        RepositorioEncuestas(
+            encuestaDatabase.encuestaDAO(),
+            alimentoDatabase.alimentoDAO(),
+        )
+    }
     //Alimentos
 
     val alimentoDatabase by lazy { AppDatabase.getDatabase(this, applicationScope)}

@@ -11,6 +11,9 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 
 class EncuestasListFragment : Fragment(R.layout.fragment_encuestas_list) {
@@ -20,6 +23,8 @@ class EncuestasListFragment : Fragment(R.layout.fragment_encuestas_list) {
             (requireActivity().application as App).encuestaRepositorio
         )
     }
+
+    private lateinit var googleSignInClient: GoogleSignInClient
 
     private lateinit var adapter: EncuestaAdapter
     val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
@@ -34,6 +39,13 @@ class EncuestasListFragment : Fragment(R.layout.fragment_encuestas_list) {
         val btnMapa = view.findViewById<Button>(R.id.btnMapa)
         val btnCerrarSesion = view.findViewById<Button>(R.id.btnCerrarSesion)
         val btnEstadisticas = view.findViewById<Button>(R.id.btnEstadisticas)
+
+        val gsi = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(requireContext(), gsi)
 
         adapter = EncuestaAdapter(
             onResumeClick = { encuesta ->
@@ -90,14 +102,14 @@ class EncuestasListFragment : Fragment(R.layout.fragment_encuestas_list) {
 
         btnCerrarSesion.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
-
-            // 2. Volver al login y limpiar backstack
+            googleSignInClient.signOut().addOnCompleteListener {
             findNavController().navigate(
                 R.id.loginFragment,
                 null,
                 NavOptions.Builder()
                     .setPopUpTo(R.id.main_navigation, true)
                     .build())
+            }
         }
 
 

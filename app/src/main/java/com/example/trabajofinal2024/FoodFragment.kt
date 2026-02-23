@@ -180,7 +180,6 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
             fibra = currentFood.template.fibraPorUnidad
         )
 
-        // Luego calculas valores nutricionales
         val alimentoCalculado = alimentoViewModel.calcularValoresNutricionalesCompletos(
             alimentoBase,
             cantidadSeleccionada.toDoubleOrNull() ?: 0.0,

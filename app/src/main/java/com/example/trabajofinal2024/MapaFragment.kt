@@ -96,8 +96,10 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         // dibujar cuadrantes fijos y labels
         drawZones()
 
+        encuestaViewModel.cargarEncuestasCompletasFirebase()
+
         // observar encuestas y plotear marcadores/contadores
-        encuestaViewModel.getEncuestas().observe(viewLifecycleOwner) { encs ->
+        encuestaViewModel.encuestasFirebase.observe(viewLifecycleOwner) { encs ->
             lifecycleScope.launch {
                 plotEncuestasAndCount(encs)
             }
@@ -210,7 +212,7 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
 
     // ---------------- PLOTEAR ENCUESTAS Y CONTAR ----------------
 
-    private suspend fun plotEncuestasAndCount(encuestas: List<Encuesta>) = withContext(Dispatchers.Main) {
+    private suspend fun plotEncuestasAndCount(encuestas: List<EncuestaFirestore>) = withContext(Dispatchers.Main) {
         // resetear contadores y remover marcadores previos
         for (i in 0 until 5) {
             zoneTotals[i] = 0

@@ -149,14 +149,18 @@ dependencies {
 
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+
+    //Cloud Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    //Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
 
     //Mapa
     implementation("org.osmdroid:osmdroid-android:6.1.18")
 
 
-    // Add the dependency for the Firebase Authentication library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
