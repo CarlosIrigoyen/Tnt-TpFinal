@@ -6,6 +6,7 @@ plugins {
     id("com.google.gms.google-services")
 
 
+
 }
 
 
@@ -34,7 +35,13 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        compose = true
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -146,6 +153,20 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Jetpack Compose
+
+    implementation(platform("androidx.compose:compose-bom:2024.02.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material:material")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.compose.foundation:foundation")
+    // Interoperabilidad LiveData <-> Compose
+    implementation("androidx.compose.runtime:runtime-livedata")
+
+
 
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))

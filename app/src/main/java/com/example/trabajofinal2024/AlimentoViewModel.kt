@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-
+//prueba de room
 class AlimentoViewModel(private val repositorio: RepositorioAlimentos): ViewModel() {
 
     val allAlimentos: LiveData<List<Alimento>> = repositorio.allAlimentos.asLiveData()
