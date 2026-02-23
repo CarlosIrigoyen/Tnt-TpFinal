@@ -49,6 +49,12 @@ class EncuestasListFragment : Fragment() {
     ): android.view.View {
         // Usamos ComposeView para renderizar la UI en Compose desde este Fragment.
         return ComposeView(requireContext()).apply {
+            val gsi = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+
+            googleSignInClient = GoogleSignIn.getClient(requireContext(), gsi)
             setContent {
                 MaterialTheme {
                     Surface(modifier = Modifier.fillMaxSize()) {
@@ -71,7 +77,7 @@ class EncuestasListFragment : Fragment() {
                                 onCerrarSesion = {
                                     FirebaseAuth.getInstance().signOut()
                                     // Limpiar backstack y volver al login (igual que antes)
-                                    googleSignInClient.signOut(){
+                                    googleSignInClient.signOut().addOnCompleteListener{
                                     findNavController().navigate(
                                         R.id.loginFragment,
                                         null,
