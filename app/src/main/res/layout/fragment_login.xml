@@ -11,10 +11,10 @@
     <!-- Logo -->
     <ImageButton
         android:id="@+id/tnt"
-        android:layout_width="140dp"
-        android:layout_height="70dp"
+        android:layout_width="210dp"
+        android:layout_height="210dp"
         android:background="@null"
-        app:srcCompat="@drawable/tnt"
+        app:srcCompat="@drawable/alimentos"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/usuarioid"
         app:layout_constraintStart_toStartOf="parent"
