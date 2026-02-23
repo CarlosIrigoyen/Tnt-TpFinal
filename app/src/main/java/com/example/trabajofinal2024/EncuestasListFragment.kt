@@ -71,11 +71,13 @@ class EncuestasListFragment : Fragment() {
                                 onCerrarSesion = {
                                     FirebaseAuth.getInstance().signOut()
                                     // Limpiar backstack y volver al login (igual que antes)
+                                    googleSignInClient.signOut(){
                                     findNavController().navigate(
                                         R.id.loginFragment,
                                         null,
                                         NavOptions.Builder().setPopUpTo(R.id.main_navigation, true).build()
                                     )
+                                    }
                                 },
                                 onResumeEncuesta = { encuesta ->
                                     // navegar a FoodFragment con bundle
