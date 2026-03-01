@@ -113,8 +113,15 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
                     restaurarUI()
                 }
             } else {
-                foodItem = FoodItem(template)
+
+                foodItem = FoodItem(template).apply {
+                    frecuencia.value = "Nunca"
+                }
+                binding.spinnerOpciones.setSelection(0, false)
+                foodItem?.cantidad?.value = cantidadOpciones[0]
                 binding.foodItem = foodItem
+
+                binding.radioNunca.isChecked = true
             }
 
             actualizarBotones()
@@ -159,9 +166,12 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
     private fun construirAlimentoDesdeUI(): Alimento? {
         val currentFood = foodItem ?: return null
 
-        val cantidadSeleccionada = currentFood.cantidad.value ?: cantidadOpciones[0]
+        val cantidadSeleccionada =
+            binding.spinnerOpciones.selectedItem?.toString() ?: cantidadOpciones[0]
         val veces = currentFood.numeroveces.value?.toIntOrNull() ?: 1
-        val frecuencia = currentFood.frecuencia.value ?: "Nunca"
+        val frecuencia = currentFood.frecuencia.value
+            ?.takeIf { it.isNotBlank() }
+            ?: "Nunca"
 
         val alimentoBase = Alimento(
             encuestaId = encuestaId,
@@ -201,6 +211,8 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
 
 
     private fun configurarSpinner() {
+        binding.radioNunca.isChecked = true
+        foodItem?.frecuencia?.value = "Nunca"
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,

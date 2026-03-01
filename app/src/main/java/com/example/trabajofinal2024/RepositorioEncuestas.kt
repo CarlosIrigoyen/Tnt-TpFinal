@@ -114,29 +114,44 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
 
     @WorkerThread
     suspend fun markCompleted(encuestaId: Int, index: Int) {
+
         encuestaDAO.markCompleted(encuestaId, index, System.currentTimeMillis())
 
         val encuesta = encuestaDAO.getEncuestaByIdOnce(encuestaId)
-            ?: return
+            ?: run {
+                Log.e("FIREBASE", "Encuesta no encontrada en Room")
+                return
+            }
 
         val alimentos = alimentoDAO.obtenerAlimentosPorEncuesta(encuestaId)
 
-        subirEncuestaCompletaAFirebase(encuesta, alimentos)
+        try {
+            subirEncuestaCompletaAFirebase(encuesta, alimentos)
+            Log.d("FIREBASE", "Encuesta marcada como completada en Firebase")
+        } catch (e: Exception) {
+            Log.e("FIREBASE", "Error marcando como completada: ${e.message}")
+        }
     }
-
     private suspend fun subirEncuestaCompletaAFirebase(
         encuesta: Encuesta,
         alimentos: List<Alimento>
     ) {
 
+        val firestoreId = encuesta.firestoreId
+
+        if (firestoreId.isNullOrEmpty()) {
+            Log.e("FIREBASE", "No existe firestoreId. No se puede actualizar en Firebase.")
+            return
+        }
+
         val encuestaRef = db.collection("usuarios")
             .document(encuesta.userUid)
             .collection("encuestas")
-            .document(encuesta.firestoreId!!)
+            .document(firestoreId)
 
         encuestaRef.update(
             mapOf(
-                "completa" to true,
+                "completada" to true,
                 "currentIndex" to encuesta.currentIndex,
                 "updatedAt" to System.currentTimeMillis()
             )
@@ -144,25 +159,27 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
 
         val alimentosCollection = encuestaRef.collection("alimentos")
 
-
         alimentos.forEach { alimento ->
-            alimentosCollection.document(alimento.alimentoid.toString()).set(
-                mapOf(
-                    "nombre" to alimento.nombre_alimento,
-                    "categoria" to alimento.categoria,
-                    "cantidad" to alimento.cantidad_alimento,
-                    "numero_veces" to alimento.numero_veces,
-                    "frecuencia" to alimento.frecuencia_veces,
-                    "gramos" to alimento.gramos,
-                    "kcal" to alimento.kcal,
-                    "carbohidratos" to alimento.carbohidratos,
-                    "proteinas" to alimento.proteinas,
-                    "grasas" to alimento.grasas,
-                    "alcohol" to alimento.alcohol,
-                    "colesterol" to alimento.colesterol,
-                    "fibra" to alimento.fibra
+            alimentosCollection
+                .document(alimento.alimentoid.toString())
+                .set(
+                    mapOf(
+                        "nombre" to alimento.nombre_alimento,
+                        "categoria" to alimento.categoria,
+                        "cantidad" to alimento.cantidad_alimento,
+                        "numero_veces" to alimento.numero_veces,
+                        "frecuencia" to alimento.frecuencia_veces,
+                        "gramos" to alimento.gramos,
+                        "kcal" to alimento.kcal,
+                        "carbohidratos" to alimento.carbohidratos,
+                        "proteinas" to alimento.proteinas,
+                        "grasas" to alimento.grasas,
+                        "alcohol" to alimento.alcohol,
+                        "colesterol" to alimento.colesterol,
+                        "fibra" to alimento.fibra
+                    )
                 )
-            ).await()
+                .await()
         }
     }
 
@@ -170,9 +187,14 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
         onResult: (List<EncuestaFirestore>) -> Unit
     ) {
         db.collectionGroup("encuestas")
-            .whereEqualTo("completa", true)
             .get()
             .addOnSuccessListener { result ->
+
+                Log.d("FIREBASE_DEBUG", "Docs encontrados: ${result.size()}")
+
+                result.documents.forEach {
+                    Log.d("FIREBASE_DEBUG", it.data.toString())
+                }
 
                 val lista = result.documents.mapNotNull { doc ->
                     val lat = doc.getDouble("latitud")
