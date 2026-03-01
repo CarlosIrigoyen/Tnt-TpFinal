@@ -2,9 +2,11 @@ package com.example.trabajofinal2024
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -13,7 +15,11 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -125,14 +131,30 @@ private fun EncuestasScreen(
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)
+    ) {val initials = remember { obtenerIniciales() }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Título + botón Cerrar sesión (alineado al final con Row)
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween) {
-            Text(text = "Encuestas", style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold))
-            Button(onClick = onCerrarSesion) {
-                Text(text = "Cerrar Sesión")
-            }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+
+            UserInitialsAvatar(initials)
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                text = "Encuestas",
+                style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
+            )
         }
+
+        Button(onClick = onCerrarSesion) {
+            Text(text = "Cerrar Sesión")
+        }
+    }
         Spacer(modifier = Modifier.height(12.dp))
 
         // Botones: Mapa / Estadísticas
@@ -150,7 +172,9 @@ private fun EncuestasScreen(
         // Lista de encuestas
         if (encuestas.isEmpty()) {
             // Texto cuando no hay encuestas
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+            Box(   modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(text = "No hay encuestas cargadas")
             }
         } else {
@@ -172,6 +196,38 @@ private fun EncuestasScreen(
         Button(onClick = onNuevaEncuesta, modifier = Modifier.fillMaxWidth()) {
             Text(text = "Iniciar nueva encuesta")
         }
+    }
+}
+
+fun obtenerIniciales(): String {
+    val user = FirebaseAuth.getInstance().currentUser
+    val nombre = user?.displayName
+        ?: user?.email
+        ?: "U"
+
+    val partes = nombre.trim().split(" ")
+
+    return if (partes.size >= 2) {
+        "${partes[0].first()}${partes[1].first()}".uppercase()
+    } else {
+        nombre.take(2).uppercase()
+    }
+}
+
+@Composable
+fun UserInitialsAvatar(initials: String) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colors.primary)
+    ) {
+        Text(
+            text = initials,
+            color = Color.White,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
