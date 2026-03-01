@@ -21,11 +21,15 @@ interface AlimentoDAO {
     @Query("DELETE FROM alimentos")
     suspend fun borrarTodos()
 
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(encuestas: List<Encuesta>)
+
     @Query("SELECT * FROM alimentos WHERE encuesta = :encuestaId AND alimento = :nombre LIMIT 1")
-    suspend fun getAlimento(encuestaId: Int, nombre: String): Alimento?
+    suspend fun getAlimento(encuestaId: String, nombre: String): Alimento?
 
     @Query("SELECT * FROM alimentos WHERE encuesta = :encuestaId")
-    suspend fun obtenerAlimentosPorEncuesta(encuestaId: Int): List<Alimento>
+    suspend fun obtenerAlimentosPorEncuesta(encuestaId: String): List<Alimento>
 
     @Update
     suspend fun update(alimento: Alimento)
@@ -62,7 +66,7 @@ interface AlimentoDAO {
                 SUM(alcohol) as enc_alcohol
             FROM alimentos
             WHERE encuesta IN (
-                SELECT encuestaId FROM encuestas WHERE user_uid = :uid AND completada = 1
+                SELECT firestore_id FROM encuestas WHERE user_uid = :uid AND completada = 1
             )
             GROUP BY encuesta
         ) 
@@ -71,7 +75,7 @@ interface AlimentoDAO {
 
 
     data class DailySurveyStats(
-        val encuestaId: Long,
+        val encuestaId: String,
         val total_kcal: Double?,
         val total_proteinas: Double?,
         val total_fibra: Double?,
@@ -95,7 +99,7 @@ SELECT a.encuesta as encuestaId,
     SUM(a.gramos) as total_gramos
 FROM alimentos a
 INNER JOIN encuestas e
-    ON a.encuesta = e.encuestaId
+    ON a.encuesta = e.firestore_id
 WHERE e.user_uid = :uid /*AND e.completada = 1*/
 GROUP BY a.encuesta
 ORDER BY a.encuesta

@@ -18,7 +18,7 @@ class EncuestaAdapter(
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<Encuesta>() {
             override fun areItemsTheSame(oldItem: Encuesta, newItem: Encuesta): Boolean =
-                oldItem.encuestaId == newItem.encuestaId
+                oldItem.firestoreId == newItem.firestoreId
 
             override fun areContentsTheSame(oldItem: Encuesta, newItem: Encuesta): Boolean =
                 oldItem == newItem
@@ -49,7 +49,7 @@ class EncuestaAdapter(
             val progreso = encuesta.currentIndex.coerceAtMost(totalAlimentos)
             val porcentaje = if (totalAlimentos > 0) (progreso * 100 / totalAlimentos) else 0
 
-            tvTitle.text = "Encuesta #${encuesta.encuestaId}"
+            tvTitle.text = "Encuesta #${encuesta.firestoreId}"
             tvSub.text = "${encuesta.domicilio} — ${encuesta.ciudad}"
 
             // Mostrar estado

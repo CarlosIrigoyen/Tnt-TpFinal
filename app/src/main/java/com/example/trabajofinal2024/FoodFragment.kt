@@ -27,12 +27,12 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
         EncuestaViewModel.EncuestaViewModelFactory((activity?.application as App).encuestaRepositorio)
     }
 
-    private var encuestaId: Int = 0
+    private var encuestaId: String = ""
     private var currentIndex: Int = 0
     private var foodItem: FoodItem? = null
     private var encuestaCompletada: Boolean = false
 
-    private val cantidadOpciones = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500")
+    private val cantidadOpciones = arrayOf("50", "100", "150", "200", "250", "500")
 
     companion object {
         private const val STATE_INDEX = "state_current_index"
@@ -41,7 +41,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let { encuestaId = it.getInt(ARG_ENCUESTA_ID, 0) }
+        arguments?.let { encuestaId = it.getString(ARG_ENCUESTA_ID, "") }
         currentIndex = savedInstanceState?.getInt(STATE_INDEX) ?: 0
 
         val total = FoodCatalog.ALL.size
@@ -49,7 +49,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
         if (currentIndex < 0) currentIndex = 0
         if (currentIndex >= total) currentIndex = 0
 
-        if (encuestaId > 0) {
+        if (encuestaId != "") {
             encuestaViewModel.getEncuestaById(encuestaId).observe(this) { encuesta ->
                 encuesta?.let {
                     encuestaCompletada = it.completa
@@ -159,8 +159,13 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
     private fun construirAlimentoDesdeUI(): Alimento? {
         val currentFood = foodItem ?: return null
 
-        val cantidadSeleccionada = currentFood.cantidad.value ?: cantidadOpciones[0]
-        val veces = currentFood.numeroveces.value?.toIntOrNull() ?: 1
+        val cantidadSeleccionadaDouble =
+            binding.spinnerOpciones.selectedItem.toString().toDoubleOrNull() ?: 50.0
+
+        val veces= binding.vecesInput.text.toString().toIntOrNull() ?: 1
+        val cantidadSeleccionada =
+            binding.spinnerOpciones.selectedItem.toString()
+        //val veces = currentFood.numeroveces.value?.toIntOrNull() ?: 1
         val frecuencia = currentFood.frecuencia.value ?: "Nunca"
 
         val alimentoBase = Alimento(
@@ -181,8 +186,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
         )
 
         val alimentoCalculado = alimentoViewModel.calcularValoresNutricionalesCompletos(
-            alimentoBase,
-            cantidadSeleccionada.toDoubleOrNull() ?: 0.0,
+            alimentoBase, cantidadSeleccionadaDouble,
             veces,
             when (frecuencia) {
                 "Diaria" -> R.id.radioDiaria
@@ -324,7 +328,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
         }
 
         binding.abandonarEncuesta.setOnClickListener {
-            if (encuestaId > 0) {
+            if (encuestaId != "") {
                 lifecycleScope.launch {
                     encuestaViewModel.abandonEncuesta(encuestaId)
                     Toast.makeText(

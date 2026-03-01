@@ -1,12 +1,15 @@
 package com.example.trabajofinal2024
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewModel() {
 
@@ -36,26 +39,58 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
         repositorio.getEncuestas().asLiveData()
 
 
-    fun getEncuestaById(id: Int) = repositorio.getEncuestaById(id).asLiveData()
+    fun sincronizarDesdeFirestore(uid: String) {
+        viewModelScope.launch {
+            val result = FirebaseFirestore.getInstance()
+                .collection("usuarios")
+                .document(uid)
+                .collection("encuestas")
+                .get()
+                .await()
+
+            val lista = result.map { doc ->
+                Log.d("SYNC_FIREBASE", "Doc ID: ${doc.id}")
+
+                Encuesta(
+                    firestoreId = doc.id,
+                    domicilio = doc.getString("domicilio") ?: "",
+                    ciudad = doc.getString("ciudad") ?: "",
+                    lon = doc.getDouble("longitud") ?: 0.0,
+                    lan = doc.getDouble("latitud") ?: 0.0,
+                    userUid = uid,
+                    currentIndex = (doc.getLong("currentIndex") ?: 0).toInt(),
+                    activa = doc.getBoolean("activa") ?: true,
+                    completa = doc.getBoolean("completa") ?: false,
+                    updatedAt = doc.getLong("updatedAt") ?: 0L
+                )
+            }
+
+            repositorio.deleteEncuestasPorUsuario(uid)
+
+            repositorio.insertAll(lista)
+        }
+    }
+
+    fun getEncuestaById(id: String) = repositorio.getEncuestaById(id).asLiveData()
 
     fun getEncuestasPorUsuario(uid: String) = repositorio.getEncuestasPorUsuario(uid).asLiveData()
 
     fun getPendientesPorUsuario(uid: String) = repositorio.getPendientesPorUsuario(uid).asLiveData()
 
-    fun updateProgress(encuestaId: Int, index: Int) = viewModelScope.launch {
+    fun updateProgress(encuestaId: String, index: Int) = viewModelScope.launch {
         repositorio.updateProgress(encuestaId, index)
     }
 
-    fun markCompleted(encuestaId: Int, index: Int) = viewModelScope.launch {
+    fun markCompleted(encuestaId: String, index: Int) = viewModelScope.launch {
         repositorio.markCompleted(encuestaId, index)
     }
 
-    fun abandonEncuesta(encuestaId: Int) = viewModelScope.launch {
+    fun abandonEncuesta(encuestaId: String) = viewModelScope.launch {
         repositorio.abandonEncuesta(encuestaId)
     }
 
     // Nueva función para reanudar
-    fun reanudarEncuesta(encuestaId: Int) = viewModelScope.launch {
+    fun reanudarEncuesta(encuestaId: String) = viewModelScope.launch {
         repositorio.reanudarEncuesta(encuestaId)
     }
 

@@ -22,7 +22,7 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
         // 1️⃣ Guardar primero en Room
         val idRoom = encuestaDAO.insertar(encuesta)
 
-        encuesta.encuestaId = idRoom.toInt()
+        encuesta.firestoreId = idRoom.toString()
 
         try {
             // 2️⃣ Subir a Firestore
@@ -74,9 +74,11 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
         encuestaDAO.update(encuesta)
     }
 
+    suspend fun deleteEncuestasPorUsuario(uid: String) = encuestaDAO.deleteEncuestasPorUsuario(uid)
+
     fun getEncuestas() = encuestaDAO.getEncuestas()
 
-    fun getEncuestaById(id: Int): Flow<Encuesta> {
+    fun getEncuestaById(id: String): Flow<Encuesta> {
         return encuestaDAO.getEncuestaById(id)
     }
 
@@ -85,7 +87,7 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
     fun getPendientesPorUsuario(uid: String): Flow<List<Encuesta>> = encuestaDAO.getPendientesPorUsuario(uid)
 
     @WorkerThread
-    suspend fun updateProgress(encuestaId: Int, index: Int) {
+    suspend fun updateProgress(encuestaId: String, index: Int) {
         encuestaDAO.updateProgress(encuestaId, index, System.currentTimeMillis())
         val encuesta = encuestaDAO.getEncuestaByIdOnce(encuestaId)
 
@@ -112,8 +114,11 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
         }
     }
 
+    suspend fun insertAll(encuestas: List<Encuesta>) {
+        encuestaDAO.insertAll(encuestas)
+    }
     @WorkerThread
-    suspend fun markCompleted(encuestaId: Int, index: Int) {
+    suspend fun markCompleted(encuestaId: String, index: Int) {
         encuestaDAO.markCompleted(encuestaId, index, System.currentTimeMillis())
 
         val encuesta = encuestaDAO.getEncuestaByIdOnce(encuestaId)
@@ -197,13 +202,13 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
 
 
     @WorkerThread
-    suspend fun abandonEncuesta(encuestaId: Int) {
+    suspend fun abandonEncuesta(encuestaId: String) {
         encuestaDAO.abandonEncuesta(encuestaId, System.currentTimeMillis())
     }
 
     // Nueva función para reanudar
     @WorkerThread
-    suspend fun reanudarEncuesta(encuestaId: Int) {
+    suspend fun reanudarEncuesta(encuestaId: String) {
         encuestaDAO.reanudarEncuesta(encuestaId, System.currentTimeMillis())
     }
 }

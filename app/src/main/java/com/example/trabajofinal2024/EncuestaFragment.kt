@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Locale
 
 class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
@@ -61,9 +62,13 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
                 return@setOnClickListener
             }
 
+            val db = FirebaseFirestore.getInstance()
+            val docRef = db.collection("encuestas").document()
+
 
             try {
                 val nuevaEncuesta = Encuesta(
+                    firestoreId = docRef.id,
                     domicilio = domicilio,
                     ciudad = ciudad,
                     lon = lon,
@@ -75,20 +80,20 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
                     updatedAt = System.currentTimeMillis()
                 )
 
+                docRef.set(nuevaEncuesta)
+
                 encuestaViewModel.insert(nuevaEncuesta)
 
                 Toast.makeText(context, "Creando encuesta...", Toast.LENGTH_SHORT).show()
 
-                encuestaViewModel.encuestaId.observe(viewLifecycleOwner) { encuestaid ->
-                    if (encuestaid != null && encuestaid > 0) {
-                        encuestaViewModel.encuestaId.removeObservers(viewLifecycleOwner)
-                        val bundle = Bundle().apply { putInt("encuestaid", encuestaid) }
-                        findNavController().navigate(R.id.action_encuestaFragment_to_foodFragment, bundle)
-                    } else {
-                        comenzarButton.isEnabled = true
-                        Log.e("EncuestaFragment", "ID de encuesta inválida: $encuestaid")
-                    }
+                val bundle = Bundle().apply {
+                    putString("encuestaid", nuevaEncuesta.firestoreId)
                 }
+
+                findNavController().navigate(
+                    R.id.action_encuestaFragment_to_foodFragment,
+                    bundle
+                )
             } catch (e: Exception) {
                 Log.e("EncuestaFragment", "Error insertando la encuesta: ${e.message}")
                 Toast.makeText(context, "Error creando encuesta", Toast.LENGTH_SHORT).show()

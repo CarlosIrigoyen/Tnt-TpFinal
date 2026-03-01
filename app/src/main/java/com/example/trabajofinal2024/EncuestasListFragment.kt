@@ -1,10 +1,12 @@
 package com.example.trabajofinal2024
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -13,6 +15,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -42,6 +45,15 @@ class EncuestasListFragment : Fragment() {
     private val currentUserUid: String?
         get() = FirebaseAuth.getInstance().currentUser?.uid
 
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        currentUserUid?.let { uid ->
+            encuestaViewModel.sincronizarDesdeFirestore(uid)
+        }
+    }
+
     override fun onCreateView(
         inflater: android.view.LayoutInflater,
         container: android.view.ViewGroup?,
@@ -55,6 +67,8 @@ class EncuestasListFragment : Fragment() {
                 .build()
 
             googleSignInClient = GoogleSignIn.getClient(requireContext(), gsi)
+
+
             setContent {
                 MaterialTheme {
                     Surface(modifier = Modifier.fillMaxSize()) {
@@ -87,19 +101,19 @@ class EncuestasListFragment : Fragment() {
                                 },
                                 onResumeEncuesta = { encuesta ->
                                     // navegar a FoodFragment con bundle
-                                    val bundle = android.os.Bundle().apply { putInt("encuestaid", encuesta.encuestaId) }
+                                    val bundle = android.os.Bundle().apply { putString("encuestaid", encuesta.firestoreId) }
                                     findNavController().navigate(R.id.action_encuestasList_to_foodFragment, bundle)
                                 },
                                 onReanudar = { encuesta ->
-                                    encuestaViewModel.reanudarEncuesta(encuesta.encuestaId)
-                                    Toast.makeText(requireContext(), "Encuesta #${encuesta.encuestaId} reanudada.", Toast.LENGTH_SHORT).show()
+                                    encuestaViewModel.reanudarEncuesta(encuesta.firestoreId)
+                                    Toast.makeText(requireContext(), "Encuesta #${encuesta.firestoreId} reanudada.", Toast.LENGTH_SHORT).show()
                                     // navegar a FoodFragment
-                                    val bundle = android.os.Bundle().apply { putInt("encuestaid", encuesta.encuestaId) }
+                                    val bundle = android.os.Bundle().apply { putString("encuestaid", encuesta.firestoreId) }
                                     findNavController().navigate(R.id.action_encuestasList_to_foodFragment, bundle)
                                 },
                                 onAbandonar = { encuesta ->
-                                    encuestaViewModel.abandonEncuesta(encuesta.encuestaId)
-                                    Toast.makeText(requireContext(), "Encuesta #${encuesta.encuestaId} abandonada.", Toast.LENGTH_SHORT).show()
+                                    encuestaViewModel.abandonEncuesta(encuesta.firestoreId)
+                                    Toast.makeText(requireContext(), "Encuesta #${encuesta.firestoreId} abandonada.", Toast.LENGTH_SHORT).show()
                                 }
                             )
                         }
@@ -150,13 +164,19 @@ private fun EncuestasScreen(
         // Lista de encuestas
         if (encuestas.isEmpty()) {
             // Texto cuando no hay encuestas
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(text = "No hay encuestas cargadas")
             }
         } else {
             LazyColumn(modifier = Modifier.weight(1f)) {
-                items(encuestas) { encuesta ->
+                itemsIndexed(encuestas) { index, encuesta ->
                     EncuestaItem(
+                        numeroVisual = index + 1,
                         encuesta = encuesta,
                         onResume = { onResumeEncuesta(encuesta) },
                         onReanudar = { onReanudar(encuesta) },
@@ -177,6 +197,7 @@ private fun EncuestasScreen(
 
 @Composable
 private fun EncuestaItem(
+    numeroVisual: Int,
     encuesta: Encuesta,
     onResume: () -> Unit,
     onReanudar: () -> Unit,
@@ -202,7 +223,7 @@ private fun EncuestaItem(
             .padding(12.dp)
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween) {
-                Text(text = "Encuesta #${encuesta.encuestaId}", style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold))
+                Text(text = "Encuesta #$numeroVisual", style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold))
                 val estado = when {
                     encuesta.completa -> "COMPLETADA"
                     !encuesta.activa -> "ABANDONADA"

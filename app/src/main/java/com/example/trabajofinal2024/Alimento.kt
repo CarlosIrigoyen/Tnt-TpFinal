@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 
 @Entity (tableName = "alimentos", foreignKeys = [ForeignKey(
     entity = Encuesta::class,
-    parentColumns = ["encuestaId"],
+    parentColumns = ["firestore_id"],
     childColumns = ["encuesta"],
     onDelete = ForeignKey.CASCADE
 )], indices = [Index(value = ["encuesta"])])
@@ -18,7 +18,7 @@ data class Alimento(
     var alimentoid: Int = 0,
 
     @ColumnInfo (name = "encuesta")
-    var encuestaId: Int,
+    var encuestaId: String,
 
     @ColumnInfo(name = "alimento")
     var nombre_alimento: String,

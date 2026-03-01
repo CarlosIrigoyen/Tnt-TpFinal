@@ -2,7 +2,7 @@ package com.example.trabajofinal2024
 
 object FoodCatalog {
     // Leche y yogur
-    val LECHE_POLVO_ENTERA = FoodTemplate(
+    /*val LECHE_POLVO_ENTERA = FoodTemplate(
         "Leche en polvo entera",
         "Leche y yogur",
         100f,
@@ -14,9 +14,9 @@ object FoodCatalog {
         80.48f,
         0f
     )
-
+*/
     val LECHE_FLUIDA_ENTERA = FoodTemplate(
-        "Leche fluida entera",
+        "Leche",
         "Leche y yogur",
         100f,
         57.92f,
@@ -56,7 +56,7 @@ object FoodCatalog {
     )
 
     val QUESO_PASTA_SEMIDURA_AZUL = FoodTemplate(
-        "Queso de pasta semidura/azul",
+        "Queso azul",
         "Grasas animales",
         100f,
         328.16f,
@@ -83,7 +83,7 @@ object FoodCatalog {
 
     // Carnes y huevos
     val HUEVO_CRUDO_HERVIDO = FoodTemplate(
-        "Huevo de gallina entero crudo-hervido-poché",
+        "Huevo duro",
         "Carnes y huevos",
         100f,
         153.75f,
@@ -96,7 +96,7 @@ object FoodCatalog {
     )
 
     val HUEVO_FRITO = FoodTemplate(
-        "Huevo de gallina entero frito",
+        "Huevo frito",
         "Carnes y huevos",
         100f,
         191.32f,
@@ -109,7 +109,7 @@ object FoodCatalog {
     )
 
     val VACUNA_MAGRA = FoodTemplate(
-        "Vacuna magra",
+        "Carne vacuna magra",
         "Carnes y huevos",
         100f,
         130.6f,
@@ -120,9 +120,9 @@ object FoodCatalog {
         62.31f,
         0f
     )
-
+/*
     val VACUNA_CORTES_GRASOS = FoodTemplate(
-        "Vacuna cortes grasos",
+        "Carne vacuna  grasa",
         "Carnes y huevos",
         100f,
         199.55f,
@@ -133,7 +133,7 @@ object FoodCatalog {
         68.34f,
         0f
     )
-
+*/
     val CARNE_PICADA = FoodTemplate(
         "Carne picada",
         "Carnes y huevos",
@@ -148,7 +148,7 @@ object FoodCatalog {
     )
 
     val POLLO_DESHUESADO_SIN_PIEL = FoodTemplate(
-        "Pollo deshuesado sin piel",
+        "Pollo",
         "Carnes y huevos",
         100f,
         165f,
@@ -174,8 +174,8 @@ object FoodCatalog {
         0f
     )
 
-    val SALAME_SALAMIN_CHORIZO_SECO_LONGANIZA = FoodTemplate(
-        "Salame-salamín-chorizo seco-longaniza",
+    /*val SALAME_SALAMIN_CHORIZO_SECO_LONGANIZA = FoodTemplate(
+        "Salame",
         "Carnes procesadas",
         100f,
         377.45f,
@@ -186,7 +186,7 @@ object FoodCatalog {
         78f,
         0f
     )
-
+*/
     val MORTADELA = FoodTemplate(
         "Mortadela",
         "Carnes procesadas",
@@ -241,7 +241,7 @@ object FoodCatalog {
     )
 
     val EMPANADAS_CARNE = FoodTemplate(
-        "Empanadas de carne",
+        "Empanadas de carne caseras",
         "Platos populares",
         100f,
         214.41f,
@@ -292,7 +292,7 @@ object FoodCatalog {
         0f,
         2.6f
     )
-
+/*
     val DURAZNO = FoodTemplate(
         "Durazno",
         "Frutas",
@@ -305,7 +305,7 @@ object FoodCatalog {
         0f,
         1.5f
     )
-
+*/
     val MANZANA = FoodTemplate(
         "Manzana",
         "Frutas",
@@ -334,7 +334,7 @@ object FoodCatalog {
 
     // Cereales
     val ARROZ_BLANCO_COCIDO = FoodTemplate(
-        "Arroz blanco cocido",
+        "Arroz blanco",
         "Cereales",
         100f,
         130f,
@@ -425,7 +425,7 @@ object FoodCatalog {
         0f,
         0f
     )
-
+/*
     val LICOR = FoodTemplate(
         "Licor",
         "Bebidas alcohólicas",
@@ -451,27 +451,31 @@ object FoodCatalog {
         0f,
         0f
     )
-
+*/
     val ALL = listOf(
         // Leche y yogur
-        LECHE_POLVO_ENTERA, LECHE_FLUIDA_ENTERA, YOGUR,
+        //LECHE_POLVO_ENTERA,
+        LECHE_FLUIDA_ENTERA, YOGUR,
 
         // Grasas animales
         QUESO_PASTA_DURA, QUESO_PASTA_SEMIDURA_AZUL, MANTECA,
 
         // Carnes y huevos
-        HUEVO_CRUDO_HERVIDO, HUEVO_FRITO, VACUNA_MAGRA, VACUNA_CORTES_GRASOS,
+        HUEVO_CRUDO_HERVIDO, HUEVO_FRITO, VACUNA_MAGRA,
         CARNE_PICADA, POLLO_DESHUESADO_SIN_PIEL,
+        //VACUNA_CORTES_GRASOS
 
         // Carnes procesadas
-        SALCHICHAS, SALAME_SALAMIN_CHORIZO_SECO_LONGANIZA, MORTADELA,
+        SALCHICHAS,  MORTADELA,
+        //SALAME_SALAMIN_CHORIZO_SECO_LONGANIZA
 
         // Platos populares
         PAPAS_FRITAS_CASERAS, PIZZA, EMPANADAS_CARNE_FRITAS, EMPANADAS_CARNE,
         PASTEL_DE_PAPAS, PUCHERO,
 
         // Frutas
-        BANANA, DURAZNO, MANZANA, NARANJA,
+        BANANA, MANZANA, NARANJA,
+        // DURAZNO,
 
         // Cereales
         ARROZ_BLANCO_COCIDO, PAN_FRANCES,
@@ -480,7 +484,8 @@ object FoodCatalog {
         AGUAS_SABORIZADAS_CLASICAS, BEBIDAS_DEPORTIVAS_Y_ENERGIZANTES, GASEOSAS_CLASICAS,
 
         // Bebidas alcohólicas
-        VINO, CERVEZA_O_APERITIVOS, LICOR, BEBIDAS_BLANCAS
+        VINO, CERVEZA_O_APERITIVOS,
+        //LICOR, BEBIDAS_BLANCAS
     )
     fun findByName(name: String) = ALL.find { it.nombre.equals(name, ignoreCase = true) }
 }

@@ -16,14 +16,15 @@ class RepositorioAlimentos(private val alimentoDAO: AlimentoDAO) {
         alimentoDAO.borrarTodos()
     }
 
-    suspend fun getAlimento(encuestaId: Int, nombre: String) =
+
+    suspend fun getAlimento(encuestaId: String, nombre: String) =
         alimentoDAO.getAlimento(encuestaId, nombre)
 
     suspend fun update(alimento: Alimento) =
         alimentoDAO.update(alimento)
 
 
-    suspend fun obtenerAlimentosPorEncuesta(encuestaId: Int): List<Alimento> {
+    suspend fun obtenerAlimentosPorEncuesta(encuestaId: String): List<Alimento> {
         return alimentoDAO.obtenerAlimentosPorEncuesta(encuestaId)
     }
 

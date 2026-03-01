@@ -6,11 +6,13 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "encuestas")
 data class Encuesta(
-    @PrimaryKey(autoGenerate = true)
-    var encuestaId: Int = 0,
 
+    //@ColumnInfo(name = "encuestaid")
+    //var encuestaId: Int = 0,
+
+    @PrimaryKey
     @ColumnInfo(name = "firestore_id")
-    var firestoreId: String? = null,
+    var firestoreId: String,
 
     @ColumnInfo(name = "completada")
     var completa: Boolean = false,
