@@ -228,4 +228,9 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
     suspend fun reanudarEncuesta(encuestaId: Int) {
         encuestaDAO.reanudarEncuesta(encuestaId, System.currentTimeMillis())
     }
+    // RepositorioEncuestas.kt (dentro de la clase)
+    @WorkerThread
+    suspend fun obtenerAlimentosPorEncuesta(encuestaId: Int): List<Alimento> {
+        return alimentoDAO.obtenerAlimentosPorEncuesta(encuestaId)
+    }
 }

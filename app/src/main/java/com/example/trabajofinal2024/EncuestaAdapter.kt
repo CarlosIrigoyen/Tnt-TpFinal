@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 class EncuestaAdapter(
     private val onResumeClick: (Encuesta) -> Unit,
     private val onAbandonClick: (Encuesta) -> Unit,
-    private val onReanudarClick: (Encuesta) -> Unit  // Nueva función para reanudar
+    private val onReanudarClick: (Encuesta) -> Unit,
+    private val onViewClick: (Encuesta) -> Unit
 ) : ListAdapter<Encuesta, EncuestaAdapter.EncuestaVH>(DIFF) {
 
     companion object {
@@ -52,7 +53,6 @@ class EncuestaAdapter(
             tvTitle.text = "Encuesta #${encuesta.encuestaId}"
             tvSub.text = "${encuesta.domicilio} — ${encuesta.ciudad}"
 
-            // Mostrar estado
             val estado = when {
                 encuesta.completa -> "COMPLETADA"
                 !encuesta.activa -> "ABANDONADA"
@@ -61,16 +61,13 @@ class EncuestaAdapter(
             tvEstado.text = "Estado: $estado"
             tvProgreso.text = "Progreso: $progreso/$totalAlimentos alimentos ($porcentaje%)"
 
-            // Configurar visibilidad de botones según estado
             if (encuesta.completa) {
-                // Encuesta completada
                 btnReanudar.visibility = View.GONE
                 btnAbandonar.visibility = View.GONE
                 btnVer.visibility = View.VISIBLE
                 btnVer.text = "Ver Detalles"
-                btnVer.setOnClickListener { onResumeClick(encuesta) }
+                btnVer.setOnClickListener { onViewClick(encuesta) }
             } else if (!encuesta.activa) {
-                // Encuesta abandonada
                 btnReanudar.visibility = View.VISIBLE
                 btnReanudar.text = "Reanudar"
                 btnAbandonar.visibility = View.GONE
@@ -78,7 +75,6 @@ class EncuestaAdapter(
 
                 btnReanudar.setOnClickListener { onReanudarClick(encuesta) }
             } else {
-                // Encuesta activa
                 btnReanudar.visibility = View.VISIBLE
                 btnReanudar.text = "Continuar"
                 btnAbandonar.visibility = View.VISIBLE

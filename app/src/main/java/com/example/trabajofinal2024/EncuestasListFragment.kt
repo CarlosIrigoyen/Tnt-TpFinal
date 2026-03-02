@@ -28,8 +28,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -65,13 +63,9 @@ class EncuestasListFragment : Fragment() {
                 MaterialTheme {
                     Surface(modifier = Modifier.fillMaxSize()) {
                         val uid = currentUserUid
-                        // Si no hay usuario logueado: navegar al login (igual que antes)
                         if (uid == null) {
-                            // Navegación fuera del tree de Compose: usamos findNavController()
-                            // Esto ocurre una vez en onCreateView; aseguramos no crash.
                             findNavController().navigate(R.id.loginFragment)
                         } else {
-                            // Observamos las encuestas del usuario como LiveData -> State
                             val encuestas by encuestaViewModel.getEncuestasPorUsuario(uid)
                                 .observeAsState(initial = emptyList())
 
@@ -82,30 +76,32 @@ class EncuestasListFragment : Fragment() {
                                 onNuevaEncuesta = { findNavController().navigate(R.id.action_encuestasList_to_encuestaFragment) },
                                 onCerrarSesion = {
                                     FirebaseAuth.getInstance().signOut()
-                                    // Limpiar backstack y volver al login (igual que antes)
                                     googleSignInClient.signOut().addOnCompleteListener{
-                                    findNavController().navigate(
-                                        R.id.loginFragment,
-                                        null,
-                                        NavOptions.Builder().setPopUpTo(R.id.main_navigation, true).build()
-                                    )
+                                        findNavController().navigate(
+                                            R.id.loginFragment,
+                                            null,
+                                            NavOptions.Builder().setPopUpTo(R.id.main_navigation, true).build()
+                                        )
                                     }
                                 },
                                 onResumeEncuesta = { encuesta ->
-                                    // navegar a FoodFragment con bundle
                                     val bundle = android.os.Bundle().apply { putInt("encuestaid", encuesta.encuestaId) }
                                     findNavController().navigate(R.id.action_encuestasList_to_foodFragment, bundle)
                                 },
                                 onReanudar = { encuesta ->
                                     encuestaViewModel.reanudarEncuesta(encuesta.encuestaId)
                                     Toast.makeText(requireContext(), "Encuesta #${encuesta.encuestaId} reanudada.", Toast.LENGTH_SHORT).show()
-                                    // navegar a FoodFragment
                                     val bundle = android.os.Bundle().apply { putInt("encuestaid", encuesta.encuestaId) }
                                     findNavController().navigate(R.id.action_encuestasList_to_foodFragment, bundle)
                                 },
                                 onAbandonar = { encuesta ->
                                     encuestaViewModel.abandonEncuesta(encuesta.encuestaId)
                                     Toast.makeText(requireContext(), "Encuesta #${encuesta.encuestaId} abandonada.", Toast.LENGTH_SHORT).show()
+                                },
+                                onVerDetalles = { encuesta ->
+                                    val bundle = android.os.Bundle().apply { putInt("encuestaid", encuesta.encuestaId) }
+                                    // Navegamos al fragmento de detalle
+                                    findNavController().navigate(R.id.detalleEncuestaFragment, bundle)
                                 }
                             )
                         }
@@ -125,36 +121,38 @@ private fun EncuestasScreen(
     onCerrarSesion: () -> Unit,
     onResumeEncuesta: (Encuesta) -> Unit,
     onReanudar: (Encuesta) -> Unit,
-    onAbandonar: (Encuesta) -> Unit
+    onAbandonar: (Encuesta) -> Unit,
+    onVerDetalles: (Encuesta) -> Unit
 ) {
     val ctx = LocalContext.current
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)
-    ) {val initials = remember { obtenerIniciales() }
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        val initials = remember { obtenerIniciales() }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
 
-            UserInitialsAvatar(initials)
+            Row(verticalAlignment = Alignment.CenterVertically) {
 
-            Spacer(modifier = Modifier.width(8.dp))
+                UserInitialsAvatar(initials)
 
-            Text(
-                text = "Encuestas",
-                style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
-            )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Encuestas",
+                    style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+
+            Button(onClick = onCerrarSesion) {
+                Text(text = "Cerrar Sesión")
+            }
         }
-
-        Button(onClick = onCerrarSesion) {
-            Text(text = "Cerrar Sesión")
-        }
-    }
         Spacer(modifier = Modifier.height(12.dp))
 
         // Botones: Mapa / Estadísticas
@@ -171,10 +169,9 @@ private fun EncuestasScreen(
 
         // Lista de encuestas
         if (encuestas.isEmpty()) {
-            // Texto cuando no hay encuestas
-            Box(   modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(text = "No hay encuestas cargadas")
             }
         } else {
@@ -184,7 +181,8 @@ private fun EncuestasScreen(
                         encuesta = encuesta,
                         onResume = { onResumeEncuesta(encuesta) },
                         onReanudar = { onReanudar(encuesta) },
-                        onAbandonar = { onAbandonar(encuesta) }
+                        onAbandonar = { onAbandonar(encuesta) },
+                        onVerDetalles = { onVerDetalles(encuesta) }
                     )
                 }
             }
@@ -236,13 +234,12 @@ private fun EncuestaItem(
     encuesta: Encuesta,
     onResume: () -> Unit,
     onReanudar: () -> Unit,
-    onAbandonar: () -> Unit
+    onAbandonar: () -> Unit,
+    onVerDetalles: () -> Unit
 ) {
-    // replicamos la lógica de estado/progreso que ya tenías
     val totalAlimentos = try {
         FoodCatalog.ALL.size
     } catch (t: Throwable) {
-        // si no existe FoodCatalog por alguna razón, evitamos crash
         0
     }
     val progreso = encuesta.currentIndex.coerceAtMost(totalAlimentos)
@@ -272,11 +269,9 @@ private fun EncuestaItem(
             Text(text = "Progreso: $progreso/$totalAlimentos alimentos ($porcentaje%)", style = MaterialTheme.typography.body2)
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Botones de acción con la misma visibilidad/etiquetas que tenías
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly) {
                 if (encuesta.completa) {
-                    // Solo "Ver detalles" (en tu código original vinculaba esto a onResumeClick)
-                    Button(onClick = onResume, modifier = Modifier.weight(1f)) {
+                    Button(onClick = onVerDetalles, modifier = Modifier.weight(1f)) {
                         Text("Ver Detalles")
                     }
                 } else if (!encuesta.activa) {

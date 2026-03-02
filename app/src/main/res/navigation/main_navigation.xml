@@ -89,4 +89,13 @@
         android:id="@+id/statsFragment"
         android:name="com.example.trabajofinal2024.StatsFragment"
         tools:layout="@layout/fragment_stats" />
+    <fragment
+        android:id="@+id/detalleEncuestaFragment"
+        android:name="com.example.trabajofinal2024.DetalleEncuestaFragment"
+        tools:layout="@layout/fragment_detalle_encuesta" >
+        <argument
+            android:name="encuestaid"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
 </navigation>
