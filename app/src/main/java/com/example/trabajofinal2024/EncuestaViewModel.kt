@@ -12,10 +12,12 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
 
     val allEncuestas: LiveData<List<Encuesta>> = repositorio.allEncuestas.asLiveData()
 
+    // LiveData antiguo (ya no se usa, pero se mantiene por si acaso)
     private val _encuestasFirebase = MutableLiveData<List<EncuestaFirestore>>()
-    val encuestasFirebase: LiveData<List<EncuestaFirestore>> =
-        _encuestasFirebase
+    val encuestasFirebase: LiveData<List<EncuestaFirestore>> = _encuestasFirebase
 
+    // NUEVO: LiveData que viene del repositorio con escucha en tiempo real
+    val encuestasFirestoreLiveData: LiveData<List<EncuestaFirestore>> = repositorio.encuestasFirestoreLiveData
 
     private val _encuestaId = MutableLiveData<Int>()
     val encuestaId: LiveData<Int> get() = _encuestaId
@@ -25,16 +27,13 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
             val id = repositorio.insert(encuesta)
             _encuestaId.value = id.toInt()
         }
-
     }
 
     fun update(encuesta: Encuesta) = viewModelScope.launch {
         repositorio.update(encuesta)
     }
 
-    fun getEncuestas() =
-        repositorio.getEncuestas().asLiveData()
-
+    fun getEncuestas() = repositorio.getEncuestas().asLiveData()
 
     fun getEncuestaById(id: Int) = repositorio.getEncuestaById(id).asLiveData()
 
@@ -54,18 +53,17 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
         repositorio.abandonEncuesta(encuestaId)
     }
 
-    // Nueva función para reanudar
     fun reanudarEncuesta(encuestaId: Int) = viewModelScope.launch {
         repositorio.reanudarEncuesta(encuestaId)
     }
 
-
-    fun cargarEncuestasCompletasFirebase() {
-        repositorio.getEncuestasCompletasDesdeFirebase { lista ->
-            _encuestasFirebase.postValue(lista)
-        }
+    // Iniciar escucha en tiempo real de Firestore
+    fun startListeningFirestore() {
+        repositorio.listenEncuestasFromFirestore()
     }
 
+    // Método obsoleto eliminado
+    // fun cargarEncuestasCompletasFirebase() { ... }
 
     class EncuestaViewModelFactory(private val repositorio: RepositorioEncuestas) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

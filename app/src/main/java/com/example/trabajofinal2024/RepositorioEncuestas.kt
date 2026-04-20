@@ -2,53 +2,65 @@ package com.example.trabajofinal2024
 
 import android.util.Log
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
-class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alimentoDAO: AlimentoDAO, ) {
+class RepositorioEncuestas(
+    private val encuestaDAO: EncuestaDAO,
+    private val alimentoDAO: AlimentoDAO,
+) {
 
     val allEncuestas: Flow<List<Encuesta>> = encuestaDAO.getEncuestas()
 
-
     private val db = Firebase.firestore
 
-    @Suppress("RedundantSuspendModifier")
+    // LiveData para el mapa con actualización en tiempo real
+    private val _encuestasFirestoreLiveData = MutableLiveData<List<EncuestaFirestore>>()
+    val encuestasFirestoreLiveData: LiveData<List<EncuestaFirestore>> = _encuestasFirestoreLiveData
+
+    // Iniciar escucha en tiempo real de todas las encuestas (collection group)
+    fun listenEncuestasFromFirestore() {
+        db.collectionGroup("encuestas")
+            .addSnapshotListener { snapshots, error ->
+                if (error != null) {
+                    Log.e("FIREBASE", "Error en listener: ${error.message}")
+                    return@addSnapshotListener
+                }
+                val lista = snapshots?.documents?.mapNotNull { doc ->
+                    val lat = doc.getDouble("latitud")
+                    val lon = doc.getDouble("longitud")
+                    val completa = doc.getBoolean("completa") ?: false
+                    if (lat != null && lon != null) {
+                        EncuestaFirestore(lan = lat, lon = lon, completa = completa)
+                    } else null
+                } ?: emptyList()
+                _encuestasFirestoreLiveData.postValue(lista)
+                Log.d("FIREBASE", "Listener recibió ${lista.size} encuestas")
+            }
+    }
+
     @WorkerThread
     suspend fun insert(encuesta: Encuesta): Long {
-
-        // 1️⃣ Guardar primero en Room
         val idRoom = encuestaDAO.insertar(encuesta)
-
         encuesta.encuestaId = idRoom.toInt()
-
         try {
-            // 2️⃣ Subir a Firestore
             val firestoreId = subirEncuestaAFirebase(encuesta)
-
-            // 3️⃣ Guardar el id de Firestore en Room
             encuesta.firestoreId = firestoreId
             encuestaDAO.update(encuesta)
-
         } catch (e: Exception) {
             Log.e("FIREBASE", "Error subiendo encuesta: ${e.message}")
-            // Aquí NO cancelamos Room
-            // Simplemente queda pendiente de sincronizar
         }
-
         return idRoom
     }
 
     private suspend fun subirEncuestaAFirebase(encuesta: Encuesta): String {
-
         val userId = encuesta.userUid
-
-        require(userId.isNotEmpty()) {
-            "El userUid está vacío. El usuario no está autenticado."
-        }
-
+        require(userId.isNotEmpty()) { "El userUid está vacío." }
         val docRef = db.collection("usuarios")
             .document(userId)
             .collection("encuestas")
@@ -65,7 +77,6 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
                 )
             )
             .await()
-
         return docRef.id
     }
 
@@ -76,9 +87,7 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
 
     fun getEncuestas() = encuestaDAO.getEncuestas()
 
-    fun getEncuestaById(id: Int): Flow<Encuesta> {
-        return encuestaDAO.getEncuestaById(id)
-    }
+    fun getEncuestaById(id: Int): Flow<Encuesta> = encuestaDAO.getEncuestaById(id)
 
     fun getEncuestasPorUsuario(uid: String): Flow<List<Encuesta>> = encuestaDAO.getEncuestasPorUsuario(uid)
 
@@ -88,16 +97,11 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
     suspend fun updateProgress(encuestaId: Int, index: Int) {
         encuestaDAO.updateProgress(encuestaId, index, System.currentTimeMillis())
         val encuesta = encuestaDAO.getEncuestaByIdOnce(encuestaId)
-
-        encuesta?.let {
-            actualizarProgresoEnFirebase(it)
-        }
+        encuesta?.let { actualizarProgresoEnFirebase(it) }
     }
 
-    private suspend fun  actualizarProgresoEnFirebase(encuesta: Encuesta) {
-
+    private suspend fun actualizarProgresoEnFirebase(encuesta: Encuesta) {
         encuesta.firestoreId?.let { id ->
-
             db.collection("usuarios")
                 .document(encuesta.userUid)
                 .collection("encuestas")
@@ -114,17 +118,9 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
 
     @WorkerThread
     suspend fun markCompleted(encuestaId: Int, index: Int) {
-
         encuestaDAO.markCompleted(encuestaId, index, System.currentTimeMillis())
-
-        val encuesta = encuestaDAO.getEncuestaByIdOnce(encuestaId)
-            ?: run {
-                Log.e("FIREBASE", "Encuesta no encontrada en Room")
-                return
-            }
-
+        val encuesta = encuestaDAO.getEncuestaByIdOnce(encuestaId) ?: return
         val alimentos = alimentoDAO.obtenerAlimentosPorEncuesta(encuestaId)
-
         try {
             subirEncuestaCompletaAFirebase(encuesta, alimentos)
             Log.d("FIREBASE", "Encuesta marcada como completada en Firebase")
@@ -132,18 +128,9 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
             Log.e("FIREBASE", "Error marcando como completada: ${e.message}")
         }
     }
-    private suspend fun subirEncuestaCompletaAFirebase(
-        encuesta: Encuesta,
-        alimentos: List<Alimento>
-    ) {
 
-        val firestoreId = encuesta.firestoreId
-
-        if (firestoreId.isNullOrEmpty()) {
-            Log.e("FIREBASE", "No existe firestoreId. No se puede actualizar en Firebase.")
-            return
-        }
-
+    private suspend fun subirEncuestaCompletaAFirebase(encuesta: Encuesta, alimentos: List<Alimento>) {
+        val firestoreId = encuesta.firestoreId ?: return
         val encuestaRef = db.collection("usuarios")
             .document(encuesta.userUid)
             .collection("encuestas")
@@ -158,7 +145,6 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
         ).await()
 
         val alimentosCollection = encuestaRef.collection("alimentos")
-
         alimentos.forEach { alimento ->
             alimentosCollection
                 .document(alimento.alimentoid.toString())
@@ -183,52 +169,16 @@ class RepositorioEncuestas(private val encuestaDAO: EncuestaDAO,private val alim
         }
     }
 
-    fun getEncuestasCompletasDesdeFirebase(
-        onResult: (List<EncuestaFirestore>) -> Unit
-    ) {
-        db.collectionGroup("encuestas")
-            .get()
-            .addOnSuccessListener { result ->
-
-                Log.d("FIREBASE_DEBUG", "Docs encontrados: ${result.size()}")
-
-                result.documents.forEach {
-                    Log.d("FIREBASE_DEBUG", it.data.toString())
-                }
-
-                val lista = result.documents.mapNotNull { doc ->
-                    val lat = doc.getDouble("latitud")
-                    val lon = doc.getDouble("longitud")
-                    val completa = doc.getBoolean("completa") ?: false
-
-                    if (lat != null && lon != null) {
-                        EncuestaFirestore(
-                            lan = lat,
-                            lon = lon,
-                            completa = completa
-                        )
-                    } else null
-                }
-
-                onResult(lista)
-            }
-    }
-
-
-
-
-
     @WorkerThread
     suspend fun abandonEncuesta(encuestaId: Int) {
         encuestaDAO.abandonEncuesta(encuestaId, System.currentTimeMillis())
     }
 
-    // Nueva función para reanudar
     @WorkerThread
     suspend fun reanudarEncuesta(encuestaId: Int) {
         encuestaDAO.reanudarEncuesta(encuestaId, System.currentTimeMillis())
     }
-    // RepositorioEncuestas.kt (dentro de la clase)
+
     @WorkerThread
     suspend fun obtenerAlimentosPorEncuesta(encuestaId: Int): List<Alimento> {
         return alimentoDAO.obtenerAlimentosPorEncuesta(encuestaId)

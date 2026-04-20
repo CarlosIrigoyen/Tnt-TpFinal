@@ -30,19 +30,14 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
     private lateinit var tvCompletadasValue: TextView
     private lateinit var tvPausadasValue: TextView
 
-    // LIMITES FIJOS DE TRELEW (aprox.)
     private val TRELEW_NORTH = -43.2150
     private val TRELEW_SOUTH = -43.2900
     private val TRELEW_EAST = -65.2500
     private val TRELEW_WEST = -65.3400
-
-    // pequeños parámetros para posicionar labels mejor
     private val TRELEW_LAT_SPAN = TRELEW_NORTH - TRELEW_SOUTH
     private val TRELEW_LON_SPAN = TRELEW_EAST - TRELEW_WEST
-
     private val centerFraction = 0.30
 
-    // colores
     private val completeColor = 0xFF4CAF50.toInt()
     private val pausedColor = 0xFFFF5722.toInt()
     private val zoneFill0 = 0x334CAF50.toInt()
@@ -51,14 +46,11 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
     private val zoneFill3 = 0x334CAFEF.toInt()
     private val zoneFill4 = 0x33F06292.toInt()
 
-    // caches / estructuras
-    private val geocodeCache = ConcurrentHashMap<String, Pair<Double, Double>>()
     private val zonePolygons = mutableMapOf<Int, Polygon>()
     private val zoneOriginalColors = mutableMapOf<Int, Int>()
     private val markersByZone = mutableMapOf<Int, MutableList<Marker>>()
     private val labelMarkers = mutableMapOf<Int, Marker>()
 
-    // contadores
     private val zoneTotals = IntArray(5)
     private val zoneCompletes = IntArray(5)
     private val zonePaused = IntArray(5)
@@ -86,20 +78,19 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         tvCompletadasValue = view.findViewById(R.id.tvCompletadasValue)
         tvPausadasValue = view.findViewById(R.id.tvPausadasValue)
 
-        // centrar en Trelew y limitar scroll al área
         val center = GeoPoint(-43.2496, -65.3000)
         mapView.controller.setCenter(center)
         mapView.controller.setZoom(13.5)
         val bounds = BoundingBox(TRELEW_NORTH, TRELEW_EAST, TRELEW_SOUTH, TRELEW_WEST)
         mapView.setScrollableAreaLimitDouble(bounds)
 
-        // dibujar cuadrantes fijos y labels
         drawZones()
 
-        encuestaViewModel.cargarEncuestasCompletasFirebase()
+        // Iniciar escucha en tiempo real
+        encuestaViewModel.startListeningFirestore()
 
-        // observar encuestas y plotear marcadores/contadores
-        encuestaViewModel.encuestasFirebase.observe(viewLifecycleOwner) { encs ->
+        // Observar los datos en vivo
+        encuestaViewModel.encuestasFirestoreLiveData.observe(viewLifecycleOwner) { encs ->
             lifecycleScope.launch {
                 plotEncuestasAndCount(encs)
             }
@@ -108,14 +99,10 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         resetLeyenda()
     }
 
-    // ---------------- DRAW ZONES (FIJOS EN TRELEW) ----------------
-
     private fun drawZones() {
-        // limpiar polígonos previos (mantener marcadores porque plot los re-agregará)
         mapView.overlays.removeAll(zonePolygons.values)
         zonePolygons.clear()
         zoneOriginalColors.clear()
-        // limpiar labels previos
         labelMarkers.values.forEach { mapView.overlays.remove(it) }
         labelMarkers.clear()
 
@@ -126,26 +113,21 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
 
         val latSpan = north - south
         val lonSpan = east - west
-
         val halfCenterLatSpan = (latSpan * centerFraction) / 2.0
         val halfCenterLonSpan = (lonSpan * centerFraction) / 2.0
-
         val centerLat = (north + south) / 2.0
         val centerLon = (east + west) / 2.0
-
         val centerNorth = centerLat + halfCenterLatSpan
         val centerSouth = centerLat - halfCenterLatSpan
         val centerWest = centerLon - halfCenterLonSpan
         val centerEast = centerLon + halfCenterLonSpan
 
-        // crear polígonos
         registerZone(0, createRectPolygon(centerNorth, centerEast, centerSouth, centerWest, zoneFill0))
         registerZone(1, createRectPolygon(north, east, centerNorth, west, zoneFill1))
         registerZone(2, createRectPolygon(centerSouth, east, south, west, zoneFill2))
         registerZone(3, createRectPolygon(centerNorth, east, centerSouth, centerEast, zoneFill3))
         registerZone(4, createRectPolygon(centerNorth, centerWest, centerSouth, west, zoneFill4))
 
-        // añadir labels (posicionados con offsets para evitar solapamientos)
         addOrUpdateLabel(0, (centerNorth + centerSouth) / 2.0, (centerWest + centerEast) / 2.0, zoneName(0))
         addOrUpdateLabel(1, (north + centerNorth) / 2.0, (west + east) / 2.0, zoneName(1))
         addOrUpdateLabel(2, (centerSouth + south) / 2.0, (west + east) / 2.0, zoneName(2))
@@ -179,21 +161,16 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         return polygon
     }
 
-    // ---------------- LABELS MEJORADAS ----------------
-
     private fun addOrUpdateLabel(index: Int, baseLat: Double, baseLon: Double, text: String) {
-        // offsets relativos al tamaño de Trelew para evitar solapamientos
-        val latOffset = TRELEW_LAT_SPAN * 0.03  // ~3% del alto del área
-        val lonOffset = TRELEW_LON_SPAN * 0.03  // ~3% del ancho del área
-
+        val latOffset = TRELEW_LAT_SPAN * 0.03
+        val lonOffset = TRELEW_LON_SPAN * 0.03
         val (lat, lon) = when (index) {
-            1 -> Pair(baseLat + latOffset, baseLon) // NORTE -> subir un poco
-            2 -> Pair(baseLat - latOffset, baseLon) // SUR -> bajar un poco
-            3 -> Pair(baseLat, baseLon + lonOffset) // ESTE -> mover a la derecha
-            4 -> Pair(baseLat, baseLon - lonOffset) // OESTE -> mover a la izquierda
-            else -> Pair(baseLat + latOffset * 0.4, baseLon) // CENTRO -> un poco arriba
+            1 -> Pair(baseLat + latOffset, baseLon)
+            2 -> Pair(baseLat - latOffset, baseLon)
+            3 -> Pair(baseLat, baseLon + lonOffset)
+            4 -> Pair(baseLat, baseLon - lonOffset)
+            else -> Pair(baseLat + latOffset * 0.4, baseLon)
         }
-
         val existing = labelMarkers[index]
         val drawable = createTextDrawable(text, width = 280, height = 110, textSize = 20f)
         if (existing != null) {
@@ -210,10 +187,7 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         }
     }
 
-    // ---------------- PLOTEAR ENCUESTAS Y CONTAR ----------------
-
     private suspend fun plotEncuestasAndCount(encuestas: List<EncuestaFirestore>) = withContext(Dispatchers.Main) {
-        // resetear contadores y remover marcadores previos
         for (i in 0 until 5) {
             zoneTotals[i] = 0
             zoneCompletes[i] = 0
@@ -222,7 +196,6 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
             markersByZone[i] = mutableListOf()
         }
 
-        // procesar encuestas con coords
         for (enc in encuestas) {
             val lat = enc.lan
             val lon = enc.lon
@@ -243,12 +216,10 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
                 mv.controller.setZoom(16.0)
                 true
             }
-
             markersByZone.getOrPut(zoneIndex) { mutableListOf() }.add(marker)
             mapView.overlays.add(marker)
         }
 
-        // si hay zona seleccionada, actualizar la leyenda con la zona y conteos
         if (selectedZoneIndex in 0..4) {
             tvLeyendaTitulo.text = "Estado de Encuesta: ${zoneName(selectedZoneIndex)}"
             tvCompletadasValue.text = zoneCompletes[selectedZoneIndex].toString()
@@ -256,25 +227,18 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         } else {
             resetLeyenda()
         }
-
         mapView.invalidate()
     }
 
-    // ---------------- SELECCIÓN / LEYENDA ----------------
-
     private fun onZoneClicked(index: Int) {
-        // resaltar polígonos
         zonePolygons.forEach { (i, poly) ->
             val orig = zoneOriginalColors[i] ?: 0x30CCCCCC.toInt()
             poly.fillColor = if (i == index) orig else 0x20CCCCCC.toInt()
         }
         selectedZoneIndex = index
-
-        // actualizar la tarjeta para mostrar la zona
         tvLeyendaTitulo.text = "Estado de Encuesta: ${zoneName(index)}"
         tvCompletadasValue.text = zoneCompletes[index].toString()
         tvPausadasValue.text = zonePaused[index].toString()
-
         mapView.invalidate()
     }
 
@@ -283,8 +247,6 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         tvCompletadasValue.text = "-"
         tvPausadasValue.text = "-"
     }
-
-    // ---------------- DRAW HELPERS (ICONOS Y TEXTOS) ----------------
 
     private fun createCircleDrawable(color: Int, size: Int = 44): BitmapDrawable {
         val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
@@ -297,37 +259,27 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
     private fun createTextDrawable(text: String, width: Int = 220, height: Int = 80, textSize: Float = 18f): BitmapDrawable {
         val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bmp)
-
-        // fondo blanco semi-opaco con bordes redondeados
-        val bg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xEFFFFF.toInt() } // blanco semitransparente
-        // nota: usar 0xEFFFFF no es un color ARGB perfecto — si preferís: 0xCCFFFFFF.toInt()
+        val bg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xCCFFFFFF.toInt() }
         canvas.drawRoundRect(RectF(0f, 0f, width.toFloat(), height.toFloat()), 14f, 14f, bg)
-
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             this.textSize = textSize
             isFakeBoldText = true
             color = 0xFF000000.toInt()
             textAlign = Paint.Align.CENTER
         }
-
         val lines = text.split("\n")
         val fm = paint.fontMetrics
         val lineHeight = (fm.bottom - fm.top)
         var y = (height - lineHeight * lines.size) / 2f - fm.top
-
         for (line in lines) {
             canvas.drawText(line, width / 2f, y, paint)
             y += lineHeight
         }
-
         return BitmapDrawable(resources, bmp)
     }
 
-    // ---------------- DETERMINAR ZONA (FIJA EN TRELEW) ----------------
-
     private fun determineZoneForLatLon(lat: Double, lon: Double): Int {
         if (lat > TRELEW_NORTH || lat < TRELEW_SOUTH || lon > TRELEW_EAST || lon < TRELEW_WEST) return -1
-
         val latSpan = TRELEW_NORTH - TRELEW_SOUTH
         val lonSpan = TRELEW_EAST - TRELEW_WEST
         val halfCenterLatSpan = (latSpan * centerFraction) / 2.0
@@ -338,7 +290,6 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         val centerSouth = centerLat - halfCenterLatSpan
         val centerWest = centerLon - halfCenterLonSpan
         val centerEast = centerLon + halfCenterLonSpan
-
         return when {
             lat >= centerSouth && lat <= centerNorth && lon >= centerWest && lon <= centerEast -> 0
             lat > centerNorth -> 1
@@ -358,7 +309,6 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         else -> "DESCONOCIDO"
     }
 
-    // lifecycle
     override fun onResume() {
         super.onResume()
         mapView.onResume()

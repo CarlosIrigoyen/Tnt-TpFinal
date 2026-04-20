@@ -1,54 +1,112 @@
 package com.example.trabajofinal2024
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var navView: NavigationView
+    private lateinit var navController: androidx.navigation.NavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // edge-to-edge (mantenemos tu llamada)
         enableEdgeToEdge()
-
         setContentView(R.layout.activity_main)
 
-        // aplicar paddings de system bars a la root (tu código original)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu)
+
+        drawerLayout = findViewById(R.id.drawerLayout)
+        navView = findViewById(R.id.navView)
+
+        // Configurar el toggle manualmente (esto hace que el ícono abra el drawer)
+        toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar,
+            R.string.navigation_drawer_open,   // puedes crear estos strings
+            R.string.navigation_drawer_close
+        )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+
+        // Escuchar cambios de destino para actualizar título y bloquear drawer en login
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.loginFragment -> {
+                    supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                    title = "Iniciar Sesión"
+                }
+                else -> {
+                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu)
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                    title = when (destination.id) {
+                        R.id.encuestasListFragment -> "Encuestas"
+                        R.id.mapaFragment -> "Mapa"
+                        R.id.statsFragment -> "Estadísticas"
+                        R.id.encuestaFragment -> "Nueva Encuesta"
+                        R.id.foodFragment -> "Registro de Alimentos"
+                        R.id.detalleEncuestaFragment -> "Detalle de Encuesta"
+                        else -> "Encuestas"
+                    }
+                }
+            }
         }
 
-        // ------------------------------
-        // Elegir startDestination según sesión (compatible con navigation 2.7.7+)
-        // ------------------------------
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
-
-        if (navHostFragment == null) {
-            // Por seguridad: si no encuentra el NavHost, abortar sin crash.
-            return
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_encuestas -> {
+                    navController.navigate(R.id.encuestasListFragment, null, NavOptions.Builder()
+                        .setPopUpTo(R.id.encuestasListFragment, true)
+                        .build())
+                }
+                R.id.nav_mapa -> {
+                    navController.navigate(R.id.mapaFragment)
+                }
+                R.id.nav_estadisticas -> {
+                    navController.navigate(R.id.statsFragment)
+                }
+                R.id.nav_cerrar_sesion -> {
+                    FirebaseAuth.getInstance().signOut()
+                    navController.navigate(R.id.loginFragment, null, NavOptions.Builder()
+                        .setPopUpTo(R.id.loginFragment, true)
+                        .build())
+                }
+            }
+            drawerLayout.closeDrawer(GravityCompat.START)
+            true
         }
 
-        val navController = navHostFragment.navController
-        val navInflater = navController.navInflater
-        val navGraph = navInflater.inflate(R.navigation.main_navigation)
-
-        // Comprobar sesión Firebase
         val userLogged = FirebaseAuth.getInstance().currentUser != null
-
-        // setStartDestination (método compatible)
         if (userLogged) {
-            navGraph.setStartDestination(R.id.encuestasListFragment)
+            navController.navigate(R.id.encuestasListFragment)
         } else {
-            navGraph.setStartDestination(R.id.loginFragment)
+            navController.navigate(R.id.loginFragment)
         }
+    }
 
-        navController.graph = navGraph
+    // Este método es llamado cuando se presiona el ícono de la barra
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Si el toggle maneja el evento (abrir/cerrar drawer), lo usamos
+        if (toggle.onOptionsItemSelected(item)) {
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
