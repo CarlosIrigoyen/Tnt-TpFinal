@@ -16,7 +16,7 @@ object FoodCatalog {
     )
 
     val LECHE_FLUIDA_ENTERA = FoodTemplate(
-        "Leche fluida entera",
+        "Leche",
         "Leche y yogur",
         100f,
         57.92f,
@@ -43,7 +43,7 @@ object FoodCatalog {
 
     // Grasas animales
     val QUESO_PASTA_DURA = FoodTemplate(
-        "Queso de pasta dura",
+        "Queso",
         "Grasas animales",
         100f,
         373.83f,
@@ -96,7 +96,7 @@ object FoodCatalog {
     )
 
     val HUEVO_FRITO = FoodTemplate(
-        "Huevo de gallina entero frito",
+        "Huevo frito",
         "Carnes y huevos",
         100f,
         191.32f,
@@ -109,7 +109,7 @@ object FoodCatalog {
     )
 
     val VACUNA_MAGRA = FoodTemplate(
-        "Vacuna magra",
+        "Carne vacuna",
         "Carnes y huevos",
         100f,
         130.6f,
@@ -148,7 +148,7 @@ object FoodCatalog {
     )
 
     val POLLO_DESHUESADO_SIN_PIEL = FoodTemplate(
-        "Pollo deshuesado sin piel",
+        "Pollo",
         "Carnes y huevos",
         100f,
         165f,
@@ -202,7 +202,7 @@ object FoodCatalog {
 
     // Platos populares
     val PAPAS_FRITAS_CASERAS = FoodTemplate(
-        "Papas fritas caseras",
+        "Papas fritas",
         "Platos populares",
         100f,
         162.04f,
@@ -334,7 +334,7 @@ object FoodCatalog {
 
     // Cereales
     val ARROZ_BLANCO_COCIDO = FoodTemplate(
-        "Arroz blanco cocido",
+        "Arroz",
         "Cereales",
         100f,
         130f,
@@ -374,7 +374,7 @@ object FoodCatalog {
     )
 
     val BEBIDAS_DEPORTIVAS_Y_ENERGIZANTES = FoodTemplate(
-        "Bebidas deportivas y energizantes",
+        "Energizantes",
         "Bebidas e infusiones azucaradas",
         100f,
         24f,
@@ -387,7 +387,7 @@ object FoodCatalog {
     )
 
     val GASEOSAS_CLASICAS = FoodTemplate(
-        "Gaseosas clásicas",
+        "Gaseosas",
         "Bebidas e infusiones azucaradas",
         100f,
         42.96f,
@@ -414,7 +414,7 @@ object FoodCatalog {
     )
 
     val CERVEZA_O_APERITIVOS = FoodTemplate(
-        "Cerveza o aperitivos",
+        "Cerveza",
         "Bebidas alcohólicas",
         100f,
         35.48f,
@@ -454,33 +454,45 @@ object FoodCatalog {
 
     val ALL = listOf(
         // Leche y yogur
-        LECHE_POLVO_ENTERA, LECHE_FLUIDA_ENTERA, YOGUR,
+         LECHE_FLUIDA_ENTERA,YOGUR, // LECHE_POLVO_ENTERA,
 
         // Grasas animales
-        QUESO_PASTA_DURA, QUESO_PASTA_SEMIDURA_AZUL, MANTECA,
+        QUESO_PASTA_DURA, //QUESO_PASTA_SEMIDURA_AZUL,
+         MANTECA,
 
         // Carnes y huevos
-        HUEVO_CRUDO_HERVIDO, HUEVO_FRITO, VACUNA_MAGRA, VACUNA_CORTES_GRASOS,
+        //HUEVO_CRUDO_HERVIDO, ,  VACUNA_CORTES_GRASOS,
+        HUEVO_FRITO,
+        VACUNA_MAGRA,
         CARNE_PICADA, POLLO_DESHUESADO_SIN_PIEL,
 
         // Carnes procesadas
-        SALCHICHAS, SALAME_SALAMIN_CHORIZO_SECO_LONGANIZA, MORTADELA,
+        //, SALAME_SALAMIN_CHORIZO_SECO_LONGANIZA,
+        MORTADELA, SALCHICHAS,
 
         // Platos populares
-        PAPAS_FRITAS_CASERAS, PIZZA, EMPANADAS_CARNE_FRITAS, EMPANADAS_CARNE,
-        PASTEL_DE_PAPAS, PUCHERO,
+        //PAPAS_FRITAS_CASERAS,
+        PIZZA, //EMPANADAS_CARNE_FRITAS,
+        EMPANADAS_CARNE,
+        //PASTEL_DE_PAPAS,
+        PUCHERO,
 
         // Frutas
-        BANANA, DURAZNO, MANZANA, NARANJA,
+        BANANA, //DURAZNO,
+        MANZANA,
+        // NARANJA,
 
         // Cereales
-        ARROZ_BLANCO_COCIDO, PAN_FRANCES,
+        ARROZ_BLANCO_COCIDO, //PAN_FRANCES,
 
         // Bebidas e infusiones azucaradas
-        AGUAS_SABORIZADAS_CLASICAS, BEBIDAS_DEPORTIVAS_Y_ENERGIZANTES, GASEOSAS_CLASICAS,
+        //AGUAS_SABORIZADAS_CLASICAS,
+        BEBIDAS_DEPORTIVAS_Y_ENERGIZANTES,
+        GASEOSAS_CLASICAS,
 
         // Bebidas alcohólicas
-        VINO, CERVEZA_O_APERITIVOS, LICOR, BEBIDAS_BLANCAS
+        //VINO, , LICOR, BEBIDAS_BLANCAS
+        CERVEZA_O_APERITIVOS
     )
     fun findByName(name: String) = ALL.find { it.nombre.equals(name, ignoreCase = true) }
 }
