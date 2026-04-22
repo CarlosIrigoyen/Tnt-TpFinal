@@ -125,7 +125,7 @@ dependencies {
 
     // To use Kotlin annotation processing tool (kapt)
     kapt("androidx.room:room-compiler:$roomVersion")
-
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
     val lifecycleVersion = "2.7.0"
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")

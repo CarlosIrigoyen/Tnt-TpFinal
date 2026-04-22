@@ -54,69 +54,69 @@ class LoginFragment : Fragment() {
     private lateinit var loginButton: Button
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View {
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
 
-            val rootView = inflater.inflate(R.layout.fragment_login, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_login, container, false)
 
-            // Firebase Auth
-            auth = FirebaseAuth.getInstance()
+        // Firebase Auth
+        auth = FirebaseAuth.getInstance()
 
-            googleButton = rootView.findViewById(R.id.btnGoogle)
+        googleButton = rootView.findViewById(R.id.btnGoogle)
 
-            val gsi = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        val gsi = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
-            googleSignInClient = GoogleSignIn.getClient(requireActivity(), gsi)
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gsi)
 
-            googleButton.setOnClickListener {
-                signInWithGoogle()
-            }
+        googleButton.setOnClickListener {
+            signInWithGoogle()
+        }
 
 
         // Views (los IDs vienen de TU XML)
-            emailEditText = rootView.findViewById(R.id.usuariotext)
-            passwordEditText = rootView.findViewById(R.id.contraseñaeditText)
-            loginButton = rootView.findViewById(R.id.ingresarid)
+        emailEditText = rootView.findViewById(R.id.usuariotext)
+        passwordEditText = rootView.findViewById(R.id.contraseñaeditText)
+        loginButton = rootView.findViewById(R.id.ingresarid)
 
-            loginButton.setOnClickListener {
-                loginUser()
-            }
-
-            return rootView
+        loginButton.setOnClickListener {
+            loginUser()
         }
 
-        private fun loginUser() {
-            val email = emailEditText.text.toString().trim()
-            val password = passwordEditText.text.toString().trim()
+        return rootView
+    }
 
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(requireContext(), "Ingrese usuario y contraseña", Toast.LENGTH_LONG).show()
-                return
-            }
+    private fun loginUser() {
+        val email = emailEditText.text.toString().trim()
+        val password = passwordEditText.text.toString().trim()
 
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(requireContext(), "Login exitoso", Toast.LENGTH_LONG).show()
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(requireContext(), "Ingrese usuario y contraseña", Toast.LENGTH_LONG).show()
+            return
+        }
 
-                        // Navegar con Navigation Component
-                        findNavController()
-                            .navigate(R.id.action_loginFragment_to_encuestasListFragment)
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(requireContext(), "Login exitoso", Toast.LENGTH_LONG).show()
 
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "Error: ${task.exception?.localizedMessage}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    // Navegar con Navigation Component
+                    findNavController()
+                        .navigate(R.id.action_loginFragment_to_encuestasListFragment)
+
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Error: ${task.exception?.localizedMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-        }
+            }
+    }
 
     private fun signInWithGoogle() {
         val signInIntent = googleSignInClient.signInIntent
