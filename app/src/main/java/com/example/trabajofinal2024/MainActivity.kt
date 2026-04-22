@@ -9,17 +9,29 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
+
+    private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var navView: NavigationView
     private lateinit var navController: androidx.navigation.NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
@@ -84,9 +96,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.nav_cerrar_sesion -> {
                     FirebaseAuth.getInstance().signOut()
-                    navController.navigate(R.id.loginFragment, null, NavOptions.Builder()
-                        .setPopUpTo(R.id.loginFragment, true)
-                        .build())
+                    googleSignInClient.signOut().addOnCompleteListener {
+                        navController.navigate(
+                            R.id.loginFragment,
+                            null,
+                            NavOptions.Builder()
+                                .setPopUpTo(R.id.loginFragment, true)
+                                .build()
+                        )
+                    }
                 }
             }
             drawerLayout.closeDrawer(GravityCompat.START)

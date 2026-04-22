@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -90,27 +92,36 @@ private fun EncuestasContent(
     onAbandonar: (Encuesta) -> Unit,
     onVerDetalles: (Encuesta) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        if (encuestas.isEmpty()) {
-            Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text("No hay encuestas cargadas")
-            }
-        } else {
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(encuestas) { encuesta ->
-                    EncuestaItem(
-                        encuesta = encuesta,
-                        onResume = { onResumeEncuesta(encuesta) },
-                        onReanudar = { onReanudar(encuesta) },
-                        onAbandonar = { onAbandonar(encuesta) },
-                        onVerDetalles = { onVerDetalles(encuesta) }
-                    )
-                }
+    Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNuevaEncuesta) {
+                Icon(Icons.Default.Add, contentDescription = "Nueva encuesta")
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = onNuevaEncuesta, modifier = Modifier.fillMaxWidth()) {
-            Text("Iniciar nueva encuesta")
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+
+            if (encuestas.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No hay encuestas cargadas")
+                }
+            } else {
+                LazyColumn {
+                    items(encuestas) { encuesta ->
+                        EncuestaItem(
+                            encuesta = encuesta,
+                            onResume = { onResumeEncuesta(encuesta) },
+                            onReanudar = { onReanudar(encuesta) },
+                            onAbandonar = { onAbandonar(encuesta) },
+                            onVerDetalles = { onVerDetalles(encuesta) }
+                        )
+                    }
+                }
+            }
         }
     }
 }
