@@ -5,6 +5,7 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
@@ -21,26 +22,37 @@ class RepositorioEncuestas(
 
     // LiveData para el mapa con actualización en tiempo real
     private val _encuestasFirestoreLiveData = MutableLiveData<List<EncuestaFirestore>>()
+
+    private var listenerRegistration: ListenerRegistration? = null
     val encuestasFirestoreLiveData: LiveData<List<EncuestaFirestore>> = _encuestasFirestoreLiveData
 
-    // Iniciar escucha en tiempo real de todas las encuestas (collection group)
-    fun listenEncuestasFromFirestore() {
-        db.collectionGroup("encuestas")
+    fun listenEncuestasFromFirestore(userUid: String) {
+
+        listenerRegistration?.remove()
+        listenerRegistration = db.collection("usuarios")
+            .document(userUid)
+            .collection("encuestas")
             .addSnapshotListener { snapshots, error ->
                 if (error != null) {
                     Log.e("FIREBASE", "Error en listener: ${error.message}")
                     return@addSnapshotListener
                 }
+
                 val lista = snapshots?.documents?.mapNotNull { doc ->
                     val lat = doc.getDouble("latitud")
                     val lon = doc.getDouble("longitud")
                     val completa = doc.getBoolean("completa") ?: false
+
                     if (lat != null && lon != null) {
-                        EncuestaFirestore(lan = lat, lon = lon, completa = completa)
+                        EncuestaFirestore(
+                            lan = lat,
+                            lon = lon,
+                            completa = completa
+                        )
                     } else null
                 } ?: emptyList()
+
                 _encuestasFirestoreLiveData.postValue(lista)
-                Log.d("FIREBASE", "Listener recibió ${lista.size} encuestas")
             }
     }
 
@@ -138,7 +150,7 @@ class RepositorioEncuestas(
 
         encuestaRef.update(
             mapOf(
-                "completada" to true,
+                "completa" to true,
                 "currentIndex" to encuesta.currentIndex,
                 "updatedAt" to System.currentTimeMillis()
             )

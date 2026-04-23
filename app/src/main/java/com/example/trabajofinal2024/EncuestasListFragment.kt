@@ -1,6 +1,7 @@
 package com.example.trabajofinal2024
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +29,16 @@ class EncuestasListFragment : Fragment() {
         EncuestaViewModel.EncuestaViewModelFactory(
             (requireActivity().application as App).encuestaRepositorio
         )
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+        uid?.let {
+            encuestaViewModel.startListeningFirestore(it)
+        }
     }
 
     private val currentUserUid: String?

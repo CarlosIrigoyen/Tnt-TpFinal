@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,9 +64,9 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         )
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
 
         mapView = view.findViewById(R.id.map)
@@ -84,10 +85,17 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
         val bounds = BoundingBox(TRELEW_NORTH, TRELEW_EAST, TRELEW_SOUTH, TRELEW_WEST)
         mapView.setScrollableAreaLimitDouble(bounds)
 
+        resetLeyenda()
+
+
         drawZones()
 
         // Iniciar escucha en tiempo real
-        encuestaViewModel.startListeningFirestore()
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+        uid?.let {
+            encuestaViewModel.startListeningFirestore(it)
+        }
 
         // Observar los datos en vivo
         encuestaViewModel.encuestasFirestoreLiveData.observe(viewLifecycleOwner) { encs ->
@@ -98,6 +106,7 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
 
         resetLeyenda()
     }
+
 
     private fun drawZones() {
         mapView.overlays.removeAll(zonePolygons.values)
@@ -225,7 +234,12 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
             tvCompletadasValue.text = zoneCompletes[selectedZoneIndex].toString()
             tvPausadasValue.text = zonePaused[selectedZoneIndex].toString()
         } else {
-            resetLeyenda()
+            val totalCompletadas = zoneCompletes.sum()
+            val totalPausadas = zonePaused.sum()
+
+            tvLeyendaTitulo.text = "Total de encuestas"
+            tvCompletadasValue.text = totalCompletadas.toString()
+            tvPausadasValue.text = totalPausadas.toString()
         }
         mapView.invalidate()
     }

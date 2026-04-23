@@ -57,10 +57,10 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
         repositorio.reanudarEncuesta(encuestaId)
     }
 
-    // Iniciar escucha en tiempo real de Firestore
-    fun startListeningFirestore() {
-        repositorio.listenEncuestasFromFirestore()
+    fun startListeningFirestore(userUid: String) {
+        repositorio.listenEncuestasFromFirestore(userUid)
     }
+
 
     // Método obsoleto eliminado
     // fun cargarEncuestasCompletasFirebase() { ... }

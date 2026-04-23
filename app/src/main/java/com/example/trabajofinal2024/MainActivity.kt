@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private lateinit var navController: androidx.navigation.NavController
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -31,6 +33,8 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -58,6 +62,12 @@ class MainActivity : AppCompatActivity() {
 
         // Escuchar cambios de destino para actualizar título y bloquear drawer en login
         navController.addOnDestinationChangedListener { _, destination, _ ->
+
+            val user = FirebaseAuth.getInstance().currentUser
+
+            if (user == null && destination.id != R.id.loginFragment) {
+                navController.navigate(R.id.loginFragment)
+            }
             when (destination.id) {
                 R.id.loginFragment -> {
                     supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -111,11 +121,16 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        val userLogged = FirebaseAuth.getInstance().currentUser != null
-        if (userLogged) {
-            navController.navigate(R.id.encuestasListFragment)
-        } else {
-            navController.navigate(R.id.loginFragment)
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if (user != null) {
+            navController.navigate(
+                R.id.encuestasListFragment,
+                null,
+                NavOptions.Builder()
+                    .setPopUpTo(R.id.loginFragment, true)
+                    .build()
+            )
         }
     }
 
