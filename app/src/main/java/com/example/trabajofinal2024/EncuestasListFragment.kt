@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -106,8 +107,8 @@ private fun EncuestasContent(
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         floatingActionButton = {
-            FloatingActionButton(onClick = onNuevaEncuesta) {
-                Icon(Icons.Default.Add, contentDescription = "Nueva encuesta")
+            FloatingActionButton(onClick = onNuevaEncuesta,     backgroundColor = MaterialTheme.colors.primary) {
+                Icon(Icons.Default.Add, contentDescription = "Nueva encuesta", tint = Color.White)
             }
         }
     ) { padding ->
