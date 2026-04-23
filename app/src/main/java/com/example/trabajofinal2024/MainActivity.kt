@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavOptions
+import android.widget.TextView
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -36,6 +37,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
@@ -59,6 +63,8 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
+
+        setupHeader()
 
         // Escuchar cambios de destino para actualizar título y bloquear drawer en login
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -131,6 +137,27 @@ class MainActivity : AppCompatActivity() {
                     .setPopUpTo(R.id.loginFragment, true)
                     .build()
             )
+        }
+    }
+
+    private fun setupHeader() {
+        val headerView = navView.getHeaderView(0)
+
+        val tvInitial = headerView.findViewById<TextView>(R.id.tvInitial)
+        val tvName = headerView.findViewById<TextView>(R.id.tvName)
+        val tvEmail = headerView.findViewById<TextView>(R.id.tvEmail)
+
+        val user = FirebaseAuth.getInstance().currentUser
+
+        user?.let {
+            val name = it.displayName ?: "Usuario"
+            val email = it.email ?: ""
+
+            tvName.text = name
+            tvEmail.text = email
+
+            val initial = name.firstOrNull()?.uppercase() ?: "U"
+            tvInitial.text = initial
         }
     }
 
