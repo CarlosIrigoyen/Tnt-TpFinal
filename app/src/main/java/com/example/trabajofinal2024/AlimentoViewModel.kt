@@ -12,8 +12,8 @@ class AlimentoViewModel(private val repositorio: RepositorioAlimentos): ViewMode
     val allAlimentos: LiveData<List<Alimento>> = repositorio.allAlimentos.asLiveData()
 
 
-    fun insert(alimento:Alimento) = viewModelScope.launch {
-        repositorio.insert(alimento)
+    suspend fun insert(alimento:Alimento): Long {
+        return repositorio.insert(alimento)
     }
 
     fun calcularValoresNutricionalesCompletos(

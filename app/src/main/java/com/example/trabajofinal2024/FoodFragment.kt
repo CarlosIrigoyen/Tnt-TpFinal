@@ -29,10 +29,12 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
 
     private var encuestaId: Int = 0
     private var currentIndex: Int = 0
+
+    private var encuestaActual: Encuesta? = null
     private var foodItem: FoodItem? = null
     private var encuestaCompletada: Boolean = false
 
-    private val cantidadOpciones = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500")
+    private val cantidadOpciones = arrayOf("100", "150", "200", "250", "500")
 
     companion object {
         private const val STATE_INDEX = "state_current_index"
@@ -53,6 +55,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
             encuestaViewModel.getEncuestaById(encuestaId).observe(this) { encuesta ->
                 encuesta?.let {
                     encuestaCompletada = it.completa
+                    encuestaActual = it
 
                     if (it.completa) {
                         // Encuesta ya completada
@@ -74,7 +77,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
                         ).show()
                     }
 
-                    currentIndex = it.currentIndex.coerceIn(0, FoodCatalog.ALL.size)
+                    currentIndex = it.currentIndex.coerceIn(0, FoodCatalog.ALL.size - 1)
                     setFoodAtIndex(currentIndex)
 
                     // Mostrar progreso
@@ -96,6 +99,12 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
     }
 
     private fun setFoodAtIndex(index: Int) {
+
+        if (index !in 0 until FoodCatalog.ALL.size) {
+            Log.e("FoodFragment", "Índice inválido: $index")
+            return
+        }
+
         val template = FoodCatalog.ALL[index]
 
         lifecycleScope.launch {
@@ -309,15 +318,25 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
 
                 if (currentIndex >= FoodCatalog.ALL.size) {
 
-                    encuestaViewModel.markCompleted(encuestaId, currentIndex)
+                    encuestaActual?.let {
+                        Log.d("FIREBASE", "Actualizando encuesta en Firebase: ${encuestaActual?.firestoreId}")
+                        it.currentIndex = currentIndex - 1
+                        it.completa = true
+                        encuestaViewModel.markCompleted(it)
 
-                    Toast.makeText(
-                        requireContext(),
-                        "¡Encuesta completada!",
-                        Toast.LENGTH_LONG
-                    ).show()
 
-                    findNavController().popBackStack()
+                    }
+                    context?.let {
+                        Toast.makeText( it,
+                            "¡Encuesta completada!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+
+                    if (isAdded) {
+                        findNavController().popBackStack()
+                    }
+
 
                 } else {
 
@@ -375,11 +394,9 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
         } else {
             alimentoViewModel.insert(alimento)
         }
+
+        encuestaActual?.let { encuesta ->
+            encuestaViewModel.guardarAlimentoFirebase(encuesta, alimento)
+        }
     }
-
-
-
-
-
-
 }

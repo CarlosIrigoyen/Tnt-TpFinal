@@ -1,5 +1,6 @@
 package com.example.trabajofinal2024
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -45,10 +46,9 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
         repositorio.updateProgress(encuestaId, index)
     }
 
-    fun markCompleted(encuestaId: Int, index: Int) = viewModelScope.launch {
-        repositorio.markCompleted(encuestaId, index)
-    }
-
+     suspend fun markCompleted(encuesta: Encuesta) {
+         repositorio.markCompleted(encuesta)
+     }
     fun abandonEncuesta(encuestaId: Int) = viewModelScope.launch {
         repositorio.abandonEncuesta(encuestaId)
     }
@@ -59,6 +59,12 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
 
     fun startListeningFirestore(userUid: String) {
         repositorio.listenEncuestasFromFirestore(userUid)
+    }
+
+    fun guardarAlimentoFirebase(encuesta: Encuesta, alimento: Alimento) {
+        viewModelScope.launch {
+            repositorio.guardarAlimentoEnFirebase(encuesta, alimento)
+        }
     }
 
 

@@ -147,7 +147,7 @@ private fun EncuestaItem(
     onVerDetalles: () -> Unit
 ) {
     val totalAlimentos = FoodCatalog.ALL.size
-    val progreso = encuesta.currentIndex.coerceAtMost(totalAlimentos)
+    val progreso = (encuesta.currentIndex + 1).coerceAtMost(totalAlimentos)
     val porcentaje = if (totalAlimentos > 0) (progreso * 100 / totalAlimentos) else 0
 
     Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), elevation = 6.dp) {

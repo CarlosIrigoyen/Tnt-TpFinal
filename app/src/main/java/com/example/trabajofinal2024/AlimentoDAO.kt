@@ -15,7 +15,7 @@ interface AlimentoDAO {
     fun getAlimentos(): Flow<List<Alimento>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertar(alimento: Alimento)
+    suspend fun insertar(alimento: Alimento):Long 
 
 
     @Query("DELETE FROM alimentos")

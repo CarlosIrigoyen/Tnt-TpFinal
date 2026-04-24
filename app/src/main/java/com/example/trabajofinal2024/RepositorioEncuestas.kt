@@ -10,6 +10,8 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.NonCancellable
 
 class RepositorioEncuestas(
     private val encuestaDAO: EncuestaDAO,
@@ -54,6 +56,47 @@ class RepositorioEncuestas(
 
                 _encuestasFirestoreLiveData.postValue(lista)
             }
+    }
+
+    fun Alimento.getFirestoreId(): String {
+        return nombre_alimento
+            .lowercase()
+            .trim()
+            .replace(" ", "_")
+    }
+
+
+    suspend fun guardarAlimentoEnFirebase(
+        encuesta: Encuesta,
+        alimento: Alimento
+    ) {
+        val firestoreId = encuesta.firestoreId ?: return
+
+
+        val ref = db.collection("usuarios")
+            .document(encuesta.userUid)
+            .collection("encuestas")
+            .document(firestoreId)
+            .collection("alimentos")
+            .document(alimento.getFirestoreId())
+
+        ref.set(
+            mapOf(
+                "nombre" to alimento.nombre_alimento,
+                "categoria" to alimento.categoria,
+                "cantidad" to alimento.cantidad_alimento,
+                "numero_veces" to alimento.numero_veces,
+                "frecuencia" to alimento.frecuencia_veces,
+                "gramos" to alimento.gramos,
+                "kcal" to alimento.kcal,
+                "carbohidratos" to alimento.carbohidratos,
+                "proteinas" to alimento.proteinas,
+                "grasas" to alimento.grasas,
+                "alcohol" to alimento.alcohol,
+                "colesterol" to alimento.colesterol,
+                "fibra" to alimento.fibra
+            )
+        ).await()
     }
 
     @WorkerThread
@@ -129,11 +172,15 @@ class RepositorioEncuestas(
     }
 
     @WorkerThread
-    suspend fun markCompleted(encuestaId: Int, index: Int) {
-        encuestaDAO.markCompleted(encuestaId, index, System.currentTimeMillis())
-        val encuesta = encuestaDAO.getEncuestaByIdOnce(encuestaId) ?: return
-        val alimentos = alimentoDAO.obtenerAlimentosPorEncuesta(encuestaId)
+    suspend fun markCompleted(encuesta: Encuesta) {
         try {
+            encuestaDAO.update(encuesta)
+        } catch (e: Exception) {
+            Log.e("FIREBASE", "Error actualizando encuesta: ${e.message}")
+        }
+
+        try {
+            val alimentos = alimentoDAO.obtenerAlimentosPorEncuesta(encuesta.encuestaId)
             subirEncuestaCompletaAFirebase(encuesta, alimentos)
             Log.d("FIREBASE", "Encuesta marcada como completada en Firebase")
         } catch (e: Exception) {
@@ -141,25 +188,29 @@ class RepositorioEncuestas(
         }
     }
 
-    private suspend fun subirEncuestaCompletaAFirebase(encuesta: Encuesta, alimentos: List<Alimento>) {
-        val firestoreId = encuesta.firestoreId ?: return
+    private suspend fun subirEncuestaCompletaAFirebase(encuesta: Encuesta, alimentos: List<Alimento>) = withContext(NonCancellable) {
+        Log.d("FIREBASE", "UID: ${encuesta.userUid}")
+        Log.d("FIREBASE", "DocID: ${encuesta.firestoreId}")
+        Log.d("FIREBASE", "Completa: ${encuesta.completa}")
+        val firestoreId = encuesta.firestoreId ?: return@withContext
         val encuestaRef = db.collection("usuarios")
             .document(encuesta.userUid)
             .collection("encuestas")
             .document(firestoreId)
-
+        Log.d("FIREBASE", "EncuestaRef: $encuestaRef")
         encuestaRef.update(
             mapOf(
-                "completa" to true,
+                "completa" to encuesta.completa,
                 "currentIndex" to encuesta.currentIndex,
                 "updatedAt" to System.currentTimeMillis()
             )
         ).await()
+        Log.d("FIREBASE", "Salio del update de encuesta")
 
         val alimentosCollection = encuestaRef.collection("alimentos")
         alimentos.forEach { alimento ->
             alimentosCollection
-                .document(alimento.alimentoid.toString())
+                .document(alimento.getFirestoreId())
                 .set(
                     mapOf(
                         "nombre" to alimento.nombre_alimento,
@@ -179,6 +230,7 @@ class RepositorioEncuestas(
                 )
                 .await()
         }
+        Log.d("FIREBASE", "Salio del update de alimentos")
     }
 
     @WorkerThread

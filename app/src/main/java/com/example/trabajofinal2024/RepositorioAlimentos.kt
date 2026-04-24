@@ -8,8 +8,8 @@ class RepositorioAlimentos(private val alimentoDAO: AlimentoDAO) {
 
     val allAlimentos: Flow<List<Alimento>> = alimentoDAO.getAlimentos()
 
-    suspend fun insert(alimento: Alimento) {
-        alimentoDAO.insertar(alimento)
+    suspend fun insert(alimento: Alimento):Long {
+        return alimentoDAO.insertar(alimento)
     }
 
     suspend fun borrarTodos() {
