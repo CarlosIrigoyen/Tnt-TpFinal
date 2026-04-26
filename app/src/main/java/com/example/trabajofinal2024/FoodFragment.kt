@@ -15,11 +15,23 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.trabajofinal2024.databinding.FragmentFoodBinding
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FoodFragment : Fragment(R.layout.fragment_food) {
 
     private lateinit var binding: FragmentFoodBinding
+
+    private var encuestaInicializada = false
+
+    private var setFoodJob: Job? = null
+
+
     private val alimentoViewModel: AlimentoViewModel by viewModels {
         AlimentoViewModel.AlimentoViewModelFactory((activity?.application as App).alimentoRepositorio)
     }
@@ -27,7 +39,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
         EncuestaViewModel.EncuestaViewModelFactory((activity?.application as App).encuestaRepositorio)
     }
 
-    private var encuestaId: Int = 0
+    private var encuestaId: String? = ""
     private var currentIndex: Int = 0
 
     private var encuestaActual: Encuesta? = null
@@ -41,50 +53,11 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
         private const val ARG_ENCUESTA_ID = "encuestaid"
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let { encuestaId = it.getInt(ARG_ENCUESTA_ID, 0) }
+        arguments?.let { encuestaId = it.getString(ARG_ENCUESTA_ID) }
         currentIndex = savedInstanceState?.getInt(STATE_INDEX) ?: 0
-
-        val total = FoodCatalog.ALL.size
-        if (total == 0) currentIndex = 0
-        if (currentIndex < 0) currentIndex = 0
-        if (currentIndex >= total) currentIndex = 0
-
-        if (encuestaId > 0) {
-            encuestaViewModel.getEncuestaById(encuestaId).observe(this) { encuesta ->
-                encuesta?.let {
-                    encuestaCompletada = it.completa
-                    encuestaActual = it
-
-                    if (it.completa) {
-                        // Encuesta ya completada
-                        Toast.makeText(
-                            requireContext(),
-                            "Esta encuesta ya fue completada.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        findNavController().popBackStack()
-                        return@observe
-                    }
-
-                    // Si está abandonada, mostramos mensaje
-                    if (!it.activa) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Reanudando encuesta abandonada...",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    currentIndex = it.currentIndex.coerceIn(0, FoodCatalog.ALL.size - 1)
-                    setFoodAtIndex(currentIndex)
-
-                    // Mostrar progreso
-                    binding.progresoText.text = "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
-                }
-            }
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -105,18 +78,21 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
             return
         }
 
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val encuestaId = encuestaActual?.firestoreId ?: return
+
         val template = FoodCatalog.ALL[index]
+        setFoodJob?.cancel()
+        setFoodJob = lifecycleScope.launch {
+            val alimentoGuardado = alimentoViewModel.getAlimentoFirebase(uid, encuestaId, template.nombre)
 
-        lifecycleScope.launch {
-            val alimentoGuardado = alimentoViewModel.getAlimento(encuestaId, template.nombre)
-
+            if (!isActive) return@launch
             val item = if (alimentoGuardado != null) {
                 FoodItem(template).apply {
                     numeroveces.value = alimentoGuardado.numero_veces
                     cantidad.value = alimentoGuardado.cantidad_alimento
                     frecuencia.value = alimentoGuardado.frecuencia_veces
                 }.also {
-                    // ⚡ Restaurar UI solo si hay valores guardados
                     foodItem = it
                     binding.foodItem = foodItem
                     restaurarUI()
@@ -183,7 +159,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
             ?: "Nunca"
 
         val alimentoBase = Alimento(
-            encuestaId = encuestaId,
+            encuestaId = 0,
             nombre_alimento = currentFood.alimentoNombre,
             categoria = currentFood.categoria,
             cantidad_alimento = cantidadSeleccionada,
@@ -247,12 +223,58 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Inicializar texto de progreso
-        binding.progresoText.text = "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
+
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val idEncuesta = encuestaId ?: return
+
+        encuestaViewModel.getEncuestaFirebase(uid, idEncuesta)
+            .observe(viewLifecycleOwner) {
+                        encuesta ->
+
+                    if (encuesta == null) {
+                        Toast.makeText(requireContext(), "Encuesta no encontrada", Toast.LENGTH_SHORT).show()
+                        findNavController().popBackStack()
+                        return@observe
+                    }
+                    encuestaCompletada = encuesta.completa
+                    encuestaActual = encuesta
+
+                    if (encuesta.completa) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Esta encuesta ya fue completada.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        findNavController().popBackStack()
+
+                        return@observe
+                    }
+
+                    if (!encuesta.activa) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Reanudando encuesta abandonada...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    if (!encuestaInicializada) {
+                        encuestaInicializada = true
+                        currentIndex = encuesta.currentIndex
+                            .coerceIn(0, FoodCatalog.ALL.size - 1)
+
+                        setFoodAtIndex(currentIndex)
+
+                        binding.progresoText.text =
+                            "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
+
+                    }
+            }
+
 
         configurarNumeroVeces()
         configurarSpinner()
-        setFoodAtIndex(currentIndex)
         binding.increment.setOnClickListener {
             val current = binding.spinnerOpciones.selectedItemPosition
             val next = (current + 1).coerceAtMost(cantidadOpciones.size - 1)
@@ -286,20 +308,24 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
 
                 lifecycleScope.launch {
 
+                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                    val encuestaId = encuestaActual?.firestoreId ?: return@launch
+
                     val alimento = construirAlimentoDesdeUI()
                     Log.d("Alimento", alimento?.encuestaId.toString())
                     if (alimento != null) {
-                        guardarAlimento(alimento) // update si existe, insert si no
+                        guardarAlimento(uid, encuestaId,alimento) // update si existe, insert si no
                     }
 
                     currentIndex--
 
-                    encuestaViewModel.updateProgress(encuestaId, currentIndex)
+                    encuestaViewModel.updateProgress(uid, encuestaId, currentIndex)
 
                     binding.progresoText.text =
                         "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
 
                     setFoodAtIndex(currentIndex)
+
                 }
             }
         }
@@ -309,55 +335,50 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
             lifecycleScope.launch {
 
                 val alimento = construirAlimentoDesdeUI() ?: return@launch
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                val encuestaId = encuestaActual?.firestoreId ?: return@launch
 
-                guardarAlimento(alimento)
+                guardarAlimento(uid, encuestaId, alimento)
 
                 currentIndex++
 
-                encuestaViewModel.updateProgress(encuestaId, currentIndex)
+                encuestaViewModel.updateProgress(uid, encuestaId, currentIndex)
 
                 if (currentIndex >= FoodCatalog.ALL.size) {
 
-                    encuestaActual?.let {
-                        Log.d("FIREBASE", "Actualizando encuesta en Firebase: ${encuestaActual?.firestoreId}")
-                        it.currentIndex = currentIndex - 1
-                        it.completa = true
-                        encuestaViewModel.markCompleted(it)
+                    encuestaViewModel.markCompletedFirebase(uid, encuestaId, currentIndex - 1)
 
+                    Toast.makeText(
+                        requireContext(),
+                        "¡Encuesta completada!",
+                        Toast.LENGTH_LONG
+                    ).show()
 
-                    }
-                    context?.let {
-                        Toast.makeText( it,
-                            "¡Encuesta completada!",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    findNavController().popBackStack()
 
-                    if (isAdded) {
-                        findNavController().popBackStack()
-                    }
+                }
 
-
-                } else {
+                else {
 
                     binding.progresoText.text =
                         "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
 
                     setFoodAtIndex(currentIndex)
-
                 }
             }
         }
 
         binding.cancelarEncuesta.setOnClickListener {
-            // Solo regresa sin abandonar
-            findNavController().popBackStack()
+            findNavController().popBackStack(R.id.encuestasListFragment, false)
         }
 
         binding.abandonarEncuesta.setOnClickListener {
-            if (encuestaId > 0) {
+
+            if (encuestaId != null) {
                 lifecycleScope.launch {
-                    encuestaViewModel.abandonEncuesta(encuestaId)
+                    val encuestaId = encuestaActual?.firestoreId ?: return@launch
+                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                    encuestaViewModel.abandonEncuestaFirebase(uid, encuestaId)
                     Toast.makeText(
                         requireContext(),
                         "Encuesta abandonada. Puedes reanudarla más tarde desde la lista.",
@@ -383,20 +404,10 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
     }
 
 
-    private suspend fun guardarAlimento(alimento: Alimento) {
+    private suspend fun guardarAlimento(uid: String, encuestaId: String, alimento: Alimento) {
 
-        val existente =
-            alimentoViewModel.getAlimento(encuestaId, alimento.nombre_alimento)
-
-        if (existente != null) {
-            alimento.alimentoid = existente.alimentoid
-            alimentoViewModel.update(alimento)
-        } else {
-            alimentoViewModel.insert(alimento)
-        }
-
-        encuestaActual?.let { encuesta ->
-            encuestaViewModel.guardarAlimentoFirebase(encuesta, alimento)
-        }
+        alimentoViewModel.guardarAlimentoEnFirebase(uid, encuestaId, alimento)
     }
-}
+
+
+    }

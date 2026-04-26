@@ -5,20 +5,29 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
 
-    private val repositorio: RepositorioEncuestas
-        get() = (requireActivity().application as App).encuestaRepositorio
+    private val alimentoViewModel: AlimentoViewModel by viewModels {
+        AlimentoViewModel.AlimentoViewModelFactory(
+            (requireActivity().application as App).alimentoRepositorio
+        )
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val encuestaId = arguments?.getInt("encuestaid", 0) ?: 0
+        val encuestaId = arguments?.getString("encuestaid") ?: ""
+
+        val encuestaNumero = arguments?.getInt("encuestaNumero", 0) ?: 0
+
 
         // TextViews totales
         val tvSub: TextView = view.findViewById(R.id.tvSubtitulo)
@@ -41,12 +50,14 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
 
         val btnVolver: Button = view.findViewById(R.id.btnVolver)
 
-        tvSub.text = "Encuesta #$encuestaId"
+        tvSub.text = "Encuesta #$encuestaNumero"
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
         // Cargar datos y calcular totales/promedios en coroutine
         lifecycleScope.launch {
             try {
-                val alimentos = repositorio.obtenerAlimentosPorEncuesta(encuestaId)
+                val alimentos = alimentoViewModel.getAlimentosPorEncuestaFirebase(uid, encuestaId)
 
                 var totalKcal = 0.0
                 var totalCarbo = 0.0

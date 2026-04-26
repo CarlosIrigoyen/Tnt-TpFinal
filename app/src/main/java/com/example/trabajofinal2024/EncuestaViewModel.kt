@@ -30,6 +30,16 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
         }
     }
 
+    private val _firestoreId = MutableLiveData<String?>()
+    val firestoreId: LiveData<String?> = _firestoreId
+
+    fun insertFirebase(encuesta: Encuesta) {
+        viewModelScope.launch {
+            val id = repositorio.insertFirebase(encuesta)
+            _firestoreId.postValue(id)
+        }
+    }
+
     fun update(encuesta: Encuesta) = viewModelScope.launch {
         repositorio.update(encuesta)
     }
@@ -38,34 +48,49 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
 
     fun getEncuestaById(id: Int) = repositorio.getEncuestaById(id).asLiveData()
 
+    fun getEncuestaFirebase(uid: String, encuestaId: String) = repositorio.getEncuestaFirebase(uid, encuestaId)
+
+
+
     fun getEncuestasPorUsuario(uid: String) = repositorio.getEncuestasPorUsuario(uid).asLiveData()
 
     fun getPendientesPorUsuario(uid: String) = repositorio.getPendientesPorUsuario(uid).asLiveData()
 
-    fun updateProgress(encuestaId: Int, index: Int) = viewModelScope.launch {
-        repositorio.updateProgress(encuestaId, index)
+    fun updateProgress(uid: String, encuestaId: String, index: Int) = viewModelScope.launch {
+        repositorio.updateProgress(uid, encuestaId, index)
     }
 
      suspend fun markCompleted(encuesta: Encuesta) {
          repositorio.markCompleted(encuesta)
      }
+
+    fun markCompletedFirebase(uid: String, encuestaId: String, currentIndex: Int) {
+         viewModelScope.launch {
+             repositorio.markCompletedFirebase(uid, encuestaId, currentIndex)
+         }
+    }
+
     fun abandonEncuesta(encuestaId: Int) = viewModelScope.launch {
         repositorio.abandonEncuesta(encuestaId)
+    }
+
+    fun abandonEncuestaFirebase(uid: String, encuestaId: String) = viewModelScope.launch {
+            repositorio.abandonEncuestaFirebase(uid, encuestaId)
     }
 
     fun reanudarEncuesta(encuestaId: Int) = viewModelScope.launch {
         repositorio.reanudarEncuesta(encuestaId)
     }
 
+    fun reanudarEncuestaFirebase(uid: String, encuestaId: String) = viewModelScope.launch {
+        repositorio.reanudarEncuestaFirebase(uid, encuestaId)
+    }
+
     fun startListeningFirestore(userUid: String) {
         repositorio.listenEncuestasFromFirestore(userUid)
     }
 
-    fun guardarAlimentoFirebase(encuesta: Encuesta, alimento: Alimento) {
-        viewModelScope.launch {
-            repositorio.guardarAlimentoEnFirebase(encuesta, alimento)
-        }
-    }
+
 
 
     // Método obsoleto eliminado

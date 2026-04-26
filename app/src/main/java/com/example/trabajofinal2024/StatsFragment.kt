@@ -4,6 +4,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -44,10 +46,17 @@ class StatsFragment : Fragment(R.layout.fragment_stats) {
     private lateinit var scatterChart: ScatterChart
     private lateinit var chipGroupNutrientes: ChipGroup
 
+    private lateinit var progressBar: ProgressBar
+    private lateinit var contenidoStats: LinearLayout
+
+
     private var currentList: List<AlimentoDAO.DailySurveyStats> = emptyList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        progressBar = view.findViewById(R.id.progressBar)
+        contenidoStats = view.findViewById(R.id.stats_container)
 
         tvNumEncuestas = view.findViewById(R.id.tvNumEncuestas)
         tvKcal = view.findViewById(R.id.tvAvgKcal)
@@ -84,7 +93,7 @@ class StatsFragment : Fragment(R.layout.fragment_stats) {
             return
         }
 
-        statsViewModel.getAveragesForUser(uid).observe(viewLifecycleOwner) { stats ->
+        statsViewModel.getAveragesForUserFirebase(uid).observe(viewLifecycleOwner) { stats ->
             if (stats == null) {
                 tvKcal.text = "Kcal promedio: 0"
                 tvCarbs.text = "Carbohidratos promedio: 0"
@@ -106,7 +115,10 @@ class StatsFragment : Fragment(R.layout.fragment_stats) {
             }
         }
 
-        statsViewModel.getDailyTotals(uid).observe(viewLifecycleOwner) { dailyList ->
+        statsViewModel.getDailyTotalsByUserFirebase(uid).observe(viewLifecycleOwner) { dailyList ->
+
+            progressBar.visibility = View.GONE
+            contenidoStats.visibility = View.VISIBLE
 
             if (dailyList.isNullOrEmpty()) {
                 tvNumEncuestas.text = "Encuestas completadas: 0"
@@ -118,6 +130,8 @@ class StatsFragment : Fragment(R.layout.fragment_stats) {
 
             currentList = dailyList
             tvNumEncuestas.text = "Encuestas completadas: ${currentList.size}"
+
+
 
             configurarGrafico(
                 currentList,

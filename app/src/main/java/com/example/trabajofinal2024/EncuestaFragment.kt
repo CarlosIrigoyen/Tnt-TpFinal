@@ -74,13 +74,13 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
                     updatedAt = System.currentTimeMillis()
                 )
 
-                encuestaViewModel.insert(nuevaEncuesta)
+                encuestaViewModel.insertFirebase(nuevaEncuesta)
                 Toast.makeText(context, "Creando encuesta...", Toast.LENGTH_SHORT).show()
 
-                encuestaViewModel.encuestaId.observe(viewLifecycleOwner) { encuestaid ->
-                    if (encuestaid != null && encuestaid > 0) {
+                encuestaViewModel.firestoreId.observe(viewLifecycleOwner) { encuestaid ->
+                    if (encuestaid != null && encuestaid != "") {
                         encuestaViewModel.encuestaId.removeObservers(viewLifecycleOwner)
-                        val bundle = Bundle().apply { putInt("encuestaid", encuestaid) }
+                        val bundle = Bundle().apply { putString("encuestaid", encuestaid) }
                         findNavController().navigate(R.id.action_encuestaFragment_to_foodFragment, bundle)
                     } else {
                         comenzarButton.isEnabled = true

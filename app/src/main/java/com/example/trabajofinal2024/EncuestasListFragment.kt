@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -58,7 +59,7 @@ class EncuestasListFragment : Fragment() {
                         findNavController().navigate(R.id.loginFragment)
                     } else {
                         val encuestas by encuestaViewModel.getEncuestasPorUsuario(uid)
-                            .observeAsState(initial = emptyList())
+                            .observeAsState(initial = null)
 
                         EncuestasContent(
                             encuestas = encuestas,
@@ -66,25 +67,32 @@ class EncuestasListFragment : Fragment() {
                                 findNavController().navigate(R.id.action_encuestasList_to_encuestaFragment)
                             },
                             onResumeEncuesta = { encuesta ->
-                                val bundle = Bundle().apply { putInt("encuestaid", encuesta.encuestaId) }
-                                findNavController().navigate(R.id.action_encuestasList_to_foodFragment, bundle)
+                                val bundle =
+                                    Bundle().apply { putString("encuestaid", encuesta.firestoreId) }
+                                findNavController().navigate(
+                                    R.id.action_encuestasList_to_foodFragment,
+                                    bundle
+                                )
                             },
                             onReanudar = { encuesta ->
                                 lifecycleScope.launch {
-                                    encuestaViewModel.reanudarEncuesta(encuesta.encuestaId)
+                                    val encuestaId = encuesta.firestoreId ?: return@launch
+                                    encuestaViewModel.reanudarEncuestaFirebase(uid, encuestaId)
                                     Toast.makeText(requireContext(), "Encuesta #${encuesta.encuestaId} reanudada.", Toast.LENGTH_SHORT).show()
-                                    val bundle = Bundle().apply { putInt("encuestaid", encuesta.encuestaId) }
+                                    val bundle = Bundle().apply { putString("encuestaid", encuesta.firestoreId) }
                                     findNavController().navigate(R.id.action_encuestasList_to_foodFragment, bundle)
                                 }
                             },
                             onAbandonar = { encuesta ->
                                 lifecycleScope.launch {
-                                    encuestaViewModel.abandonEncuesta(encuesta.encuestaId)
+                                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                                    val encuestaId = encuesta.firestoreId ?: return@launch
+                                    encuestaViewModel.abandonEncuestaFirebase(uid, encuestaId)
                                     Toast.makeText(requireContext(), "Encuesta #${encuesta.encuestaId} abandonada.", Toast.LENGTH_SHORT).show()
                                 }
                             },
-                            onVerDetalles = { encuesta ->
-                                val bundle = Bundle().apply { putInt("encuestaid", encuesta.encuestaId) }
+                            onVerDetalles = { encuesta, index ->
+                                val bundle = Bundle().apply { putString("encuestaid", encuesta.firestoreId); putInt("encuestaNumero", index + 1)}
                                 findNavController().navigate(R.id.detalleEncuestaFragment, bundle)
                             }
                         )
@@ -97,40 +105,60 @@ class EncuestasListFragment : Fragment() {
 
 @Composable
 private fun EncuestasContent(
-    encuestas: List<Encuesta>,
+    encuestas: List<Encuesta>?,
     onNuevaEncuesta: () -> Unit,
     onResumeEncuesta: (Encuesta) -> Unit,
     onReanudar: (Encuesta) -> Unit,
     onAbandonar: (Encuesta) -> Unit,
-    onVerDetalles: (Encuesta) -> Unit
+    onVerDetalles: (Encuesta, Int) -> Unit
 ) {
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         floatingActionButton = {
-            FloatingActionButton(onClick = onNuevaEncuesta,     backgroundColor = MaterialTheme.colors.primary) {
+            FloatingActionButton(
+                onClick = onNuevaEncuesta,
+                backgroundColor = MaterialTheme.colors.primary
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "Nueva encuesta", tint = Color.White)
             }
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
-
-            if (encuestas.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No hay encuestas cargadas")
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .padding(16.dp)
+        ) {
+            when {
+                encuestas == null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            } else {
-                LazyColumn {
-                    items(encuestas) { encuesta ->
-                        EncuestaItem(
-                            encuesta = encuesta,
-                            onResume = { onResumeEncuesta(encuesta) },
-                            onReanudar = { onReanudar(encuesta) },
-                            onAbandonar = { onAbandonar(encuesta) },
-                            onVerDetalles = { onVerDetalles(encuesta) }
-                        )
+
+                encuestas.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No hay encuestas cargadas")
+                    }
+                }
+
+                else -> {
+                    LazyColumn {
+                        itemsIndexed(encuestas) { index, encuesta ->
+                            EncuestaItem(
+                                encuesta = encuesta,
+                                index = index,
+                                onResume = { onResumeEncuesta(encuesta) },
+                                onReanudar = { onReanudar(encuesta) },
+                                onAbandonar = { onAbandonar(encuesta) },
+                                onVerDetalles = { onVerDetalles(encuesta, index) }
+                            )
+                        }
                     }
                 }
             }
@@ -141,19 +169,24 @@ private fun EncuestasContent(
 @Composable
 private fun EncuestaItem(
     encuesta: Encuesta,
+    index: Int,
     onResume: () -> Unit,
     onReanudar: () -> Unit,
     onAbandonar: () -> Unit,
-    onVerDetalles: () -> Unit
+    onVerDetalles: (Int) -> Unit
 ) {
     val totalAlimentos = FoodCatalog.ALL.size
     val progreso = (encuesta.currentIndex + 1).coerceAtMost(totalAlimentos)
     val porcentaje = if (totalAlimentos > 0) (progreso * 100 / totalAlimentos) else 0
 
-    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), elevation = 6.dp) {
-        Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp), elevation = 6.dp) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "Encuesta #${encuesta.encuestaId}", style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold))
+                Text(text = "Encuesta #${index + 1}", style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold))
                 val estado = when {
                     encuesta.completa -> "COMPLETADA"
                     !encuesta.activa -> "ABANDONADA"
@@ -170,7 +203,7 @@ private fun EncuestaItem(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 when {
                     encuesta.completa -> {
-                        Button(onClick = onVerDetalles, modifier = Modifier.weight(1f)) {
+                        Button(onClick = { onVerDetalles(index) }, modifier = Modifier.weight(1f)) {
                             Text("Ver Detalles")
                         }
                     }
@@ -180,10 +213,14 @@ private fun EncuestaItem(
                         }
                     }
                     else -> {
-                        Button(onClick = onResume, modifier = Modifier.weight(1f).padding(end = 4.dp)) {
+                        Button(onClick = onResume, modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 4.dp)) {
                             Text("Continuar")
                         }
-                        Button(onClick = onAbandonar, modifier = Modifier.weight(1f).padding(start = 4.dp)) {
+                        Button(onClick = onAbandonar, modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 4.dp)) {
                             Text("Abandonar")
                         }
                     }
