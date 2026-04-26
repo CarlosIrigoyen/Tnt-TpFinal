@@ -1,7 +1,13 @@
 package com.example.trabajofinal2024
 
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -21,6 +27,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import kotlin.math.roundToInt
 import kotlin.math.max
+import com.example.trabajofinal2024.setStatText
 
 class StatsFragment : Fragment(R.layout.fragment_stats) {
 
@@ -95,23 +102,23 @@ class StatsFragment : Fragment(R.layout.fragment_stats) {
 
         statsViewModel.getAveragesForUserFirebase(uid).observe(viewLifecycleOwner) { stats ->
             if (stats == null) {
-                tvKcal.text = "Kcal promedio: 0"
-                tvCarbs.text = "Carbohidratos promedio: 0"
-                tvProteinas.text = "Proteínas promedio: 0"
-                tvColesterol.text = "Colesterol promedio: 0"
-                tvFibra.text = "Fibras promedio: 0"
-                tvGrasas.text = "Grasas totales promedio: 0"
-                tvGramosTotales.text = "Gramos totales promedio: 0"
-                tvAlcohol.text = "Alcohol promedio: 0"
+                tvKcal.setStatText("Kcal promedio", "0", "kcal")
+                tvCarbs.setStatText("Carbohidratos promedio", "0", "g")
+                tvProteinas.setStatText("Proteínas promedio", "0", "g")
+                tvColesterol.setStatText("Colesterol promedio", "0", "mg")
+                tvFibra.setStatText("Fibras promedio", "0", "g")
+                tvGrasas.setStatText("Grasas totales promedio", "0", "g")
+                tvGramosTotales.setStatText("Gramos totales promedio", "0", "g")
+                tvAlcohol.setStatText("Alcohol promedio", "0", "g")
             } else {
-                tvKcal.text = "Kcal promedio: ${stats.avg_kcal?.let { String.format("%.0f", it) } ?: "0"}"
-                tvCarbs.text = "Carbohidratos promedio: ${stats.avg_carbohidratos?.let { String.format("%.1f", it) } ?: "0"} g"
-                tvProteinas.text = "Proteínas promedio: ${stats.avg_proteinas?.let { String.format("%.1f", it) } ?: "0"} g"
-                tvColesterol.text = "Colesterol promedio: ${stats.avg_colesterol?.let { String.format("%.1f", it) } ?: "0"} mg"
-                tvFibra.text = "Fibras promedio: ${stats.avg_fibra?.let { String.format("%.1f", it) } ?: "0"} g"
-                tvGrasas.text = "Grasas totales promedio: ${stats.avg_grasas?.let { String.format("%.1f", it) } ?: "0"} g"
-                tvGramosTotales.text = "Gramos totales promedio: ${stats.avg_gramos?.let { String.format("%.1f", it) } ?: "0"} g"
-                tvAlcohol.text = "Alcohol promedio: ${stats.avg_alcohol?.let { String.format("%.1f", it) } ?: "0"} g"
+                tvKcal.setStatText(          "Kcal promedio",           stats.avg_kcal?.let { String.format("%.0f", it) } ?: "0",  "kcal")
+                tvCarbs.setStatText(         "Carbohidratos promedio",  stats.avg_carbohidratos?.let { String.format("%.1f", it) } ?: "0", "g")
+                tvProteinas.setStatText(     "Proteínas promedio",      stats.avg_proteinas?.let { String.format("%.1f", it) } ?: "0", "g")
+                tvColesterol.setStatText(    "Colesterol promedio",     stats.avg_colesterol?.let { String.format("%.1f", it) } ?: "0", "mg")
+                tvFibra.setStatText(         "Fibras promedio",         stats.avg_fibra?.let { String.format("%.1f", it) } ?: "0", "g")
+                tvGrasas.setStatText(        "Grasas totales promedio", stats.avg_grasas?.let { String.format("%.1f", it) } ?: "0", "g")
+                tvGramosTotales.setStatText( "Gramos totales promedio", stats.avg_gramos?.let { String.format("%.1f", it) } ?: "0", "g")
+                tvAlcohol.setStatText(       "Alcohol promedio",        stats.avg_alcohol?.let { String.format("%.1f", it) } ?: "0", "g")
             }
         }
 
@@ -184,6 +191,8 @@ class StatsFragment : Fragment(R.layout.fragment_stats) {
             }
         }
     }
+
+
 
     private fun configurarGrafico(
         dailyList: List<AlimentoDAO.DailySurveyStats>,

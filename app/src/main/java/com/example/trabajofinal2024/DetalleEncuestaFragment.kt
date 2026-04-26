@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import com.example.trabajofinal2024.setStatText
 
 class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
 
@@ -83,22 +84,22 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
                 fun dbl(v: Double) = ((v * 10.0).roundToInt() / 10.0)
 
                 // Totales
-                tvKcalTotal.text = "Kcal total: ${dbl(totalKcal)}"
-                tvCarboTotal.text = "Carbohidratos total: ${dbl(totalCarbo)} g"
-                tvProteTotal.text = "Proteínas total: ${dbl(totalProte)} g"
-                tvColesterolTotal.text = "Colesterol total: ${dbl(totalColesterol)} mg"
-                tvFibraTotal.text = "Fibras total: ${dbl(totalFibra)} g"
-                tvGrasasTotal.text = "Grasas totales: ${dbl(totalGrasas)} g"
-                tvAlcoholTotal.text = "Alcohol total: ${dbl(totalAlcohol)} g"
-                tvGramosTotal.text = "Gramos totales: ${dbl(totalGramos)} g"
+                tvKcalTotal.setStatText("Kcal total", dbl(totalKcal).toString(), "kcal")
+                tvCarboTotal.setStatText("Carbohidratos total", dbl(totalCarbo).toString(), "g")
+                tvProteTotal.setStatText("Proteínas total", dbl(totalProte).toString(), "g")
+                tvColesterolTotal.setStatText("Colesterol total", dbl(totalColesterol).toString(), "mg")
+                tvFibraTotal.setStatText("Fibras total", dbl(totalFibra).toString(), "g")
+                tvGrasasTotal.setStatText("Grasas totales", dbl(totalGrasas).toString(), "g")
+                tvAlcoholTotal.setStatText("Alcohol total", dbl(totalAlcohol).toString(), "g")
+                tvGramosTotal.setStatText("Gramos totales", dbl(totalGramos).toString(), "g")
 
                 // Promedios por alimento
-                tvKcalProm.text = "Kcal promedio por alimento: ${dbl(totalKcal / n)}"
-                tvCarboProm.text = "Carbohidratos promedio por alimento: ${dbl(totalCarbo / n)} g"
-                tvProteProm.text = "Proteínas promedio por alimento: ${dbl(totalProte / n)} g"
-                tvGrasasProm.text = "Grasas promedio por alimento: ${dbl(totalGrasas / n)} g"
-                tvColesterolProm.text = "Colesterol promedio por alimento: ${dbl(totalColesterol / n)} mg"
-                tvFibraProm.text = "Fibra promedio por alimento: ${dbl(totalFibra / n)} g"
+                tvKcalProm.setStatText("Kcal promedio", dbl(totalKcal / n).toString(), "kcal")
+                tvCarboProm.setStatText("Carbohidratos promedio", dbl(totalCarbo / n).toString(), "g")
+                tvProteProm.setStatText("Proteínas promedio", dbl(totalProte / n).toString(), "g")
+                tvGrasasProm.setStatText("Grasas totales promedio", dbl(totalGrasas / n).toString(), "g")
+                tvColesterolProm.setStatText("Colesterol promedio", dbl(totalColesterol / n).toString(), "mg")
+                tvFibraProm.setStatText("Fibra promedio", dbl(totalFibra / n).toString(), "g")
 
             } catch (e: Exception) {
                 tvKcalTotal.text = "Error cargando datos: ${e.localizedMessage ?: e.message}"

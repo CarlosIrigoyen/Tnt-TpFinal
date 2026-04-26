@@ -16,9 +16,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
 import java.util.concurrent.ConcurrentHashMap
@@ -89,6 +91,31 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
 
 
         drawZones()
+
+        val mapEventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                // Solo deselecciona si hay una zona seleccionada
+                if (selectedZoneIndex != -1) {
+                    // Restaurar colores originales de todos los polígonos
+                    zonePolygons.forEach { (i, poly) ->
+                        poly.fillColor = zoneOriginalColors[i] ?: 0x30CCCCCC.toInt()
+                    }
+                    selectedZoneIndex = -1
+                    resetLeyenda()
+                    val totalCompletadas = zoneCompletes.sum()
+                    val totalPausadas = zonePaused.sum()
+                    tvLeyendaTitulo.text = "Total de encuestas"
+                    tvCompletadasValue.text = totalCompletadas.toString()
+                    tvPausadasValue.text = totalPausadas.toString()
+                    mapView.invalidate()
+                }
+                return true
+            }
+
+            override fun longPressHelper(p: GeoPoint?): Boolean = false
+        })
+
+        mapView.overlays.add(0, mapEventsOverlay)
 
         // Iniciar escucha en tiempo real
         val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -191,6 +218,7 @@ class MapaFragment : Fragment(R.layout.fragment_mapa) {
             m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
             m.icon = drawable
             m.title = null
+            m.infoWindow = null
             mapView.overlays.add(m)
             labelMarkers[index] = m
         }

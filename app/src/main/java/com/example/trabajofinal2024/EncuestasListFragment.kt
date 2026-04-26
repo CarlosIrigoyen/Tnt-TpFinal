@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +34,9 @@ class EncuestasListFragment : Fragment() {
             (requireActivity().application as App).encuestaRepositorio
         )
     }
+
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -103,6 +108,8 @@ class EncuestasListFragment : Fragment() {
     }
 }
 
+enum class FiltroEncuesta { TODAS, EN_PROGRESO, COMPLETADAS, ABANDONADAS }
+
 @Composable
 private fun EncuestasContent(
     encuestas: List<Encuesta>?,
@@ -112,6 +119,19 @@ private fun EncuestasContent(
     onAbandonar: (Encuesta) -> Unit,
     onVerDetalles: (Encuesta, Int) -> Unit
 ) {
+    var filtroSeleccionado by remember { mutableStateOf(FiltroEncuesta.TODAS) }
+
+    val encuestasFiltradas: List<IndexedValue<Encuesta>>? = encuestas
+        ?.withIndex()
+        ?.filter { (_, encuesta) ->
+            when (filtroSeleccionado) {
+                FiltroEncuesta.TODAS        -> true
+                FiltroEncuesta.EN_PROGRESO  -> encuesta.activa && !encuesta.completa
+                FiltroEncuesta.COMPLETADAS  -> encuesta.completa
+                FiltroEncuesta.ABANDONADAS  -> !encuesta.activa && !encuesta.completa
+            }
+        }
+
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         floatingActionButton = {
@@ -128,8 +148,14 @@ private fun EncuestasContent(
                 .padding(padding)
                 .padding(16.dp)
         ) {
+            FiltroSelector(
+                seleccionado = filtroSeleccionado,
+                onFiltroChange = { filtroSeleccionado = it }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
             when {
-                encuestas == null -> {
+                encuestasFiltradas == null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -138,7 +164,7 @@ private fun EncuestasContent(
                     }
                 }
 
-                encuestas.isEmpty() -> {
+                encuestasFiltradas.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -149,19 +175,55 @@ private fun EncuestasContent(
 
                 else -> {
                     LazyColumn {
-                        itemsIndexed(encuestas) { index, encuesta ->
+                        items(encuestasFiltradas) { indexedEncuesta ->
                             EncuestaItem(
-                                encuesta = encuesta,
-                                index = index,
-                                onResume = { onResumeEncuesta(encuesta) },
-                                onReanudar = { onReanudar(encuesta) },
-                                onAbandonar = { onAbandonar(encuesta) },
-                                onVerDetalles = { onVerDetalles(encuesta, index) }
+                                encuesta = indexedEncuesta.value,
+                                index = indexedEncuesta.index,
+                                onResume = { onResumeEncuesta(indexedEncuesta.value) },
+                                onReanudar = { onReanudar(indexedEncuesta.value) },
+                                onAbandonar = { onAbandonar(indexedEncuesta.value) },
+                                onVerDetalles = { onVerDetalles(indexedEncuesta.value, indexedEncuesta.index) }
                             )
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+
+
+@Composable
+private fun FiltroSelector(
+    seleccionado: FiltroEncuesta,
+    onFiltroChange: (FiltroEncuesta) -> Unit
+) {
+    val opciones = listOf(
+        FiltroEncuesta.TODAS       to "Todas",
+        FiltroEncuesta.EN_PROGRESO to "En progreso",
+        FiltroEncuesta.COMPLETADAS to "Completadas",
+        FiltroEncuesta.ABANDONADAS to "Abandonadas"
+    )
+
+    ScrollableTabRow(
+        selectedTabIndex = opciones.indexOfFirst { it.first == seleccionado },
+        backgroundColor = MaterialTheme.colors.surface,
+        contentColor = MaterialTheme.colors.primary,
+        edgePadding = 0.dp
+    ) {
+        opciones.forEach { (filtro, label) ->
+            Tab(
+                selected = seleccionado == filtro,
+                onClick = { onFiltroChange(filtro) },
+                text = {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.caption,
+                        maxLines = 1
+                    )
+                }
+            )
         }
     }
 }
@@ -187,17 +249,52 @@ private fun EncuestaItem(
             .padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(text = "Encuesta #${index + 1}", style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold))
-                val estado = when {
-                    encuesta.completa -> "COMPLETADA"
-                    !encuesta.activa -> "ABANDONADA"
-                    else -> "EN PROGRESO"
+                val (estadoTexto, estadoColor) = when {
+                    encuesta.completa  -> "COMPLETADA"  to Color(0xFF2E7D32) // verde oscuro
+                    !encuesta.activa   -> "ABANDONADA"  to Color(0xFFC62828) // rojo oscuro
+                    else               -> "EN PROGRESO" to Color(0xFFF9A825) // amarillo oscuro
                 }
-                Text(text = estado, style = MaterialTheme.typography.caption)
+                Surface(
+                    shape = RoundedCornerShape(50),
+                    color = estadoColor.copy(alpha = 0.15f)
+                ) {
+                    Text(
+                        text = estadoTexto,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        style = MaterialTheme.typography.caption.copy(
+                            color = estadoColor,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "${encuesta.domicilio} — ${encuesta.ciudad}", style = MaterialTheme.typography.body2)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Progreso: $progreso/$totalAlimentos alimentos ($porcentaje%)", style = MaterialTheme.typography.body2)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Progreso: $progreso/$totalAlimentos alimentos",
+                    style = MaterialTheme.typography.body2
+                )
+                Text(
+                    text = "$porcentaje%",
+                    style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            LinearProgressIndicator(
+                progress = porcentaje / 100f,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(50)),
+                color = MaterialTheme.colors.primary,
+                backgroundColor = Color.LightGray.copy(alpha = 0.3f)
+            )
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
