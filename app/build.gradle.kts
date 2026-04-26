@@ -166,6 +166,8 @@ dependencies {
     // Interoperabilidad LiveData <-> Compose
     implementation("androidx.compose.runtime:runtime-livedata")
 
+    implementation("androidx.compose.material3:material3")
+
 
 
     //Firebase
@@ -190,6 +192,19 @@ dependencies {
 
     //ChipGroup
     implementation("com.google.android.material:material:1.11.0")
+
+    // Firebase Cloud Messaging (para notificaciones push)
+    implementation("com.google.firebase:firebase-messaging-ktx:24.0.0")
+
+    // Coroutines y Flow
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+
+    implementation("androidx.cardview:cardview:1.0.0")
+
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.android.volley:volley:1.2.1")
+
 
 
 }

@@ -98,4 +98,9 @@
             app:argType="integer"
             android:defaultValue="0" />
     </fragment>
+    <fragment
+        android:id="@+id/turnosAdminFragment"
+        android:name="com.example.trabajofinal2024.TurnosAdminFragment"
+        android:label="Gestión de Turnos"
+        tools:layout="@layout/fragment_turnos_admin" />
 </navigation>

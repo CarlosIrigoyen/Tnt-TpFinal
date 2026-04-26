@@ -44,4 +44,9 @@ interface EncuestaDAO {  // La INTERFAZ se llama EncuestaDAO
 
     @Query("UPDATE encuestas SET activa = 1, updated_at = :updatedAt WHERE encuestaId = :id")
     suspend fun reanudarEncuesta(id: Int, updatedAt: Long)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdate(encuesta: Encuesta)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(encuestas: List<Encuesta>)
 }
