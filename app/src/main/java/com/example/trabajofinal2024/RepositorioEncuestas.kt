@@ -120,8 +120,7 @@ class RepositorioEncuestas(
     // ======================== LISTENER EN TIEMPO REAL (para ubicaciones) ========================
 
 
-    private val _encuestasFirestore = MutableLiveData<List<Encuesta>>()
-    val encuestasFirestore: LiveData<List<Encuesta>> = _encuestasFirestore
+
 
 
     private val _encuestasFirestore = MutableLiveData<List<Encuesta>>()

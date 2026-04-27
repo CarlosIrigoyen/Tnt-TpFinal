@@ -18,15 +18,11 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
     val db = Firebase.firestore
 
     suspend fun insert(alimento: Alimento):Long {
-        return alimentoDAO.insertar(alimento)
+        return alimentoDao.insertar(alimento)
     }
 
     suspend fun getAlimento(encuestaId: Int, nombre: String): Alimento? {
         return alimentoDao.getAlimento(encuestaId, nombre)
-    }
-
-    suspend fun update(alimento: Alimento) {
-        alimentoDao.update(alimento)
     }
 
     suspend fun getAlimentoFirebase(
@@ -112,59 +108,58 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
     }
 
     suspend fun update(alimento: Alimento) =
-        alimentoDAO.update(alimento)
+        alimentoDao.update(alimento)
 
 
     suspend fun guardarAlimentoEnFirebase(
         uid: String, encuestaId: String,
         alimento: Alimento
-    ) { withContext(NonCancellable) {
-        try {
-            val ref = db.collection("usuarios")
-                .document(uid)
-                .collection("encuestas")
-                .document(encuestaId)
-                .collection("alimentos")
-                .document(alimento.nombre_alimento)
+    ) {
+        withContext(NonCancellable) {
+            try {
+                val ref = db.collection("usuarios")
+                    .document(uid)
+                    .collection("encuestas")
+                    .document(encuestaId)
+                    .collection("alimentos")
+                    .document(alimento.nombre_alimento)
 
-            ref.set(
-                mapOf(
-                    "nombre" to alimento.nombre_alimento,
-                    "categoria" to alimento.categoria,
-                    "cantidad" to alimento.cantidad_alimento,
-                    "numero_veces" to alimento.numero_veces,
-                    "frecuencia" to alimento.frecuencia_veces,
-                    "gramos" to alimento.gramos,
-                    "kcal" to alimento.kcal,
-                    "carbohidratos" to alimento.carbohidratos,
-                    "proteinas" to alimento.proteinas,
-                    "grasas" to alimento.grasas,
-                    "alcohol" to alimento.alcohol,
-                    "colesterol" to alimento.colesterol,
-                    "fibra" to alimento.fibra
-                )
-            ).await()
+                ref.set(
+                    mapOf(
+                        "nombre" to alimento.nombre_alimento,
+                        "categoria" to alimento.categoria,
+                        "cantidad" to alimento.cantidad_alimento,
+                        "numero_veces" to alimento.numero_veces,
+                        "frecuencia" to alimento.frecuencia_veces,
+                        "gramos" to alimento.gramos,
+                        "kcal" to alimento.kcal,
+                        "carbohidratos" to alimento.carbohidratos,
+                        "proteinas" to alimento.proteinas,
+                        "grasas" to alimento.grasas,
+                        "alcohol" to alimento.alcohol,
+                        "colesterol" to alimento.colesterol,
+                        "fibra" to alimento.fibra
+                    )
+                ).await()
 
-        } catch(e: Exception) {
-            Log.e("FIREBASE", "Error guardando alimento: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("FIREBASE", "Error guardando alimento: ${e.message}")
+            }
+
         }
-
     }
-
-    }
-
 
     suspend fun obtenerAlimentosPorEncuesta(encuestaId: Int): List<Alimento> {
-        return alimentoDAO.obtenerAlimentosPorEncuesta(encuestaId)
+        return alimentoDao.obtenerAlimentosPorEncuesta(encuestaId)
     }
 
     suspend fun borrarPorEncuesta(encuestaId: Int) {
         alimentoDao.borrarPorEncuesta(encuestaId)
     }
 
-    // Estadísticas – funciones originales
     fun getStatsAveragesForUser(uid: String): Flow<StatsAverages?> {
         return alimentoDao.getAveragesPerCompletedEncuestaByUser(uid)
+    }
 
     suspend fun getStatsAveragesForUserFirebase(uid: String): StatsAverages? {
         return try {
@@ -288,9 +283,9 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
             emptyList()
         }
     }
-    }
 
     fun getDailyTotalsByUser(uid: String): LiveData<List<AlimentoDAO.DailySurveyStats>> {
         return alimentoDao.getDailyTotalsByUser(uid)
     }
-}
+    }
+
