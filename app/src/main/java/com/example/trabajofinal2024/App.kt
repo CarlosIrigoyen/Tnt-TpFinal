@@ -1,23 +1,36 @@
 package com.example.trabajofinal2024
 
 import android.app.Application
+import com.example.trabajofinal2024.AppDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
-class App: Application() {
+class App : Application() {
 
     val applicationScope = CoroutineScope(SupervisorJob())
 
-    //Encuestas
-    val encuestaDatabase by lazy { AppDatabase.getDatabase(this, applicationScope)}
+    // Base de datos única
+    val database by lazy { AppDatabase.getDatabase(this, applicationScope) }
+
+    // Repositorio de encuestas
     val encuestaRepositorio by lazy {
         RepositorioEncuestas(
-            encuestaDatabase.encuestaDAO(),
-            alimentoDatabase.alimentoDAO(),
+            database.encuestaDAO(),
+            database.alimentoDAO()
         )
     }
-    //Alimentos
 
-    val alimentoDatabase by lazy { AppDatabase.getDatabase(this, applicationScope)}
-    val alimentoRepositorio by lazy { RepositorioAlimentos(alimentoDatabase.alimentoDAO())}
+    // Repositorio de alimentos
+    val alimentoRepositorio by lazy {
+        RepositorioAlimentos(database.alimentoDAO())
+    }
+
+    // Repositorio de turnos
+    val turnoRepository by lazy {
+        TurnoRepository(
+            turnoDao = database.turnoDao(),
+            firestore = FirebaseFirestore.getInstance()
+        )
+    }
 }

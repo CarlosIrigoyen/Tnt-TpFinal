@@ -33,6 +33,9 @@ interface AlimentoDAO {
     @Query("DELETE FROM alimentos WHERE encuesta = :encuestaId")
     suspend fun borrarPorEncuesta(encuestaId: Int)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(alimentos: List<Alimento>)
+
     /**
      * Calcula el promedio por encuesta (sumas por encuesta) de los campos solicitados
      * para las encuestas completadas del usuario :uid.

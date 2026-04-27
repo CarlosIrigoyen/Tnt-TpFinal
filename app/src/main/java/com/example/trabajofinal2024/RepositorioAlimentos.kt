@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class RepositorioAlimentos(private val alimentoDAO: AlimentoDAO) {
+class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
 
-    val allAlimentos: Flow<List<Alimento>> = alimentoDAO.getAlimentos()
+    val allAlimentos: Flow<List<Alimento>> = alimentoDao.getAlimentos()
 
 
     val db = Firebase.firestore
@@ -21,12 +21,13 @@ class RepositorioAlimentos(private val alimentoDAO: AlimentoDAO) {
         return alimentoDAO.insertar(alimento)
     }
 
-    suspend fun borrarTodos() {
-        alimentoDAO.borrarTodos()
+    suspend fun getAlimento(encuestaId: Int, nombre: String): Alimento? {
+        return alimentoDao.getAlimento(encuestaId, nombre)
     }
 
-    suspend fun getAlimento(encuestaId: Int, nombre: String) =
-        alimentoDAO.getAlimento(encuestaId, nombre)
+    suspend fun update(alimento: Alimento) {
+        alimentoDao.update(alimento)
+    }
 
     suspend fun getAlimentoFirebase(
         uid: String,
@@ -158,11 +159,12 @@ class RepositorioAlimentos(private val alimentoDAO: AlimentoDAO) {
     }
 
     suspend fun borrarPorEncuesta(encuestaId: Int) {
-        alimentoDAO.borrarPorEncuesta(encuestaId)
+        alimentoDao.borrarPorEncuesta(encuestaId)
     }
 
-    // Nuevo: expone la query de estadísticas
-    fun getStatsAveragesForUser(uid: String) = alimentoDAO.getAveragesPerCompletedEncuestaByUser(uid)
+    // Estadísticas – funciones originales
+    fun getStatsAveragesForUser(uid: String): Flow<StatsAverages?> {
+        return alimentoDao.getAveragesPerCompletedEncuestaByUser(uid)
 
     suspend fun getStatsAveragesForUserFirebase(uid: String): StatsAverages? {
         return try {
@@ -286,7 +288,9 @@ class RepositorioAlimentos(private val alimentoDAO: AlimentoDAO) {
             emptyList()
         }
     }
+    }
 
-    fun getDailyTotalsByUser(uid: String) = alimentoDAO.getDailyTotalsByUser(uid)
-
+    fun getDailyTotalsByUser(uid: String): LiveData<List<AlimentoDAO.DailySurveyStats>> {
+        return alimentoDao.getDailyTotalsByUser(uid)
+    }
 }

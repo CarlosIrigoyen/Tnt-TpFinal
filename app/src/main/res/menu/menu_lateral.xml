@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_encuestas"
-        android:icon ="@drawable/icon_encuestas"
-        android:title="Encuestas" />
-    <item
-        android:id="@+id/nav_mapa"
-        android:icon="@drawable/icon_map"
-        android:title="Mapa" />
-    <item
-        android:id="@+id/nav_estadisticas"
-        android:icon="@drawable/icon_stats"
-        android:title="Estadísticas" />
-
-    <item
-        android:id="@+id/nav_turnos"
-        android:icon="@drawable/icon_turnos"
-        android:title="Turnos" />
-    <item
-        android:id="@+id/nav_cerrar_sesion"
-        android:icon="@drawable/icon_logout"
-        android:title="Cerrar Sesión" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_encuestas"
+            android:icon="@drawable/icon_encuestas"
+            android:title="Encuestas" />
+        <item
+            android:id="@+id/nav_mapa"
+            android:icon="@drawable/icon_map"
+            android:title="Mapa" />
+        <item
+            android:id="@+id/nav_estadisticas"
+            android:icon="@drawable/icon_stats"
+            android:title="Estadísticas" />
+        <!-- NUEVO ÍTEM PARA TURNOS -->
+        <item
+            android:id="@+id/nav_turnos"
+            android:icon="@drawable/icon_turnos"
+            android:title="Gestión de Turnos" />
+        <item
+            android:id="@+id/nav_cerrar_sesion"
+            android:icon="@drawable/icon_logout"
+            android:title="Cerrar sesión" />
+    </group>
 </menu>

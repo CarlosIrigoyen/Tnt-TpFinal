@@ -2,13 +2,12 @@ package com.example.trabajofinal2024
 
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.activity.enableEdgeToEdge
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavOptions
-import android.widget.TextView
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -19,29 +18,18 @@ import com.google.firebase.auth.FirebaseAuth
 class MainActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
-
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var navView: NavigationView
     private lateinit var navController: androidx.navigation.NavController
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .build()
-
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-
-
-
-
-
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
@@ -52,10 +40,9 @@ class MainActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawerLayout)
         navView = findViewById(R.id.navView)
 
-        // Configurar el toggle manualmente (esto hace que el ícono abra el drawer)
         toggle = ActionBarDrawerToggle(
             this, drawerLayout, toolbar,
-            R.string.navigation_drawer_open,   // puedes crear estos strings
+            R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
         drawerLayout.addDrawerListener(toggle)
@@ -66,14 +53,13 @@ class MainActivity : AppCompatActivity() {
 
         setupHeader()
 
-        // Escuchar cambios de destino para actualizar título y bloquear drawer en login
         navController.addOnDestinationChangedListener { _, destination, _ ->
-
             val user = FirebaseAuth.getInstance().currentUser
 
             if (user == null && destination.id != R.id.loginFragment) {
                 navController.navigate(R.id.loginFragment)
             }
+
             when (destination.id) {
                 R.id.loginFragment -> {
                     supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -91,6 +77,7 @@ class MainActivity : AppCompatActivity() {
                         R.id.encuestaFragment -> "Nueva Encuesta"
                         R.id.foodFragment -> "Registro de Alimentos"
                         R.id.detalleEncuestaFragment -> "Detalle de Encuesta"
+                        R.id.turnosAdminFragment -> " Turnos "
                         else -> "Encuestas"
                     }
                 }
@@ -122,13 +109,15 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                 }
+                R.id.nav_turnos -> {
+                    navController.navigate(R.id.turnosAdminFragment)
+                }
             }
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
 
         val user = FirebaseAuth.getInstance().currentUser
-
         if (user != null) {
             navController.navigate(
                 R.id.encuestasListFragment,
@@ -142,28 +131,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupHeader() {
         val headerView = navView.getHeaderView(0)
-
         val tvInitial = headerView.findViewById<TextView>(R.id.tvInitial)
         val tvName = headerView.findViewById<TextView>(R.id.tvName)
         val tvEmail = headerView.findViewById<TextView>(R.id.tvEmail)
 
         val user = FirebaseAuth.getInstance().currentUser
-
         user?.let {
             val name = it.displayName ?: "Usuario"
             val email = it.email ?: ""
-
             tvName.text = name
             tvEmail.text = email
-
             val initial = name.firstOrNull()?.uppercase() ?: "U"
             tvInitial.text = initial
         }
     }
 
-    // Este método es llamado cuando se presiona el ícono de la barra
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Si el toggle maneja el evento (abrir/cerrar drawer), lo usamos
         if (toggle.onOptionsItemSelected(item)) {
             return true
         }

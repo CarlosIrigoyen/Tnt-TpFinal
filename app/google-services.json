@@ -14,10 +14,79 @@
       },
       "oauth_client": [
         {
+          "client_id": "125648919689-5hfda98fpn9ruc2ktj18lehf73t3puec.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trabajofinal2024",
+            "certificate_hash": "de001744cc906f28c91f3e5ac286dfe07bcda6d5"
+          }
+        },
+        {
+          "client_id": "125648919689-qsf6pdcebof29du53m0u6hjlfe3717jr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trabajofinal2024",
+            "certificate_hash": "84f50f0e51a80164afc4c375c840a48fdc7b4e5c"
+          }
+        },
+        {
           "client_id": "125648919689-s271ddvrv1mar651ren8d6gdn34p6493.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.trabajofinal2024",
+            "certificate_hash": "a11ecd4653580aa80940508ca0c2440b940504b7"
+          }
+        },
+        {
+          "client_id": "125648919689-u2n1fv0b1hvu32qjfj4qaq75qp8s4fvs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClBaEOZCc1Bzt_vHkaEUJJEOWwJ0EHy-0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "125648919689-u2n1fv0b1hvu32qjfj4qaq75qp8s4fvs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:125648919689:android:1468d48c3f6fa6753c7a58",
+        "android_client_info": {
+          "package_name": "com.example.voluntarios"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "125648919689-c62rv69fmufcfo6gkfvmn3370vve4qgb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.voluntarios",
+            "certificate_hash": "84e8bb95f01949e5598e9563f9ae7e4082a44175"
+          }
+        },
+        {
+          "client_id": "125648919689-ceg30ocrbe6kvsgu1b304g7j0cpdcr5c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.voluntarios",
+            "certificate_hash": "cdb377716ea1f2dd4b4511af998626735240659c"
+          }
+        },
+        {
+          "client_id": "125648919689-nstoocra4i1sbr5v24pu2h8n6i22mblf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.voluntarios",
             "certificate_hash": "a11ecd4653580aa80940508ca0c2440b940504b7"
           }
         },
