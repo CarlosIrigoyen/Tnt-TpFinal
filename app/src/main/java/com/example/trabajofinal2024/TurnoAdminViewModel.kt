@@ -92,6 +92,13 @@ class TurnoAdminViewModel(
         }
     }
 
+    fun asignarTurno(turnoId: String) {
+        viewModelScope.launch {
+            repository.asignarTurno(turnoId)
+        }
+    }
+
+
     class TurnoAdminViewModelFactory(
         private val turnoRepository: TurnoRepository
     ) : ViewModelProvider.Factory {

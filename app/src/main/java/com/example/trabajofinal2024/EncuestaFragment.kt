@@ -23,11 +23,7 @@ import java.util.Locale
 class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
 
     private val CIUDAD_FIJA = "Trelew"
-    private val PROVINCIA_FIJA = "Chubut"
-    private val PAIS_FIJO = "Argentina"
 
-    var latConfirmada = 0.0
-    var lonConfirmada = 0.0
 
     private val encuestaViewModel: EncuestaViewModel by viewModels {
         EncuestaViewModel.EncuestaViewModelFactory((activity?.application as App).encuestaRepositorio)
@@ -37,9 +33,6 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
         TurnoAdminViewModel.TurnoAdminViewModelFactory((activity?.application as App).turnoRepository)
     }
 
-    private data class Turno(val id: String, val nombre: String) {
-        override fun toString() = nombre // Lo que muestra el Spinner
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val turnoSpinner: Spinner = view.findViewById(R.id.turnoInput)
@@ -60,6 +53,7 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         turnoSpinner.adapter = adapter
+
 
         turnoAdminViewModel.buscarTurnosConfirmados()
 
@@ -136,7 +130,7 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
 
                 encuestaViewModel.insertFirebase(nuevaEncuesta)
                 Toast.makeText(context, "Creando encuesta...", Toast.LENGTH_SHORT).show()
-
+                turnoAdminViewModel.asignarTurno(turnoSeleccionado.id)
                 encuestaViewModel.firestoreId.observe(viewLifecycleOwner) { encuestaid ->
                     if (encuestaid != null && encuestaid != "") {
                         encuestaViewModel.encuestaId.removeObservers(viewLifecycleOwner)

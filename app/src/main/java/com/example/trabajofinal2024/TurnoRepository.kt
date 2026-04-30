@@ -68,6 +68,7 @@ class TurnoRepository(
             val turnos = FirebaseFirestore.getInstance()
                 .collection("turnos")
                 .whereEqualTo("estado", "confirmado")
+                .whereEqualTo("asignado", false)
                 .get()
                 .await()
                 .documents
@@ -98,6 +99,19 @@ class TurnoRepository(
         }
     }
 
+
+
+    suspend fun asignarTurno(turnoId: String) {
+        try {
+            turnosCollection.document(turnoId)
+                .update("asignado", true)
+                .await()
+            Log.d("TurnoRepository", "Turno asignado correctamente")
+        } catch (e: Exception) {
+            Log.e("TurnoRepository", "Error asignando turno", e)
+        }
+    }
+
     fun stopListening() {
         listenerRegistration?.remove()
         listenerRegistration = null
@@ -109,7 +123,6 @@ class TurnoRepository(
     suspend fun getTurnoById(id: String): TurnoEntity? = turnoDao.getByIdOnce(id)
 
     suspend fun actualizarTurno(turno: TurnoEntity) {
-        turnoDao.update(turno)
         try {
             turnosCollection.document(turno.firestoreId)
                 .update(
