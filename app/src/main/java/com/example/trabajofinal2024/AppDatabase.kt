@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Database(
     entities = [Alimento::class, Encuesta::class, TurnoEntity::class],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -23,22 +23,29 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        val MIGRATION_4_5 = object : Migration(4, 5) {
+        val MIGRATION_5_6 = object : Migration(5, 6) {
             override fun migrate(database: SupportSQLiteDatabase) {
+
+                // 1. Agregar turnoId a la tabla encuestas
                 database.execSQL("""
-                    CREATE TABLE IF NOT EXISTS `turnos` (
-                        `firestoreId` TEXT NOT NULL,
-                        `uidVoluntario` TEXT NOT NULL,
-                        `estado` TEXT NOT NULL,
-                        `dia` TEXT NOT NULL,
-                        `horario` TEXT NOT NULL,
-                        `direccion` TEXT NOT NULL,
-                        `descripcion` TEXT NOT NULL,
-                        `createdAt` INTEGER NOT NULL,
-                        `updatedAt` INTEGER NOT NULL,
-                        PRIMARY KEY(`firestoreId`)
-                    )
-                """.trimIndent())
+            ALTER TABLE `encuestas` ADD COLUMN `turnoId` TEXT
+        """.trimIndent())
+
+                // 2. Crear la tabla de turnos
+                database.execSQL("""
+            CREATE TABLE IF NOT EXISTS `turnos` (
+                `firestoreId` TEXT NOT NULL,
+                `uidVoluntario` TEXT NOT NULL,
+                `estado` TEXT NOT NULL,
+                `dia` TEXT NOT NULL,
+                `horario` TEXT NOT NULL,
+                `direccion` TEXT NOT NULL,
+                `descripcion` TEXT NOT NULL,
+                `createdAt` INTEGER NOT NULL,
+                `updatedAt` INTEGER NOT NULL,
+                PRIMARY KEY(`firestoreId`)
+            )
+        """.trimIndent())
             }
         }
 
@@ -50,7 +57,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "app_database"
                 )
                     .fallbackToDestructiveMigration()
-                    .addMigrations(MIGRATION_4_5)
+                    .addMigrations(MIGRATION_5_6)
                     .build()
 
                 INSTANCE = instance

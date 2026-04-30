@@ -1,5 +1,7 @@
 package com.example.trabajofinal2024
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -80,16 +82,26 @@ class TurnoAdminViewModel(
         super.onCleared()
         repository.stopListening()
     }
-}
 
-class TurnoAdminViewModelFactory(
-    private val turnoRepository: TurnoRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TurnoAdminViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return TurnoAdminViewModel(turnoRepository) as T
+    private val _turnosNombre = MutableStateFlow<List<TurnoNombre>>(emptyList())
+    val turnosNombre: StateFlow<List<TurnoNombre>> = _turnosNombre.asStateFlow()
+    fun buscarTurnosConfirmados() {
+        viewModelScope.launch {
+            val turnos = repository.getTurnosConfirmados()
+            _turnosNombre.value = turnos
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+
+    class TurnoAdminViewModelFactory(
+        private val turnoRepository: TurnoRepository
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(TurnoAdminViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return TurnoAdminViewModel(turnoRepository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 }
+

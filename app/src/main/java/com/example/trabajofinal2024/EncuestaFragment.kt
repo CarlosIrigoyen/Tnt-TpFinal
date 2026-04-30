@@ -5,13 +5,19 @@ import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
@@ -20,36 +26,89 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
     private val PROVINCIA_FIJA = "Chubut"
     private val PAIS_FIJO = "Argentina"
 
+    var latConfirmada = 0.0
+    var lonConfirmada = 0.0
+
     private val encuestaViewModel: EncuestaViewModel by viewModels {
         EncuestaViewModel.EncuestaViewModelFactory((activity?.application as App).encuestaRepositorio)
     }
 
+    private val turnoAdminViewModel: TurnoAdminViewModel by viewModels {
+        TurnoAdminViewModel.TurnoAdminViewModelFactory((activity?.application as App).turnoRepository)
+    }
+
+    private data class Turno(val id: String, val nombre: String) {
+        override fun toString() = nombre // Lo que muestra el Spinner
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val turnoSpinner: Spinner = view.findViewById(R.id.turnoInput)
         val domicilioInput: EditText = view.findViewById(R.id.domicilioInput)
-        val ciudadInput: EditText = view.findViewById(R.id.ciudadInput)
         val comenzarButton: Button = view.findViewById(R.id.comenzar)
         val volverButton: Button = view.findViewById(R.id.volver)
 
+        var latConfirmada = 0.0
+        var lonConfirmada = 0.0
+        var domicilioConfirmado = ""
+
+        val listaTurnos = mutableListOf<TurnoNombre>()
+
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            listaTurnos
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        turnoSpinner.adapter = adapter
+
+        turnoAdminViewModel.buscarTurnosConfirmados()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                turnoAdminViewModel.turnosNombre.collect { turnos ->
+                    listaTurnos.clear()
+                    listaTurnos.addAll(turnos)
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        domicilioInput.isFocusable = false
+        domicilioInput.isFocusableInTouchMode = false
+
+        domicilioInput.setOnClickListener {
+            val bottomSheet = MapBottomSheet(
+                latInicial = if (latConfirmada != 0.0) latConfirmada else -43.2489,
+                lonInicial = if (lonConfirmada != 0.0) lonConfirmada else -65.3039,
+                domicilioInicial = domicilioConfirmado
+            ) { domicilio, lat, lon ->
+                domicilioConfirmado = domicilio
+                latConfirmada = lat
+                lonConfirmada = lon
+                domicilioInput.setText(domicilio)
+            }
+            bottomSheet.show(parentFragmentManager, "MapaBottomSheet")
+        }
+
+
         comenzarButton.setOnClickListener {
             val domicilio = domicilioInput.text.toString().trim()
-            val ciudad = ciudadInput.text.toString().trim()
+            val ciudad = CIUDAD_FIJA
 
-            if (domicilio.isBlank() || ciudad.isBlank()) {
-                Toast.makeText(requireContext(), "Completá domicilio y ciudad", Toast.LENGTH_SHORT).show()
+            val turnoSeleccionado = turnoSpinner.selectedItem as? TurnoNombre
+            if (turnoSeleccionado == null) {
+                Toast.makeText(requireContext(), "Seleccioná un turno", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val domicilioCompleto = "$domicilio, $CIUDAD_FIJA, $PROVINCIA_FIJA, $PAIS_FIJO"
-            val coords = geocodificarDireccion(requireContext(), domicilioCompleto)
 
-            if (coords == null) {
-                Toast.makeText(requireContext(), "No se pudo ubicar la dirección", Toast.LENGTH_SHORT).show()
+            if (domicilio.isBlank()) {
+                Toast.makeText(requireContext(), "Completá domicilio", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val (lat, lon) = coords
-            if (lat == 0.0 && lon == 0.0) {
-                Toast.makeText(requireContext(), "Ubicación no válida (0,0)", Toast.LENGTH_SHORT).show()
+            if (latConfirmada == 0.0 && lonConfirmada == 0.0) {
+                Toast.makeText(requireContext(), "Falta la dirección en el mapa", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -65,13 +124,14 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
                 val nuevaEncuesta = Encuesta(
                     domicilio = domicilio,
                     ciudad = ciudad,
-                    lon = lon,
-                    lan = lat,
+                    lon = lonConfirmada,
+                    lan = latConfirmada,
                     userUid = currentUserUid,
                     currentIndex = 0,
                     activa = true,
                     completa = false,
-                    updatedAt = System.currentTimeMillis()
+                    updatedAt = System.currentTimeMillis(),
+                    turnoId = turnoSeleccionado.id
                 )
 
                 encuestaViewModel.insertFirebase(nuevaEncuesta)
@@ -99,24 +159,4 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
         }
     }
 
-    private fun geocodificarDireccion(
-        context: Context,
-        direccion: String
-    ): Pair<Double, Double>? {
-        return try {
-            val geocoder = Geocoder(context, Locale.getDefault())
-            val results = geocoder.getFromLocationName(direccion, 1)
-            if (!results.isNullOrEmpty()) {
-                val location = results[0]
-                Log.d("Geo", "Coordenadas obtenidas: ${location.latitude}, ${location.longitude}")
-                Pair(location.latitude, location.longitude)
-            } else {
-                Log.e("Geo", "No se encontró la dirección: $direccion")
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("Geo", "Error geocodificando", e)
-            null
-        }
-    }
 }

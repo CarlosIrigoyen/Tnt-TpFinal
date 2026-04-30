@@ -24,7 +24,7 @@ import java.util.*
 class TurnosAdminFragment : Fragment() {
 
     private val turnoAdminViewModel: TurnoAdminViewModel by viewModels {
-        TurnoAdminViewModelFactory(
+        TurnoAdminViewModel.TurnoAdminViewModelFactory(
             TurnoRepository(
                 AppDatabase.getDatabase(requireContext(), lifecycleScope).turnoDao(),
                 FirebaseFirestore.getInstance()

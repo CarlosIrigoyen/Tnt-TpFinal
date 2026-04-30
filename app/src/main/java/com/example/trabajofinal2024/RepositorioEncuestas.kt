@@ -229,7 +229,8 @@ class RepositorioEncuestas(
                     "completa" to encuesta.completa,
                     "activa" to encuesta.activa,
                     "currentIndex" to encuesta.currentIndex,
-                    "updatedAt" to encuesta.updatedAt
+                    "updatedAt" to encuesta.updatedAt,
+                    "turnoId" to encuesta.turnoId
                 )
             )
             .await()

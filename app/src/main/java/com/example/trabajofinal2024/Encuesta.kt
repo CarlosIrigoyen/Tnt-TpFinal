@@ -41,5 +41,8 @@ data class Encuesta(
 
     // Timestamp opcional de última actualización (ms desde epoch)
     @ColumnInfo(name = "updated_at")
-    var updatedAt: Long? = null
+    var updatedAt: Long? = null,
+
+    @ColumnInfo(name = "turnoId")
+    var turnoId: String? = null
 )

@@ -18,8 +18,8 @@ import androidx.room.PrimaryKey
     indices = [Index(value = ["fireStoreid"], unique = true)]
 )
 data class Turno(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    val voluntarioId: Long?,
+    @PrimaryKey(autoGenerate = true) var id: String = "",
+    val voluntarioId: String?,
     val voluntariouid: String = "",
     val fireStoreid: String = "",
     val dia: String = "",

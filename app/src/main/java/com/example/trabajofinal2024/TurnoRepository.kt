@@ -63,6 +63,41 @@ class TurnoRepository(
         }
     }
 
+    suspend fun getTurnosConfirmados(): List<TurnoNombre> {
+        return try {
+            val turnos = FirebaseFirestore.getInstance()
+                .collection("turnos")
+                .whereEqualTo("estado", "confirmado")
+                .get()
+                .await()
+                .documents
+            turnos.mapNotNull { doc ->
+                val uidVoluntario = doc.getString("uidVoluntario") ?: return@mapNotNull null
+                val horario = doc.getString("horario") ?: ""
+                val dia = doc.getString("dia") ?: ""
+
+                val voluntario = FirebaseFirestore.getInstance()
+                    .collection("voluntarios")
+                    .whereEqualTo("firebaseUid", uidVoluntario)
+                    .limit(1)
+                    .get()
+                    .await()
+                    .documents
+                    .firstOrNull()
+
+                val nombreVoluntario = voluntario?.getString("nombre") ?: "Desconocido"
+
+                TurnoNombre(
+                    id = doc.id,
+                    nombreVisible = "Turno a las $horario del día $dia - $nombreVoluntario"
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("Error al momento de buscar turnos", "Error: ${e.message}")
+            emptyList()
+        }
+    }
+
     fun stopListening() {
         listenerRegistration?.remove()
         listenerRegistration = null

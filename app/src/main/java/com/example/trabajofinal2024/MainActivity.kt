@@ -135,6 +135,8 @@ class MainActivity : AppCompatActivity() {
         val tvName = headerView.findViewById<TextView>(R.id.tvName)
         val tvEmail = headerView.findViewById<TextView>(R.id.tvEmail)
 
+
+
         val user = FirebaseAuth.getInstance().currentUser
         user?.let {
             val name = it.displayName ?: "Usuario"
