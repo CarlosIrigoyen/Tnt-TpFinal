@@ -182,6 +182,7 @@ dependencies {
 
     //Mapa
     implementation("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("com.google.android.material:material:1.11.0") //Para el Sheet del Mapa
 
 
     implementation("com.google.firebase:firebase-auth")

@@ -3,6 +3,7 @@ package com.example.trabajofinal2024
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,6 +16,9 @@ import com.example.trabajofinal2024.setStatText
 
 class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
 
+    private lateinit var loader: ProgressBar
+    private lateinit var content: View
+
     private val alimentoViewModel: AlimentoViewModel by viewModels {
         AlimentoViewModel.AlimentoViewModelFactory(
             (requireActivity().application as App).alimentoRepositorio
@@ -24,6 +28,9 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loader = view.findViewById(R.id.loader)
+        content = view.findViewById(R.id.contentView)
+
 
         val encuestaId = arguments?.getString("encuestaid") ?: ""
 
@@ -55,9 +62,13 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
 
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
+        loader.visibility = View.VISIBLE
+        content.visibility = View.GONE
+
         // Cargar datos y calcular totales/promedios en coroutine
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+
                 val alimentos = alimentoViewModel.getAlimentosPorEncuestaFirebase(uid, encuestaId)
 
                 var totalKcal = 0.0
@@ -100,9 +111,15 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
                 tvGrasasProm.setStatText("Grasas totales promedio", dbl(totalGrasas / n).toString(), "g")
                 tvColesterolProm.setStatText("Colesterol promedio", dbl(totalColesterol / n).toString(), "mg")
                 tvFibraProm.setStatText("Fibra promedio", dbl(totalFibra / n).toString(), "g")
+                loader.visibility = View.GONE
+                content.alpha = 0f
+                content.visibility = View.VISIBLE
+                content.animate().alpha(1f).setDuration(300).start()
 
             } catch (e: Exception) {
                 tvKcalTotal.text = "Error cargando datos: ${e.localizedMessage ?: e.message}"
+                loader.visibility = View.GONE
+                content.visibility = View.VISIBLE
             }
         }
 

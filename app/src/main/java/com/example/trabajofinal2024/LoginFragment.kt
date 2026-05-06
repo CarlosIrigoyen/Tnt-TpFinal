@@ -152,9 +152,12 @@ class LoginFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        if (auth.currentUser != null) {
-            findNavController()
-                .navigate(R.id.action_loginFragment_to_encuestasListFragment)
+        if (auth.currentUser != null && isAdded) {
+            val navController = findNavController()
+
+            if (navController.currentDestination?.id == R.id.loginFragment) {
+                navController.navigate(R.id.action_loginFragment_to_encuestasListFragment)
+            }
         }
     }
 

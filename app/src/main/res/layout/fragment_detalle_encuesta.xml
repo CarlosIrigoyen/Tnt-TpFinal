@@ -1,134 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/contentView"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:padding="16dp"
+        android:visibility="gone">
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Título -->
+                <TextView
+                    android:id="@+id/tvSubtitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Encuesta"
+                    android:textSize="22sp"
+                    android:textStyle="bold"/>
+
+                <!-- ================== TOTALES ================== -->
+
+                <TextView
+                    android:id="@+id/tvKcalTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kcal total:"
+                    android:layout_marginTop="16dp"/>
+
+                <TextView
+                    android:id="@+id/tvCarboTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Carbohidratos total:"/>
+
+                <TextView
+                    android:id="@+id/tvProteTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Proteínas total:"/>
+
+                <TextView
+                    android:id="@+id/tvColesterolTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Colesterol total:"/>
+
+                <TextView
+                    android:id="@+id/tvFibraTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Fibra total:"/>
+
+                <TextView
+                    android:id="@+id/tvGrasasTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Grasas totales:"/>
+
+                <TextView
+                    android:id="@+id/tvAlcoholTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Alcohol total:"/>
+
+                <TextView
+                    android:id="@+id/tvGramosTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gramos totales:"/>
+
+                <!-- ================== PROMEDIOS ================== -->
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Promedios por alimento"
+                    android:textStyle="bold"
+                    android:layout_marginTop="24dp"/>
+
+                <TextView
+                    android:id="@+id/tvKcalPromedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kcal promedio:"/>
+
+                <TextView
+                    android:id="@+id/tvCarboPromedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Carbohidratos promedio:"/>
+
+                <TextView
+                    android:id="@+id/tvProtePromedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Proteínas promedio:"/>
+
+                <TextView
+                    android:id="@+id/tvGrasasPromedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Grasas promedio:"/>
+
+                <TextView
+                    android:id="@+id/tvColesterolPromedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Colesterol promedio:"/>
+
+                <TextView
+                    android:id="@+id/tvFibraPromedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Fibra promedio:"/>
+
+                <!-- BOTÓN VOLVER -->
+
+                <Button
+                    android:id="@+id/btnVolver"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Volver"
+                    android:layout_marginTop="24dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"/>
+                </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/loader"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!-- Título -->
-        <TextView
-            android:id="@+id/tvSubtitulo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Encuesta"
-            android:textSize="22sp"
-            android:textStyle="bold"/>
-
-        <!-- ================== TOTALES ================== -->
-
-        <TextView
-            android:id="@+id/tvKcalTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Kcal total:"
-            android:layout_marginTop="16dp"/>
-
-        <TextView
-            android:id="@+id/tvCarboTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Carbohidratos total:"/>
-
-        <TextView
-            android:id="@+id/tvProteTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Proteínas total:"/>
-
-        <TextView
-            android:id="@+id/tvColesterolTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Colesterol total:"/>
-
-        <TextView
-            android:id="@+id/tvFibraTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fibra total:"/>
-
-        <TextView
-            android:id="@+id/tvGrasasTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Grasas totales:"/>
-
-        <TextView
-            android:id="@+id/tvAlcoholTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Alcohol total:"/>
-
-        <TextView
-            android:id="@+id/tvGramosTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Gramos totales:"/>
-
-        <!-- ================== PROMEDIOS ================== -->
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Promedios por alimento"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"/>
-
-        <TextView
-            android:id="@+id/tvKcalPromedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Kcal promedio:"/>
-
-        <TextView
-            android:id="@+id/tvCarboPromedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Carbohidratos promedio:"/>
-
-        <TextView
-            android:id="@+id/tvProtePromedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Proteínas promedio:"/>
-
-        <TextView
-            android:id="@+id/tvGrasasPromedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Grasas promedio:"/>
-
-        <TextView
-            android:id="@+id/tvColesterolPromedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Colesterol promedio:"/>
-
-        <TextView
-            android:id="@+id/tvFibraPromedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fibra promedio:"/>
-
-        <!-- BOTÓN VOLVER -->
-
-        <Button
-            android:id="@+id/btnVolver"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Volver"
-            android:layout_marginTop="24dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="40dp"/>
-
-    </LinearLayout>
-
-</androidx.core.widget.NestedScrollView>
+        android:layout_gravity="center" />
+</FrameLayout>
