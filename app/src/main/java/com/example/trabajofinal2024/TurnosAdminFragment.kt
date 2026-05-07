@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -182,6 +183,7 @@ class TurnosAdminFragment : Fragment() {
                     descripcion = descripcion,
                     updatedAt = System.currentTimeMillis()
                 )
+
                 turnoAdminViewModel.updateTurno(turnoActualizado)
 
                 val infoVoluntario = turnoAdminViewModel.voluntariosMap.value[turno.uidVoluntario]

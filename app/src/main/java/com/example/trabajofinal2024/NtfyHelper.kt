@@ -19,6 +19,7 @@ object NtfyHelper {
         esAsignacion: Boolean = true
     ) {
         val topic = TopicHelper.generarTopic(uid, nombreVoluntario)
+        Log.d("Ntfy", "Enviando a topic: $topic")
         val url = "https://ntfy.sh/$topic"
         val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
         val saludo = if (esAsignacion) "🎉 ¡Hola $nombreVoluntario!" else "😟 Hola $nombreVoluntario"

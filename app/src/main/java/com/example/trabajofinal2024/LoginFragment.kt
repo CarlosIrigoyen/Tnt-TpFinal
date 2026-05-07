@@ -22,6 +22,7 @@ import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginFragment : Fragment() {
 
@@ -102,6 +103,8 @@ class LoginFragment : Fragment() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
+                    crearDocumentoAdminSiNoExiste(uid)
                     Toast.makeText(requireContext(), "Login exitoso", Toast.LENGTH_LONG).show()
 
                     // Navegar con Navigation Component
@@ -123,12 +126,26 @@ class LoginFragment : Fragment() {
         googleSignInLauncher.launch(signInIntent)
     }
 
+    private fun crearDocumentoAdminSiNoExiste(uid: String) {
+        val db = FirebaseFirestore.getInstance()
+        val adminDoc = db.collection("usuarios").document(uid)
+
+        adminDoc.get().addOnSuccessListener { snapshot ->
+            if (!snapshot.exists()) {
+                adminDoc.set(mapOf("rol" to "admin"))
+            }
+        }
+    }
+
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
 
         auth.signInWithCredential(credential)
             .addOnCompleteListener{ task ->
                 if (task.isSuccessful) {
+
+                    val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
+                    crearDocumentoAdminSiNoExiste(uid)
 
                     Toast.makeText(requireContext(), "Login con Google exitoso", Toast.LENGTH_LONG).show()
 
