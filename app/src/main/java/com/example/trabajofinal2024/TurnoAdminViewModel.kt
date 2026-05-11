@@ -1,7 +1,5 @@
 package com.example.trabajofinal2024
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -28,6 +26,10 @@ class TurnoAdminViewModel(
     private val _voluntariosMap = MutableStateFlow<Map<String, VoluntarioInfo>>(emptyMap())
     val voluntariosMap: StateFlow<Map<String, VoluntarioInfo>> = _voluntariosMap.asStateFlow()
 
+    // --- NUEVO: Estado de carga del mapa de voluntarios ---
+    private val _isLoadingVoluntarios = MutableStateFlow(true)
+    val isLoadingVoluntarios: StateFlow<Boolean> = _isLoadingVoluntarios.asStateFlow()
+
     init {
         viewModelScope.launch {
             repository.getTurnosByEstado("pendiente").collect { _turnosPendientes.value = it }
@@ -39,8 +41,10 @@ class TurnoAdminViewModel(
             repository.getTurnosByEstado("rechazado").collect { _turnosRechazados.value = it }
         }
         viewModelScope.launch {
+            _isLoadingVoluntarios.value = true
             val mapa = repository.obtenerMapaVoluntarios()
             _voluntariosMap.value = mapa
+            _isLoadingVoluntarios.value = false
         }
     }
 
@@ -85,6 +89,7 @@ class TurnoAdminViewModel(
 
     private val _turnosNombre = MutableStateFlow<List<TurnoNombre>>(emptyList())
     val turnosNombre: StateFlow<List<TurnoNombre>> = _turnosNombre.asStateFlow()
+
     fun buscarTurnosConfirmados() {
         viewModelScope.launch {
             val turnos = repository.getTurnosConfirmados()
@@ -98,7 +103,6 @@ class TurnoAdminViewModel(
         }
     }
 
-
     class TurnoAdminViewModelFactory(
         private val turnoRepository: TurnoRepository
     ) : ViewModelProvider.Factory {
@@ -111,4 +115,3 @@ class TurnoAdminViewModel(
         }
     }
 }
-

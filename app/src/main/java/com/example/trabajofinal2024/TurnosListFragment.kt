@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +16,8 @@ class TurnosListFragment : Fragment() {
 
     private lateinit var adapter: TurnosPendientesAdapter
     private var estado: String = "pendiente"
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
 
     private val viewModel: TurnoAdminViewModel by viewModels(ownerProducer = { requireParentFragment() })
 
@@ -35,8 +38,9 @@ class TurnosListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.rvTurnos)
-        // Grid de 3 columnas (sin cambios)
+        recyclerView = view.findViewById(R.id.rvTurnos)
+        progressBar = view.findViewById(R.id.progressBar)
+
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         recyclerView.setPadding(4, 4, 4, 4)
 
@@ -50,6 +54,20 @@ class TurnosListFragment : Fragment() {
         )
         recyclerView.adapter = adapter
 
+        // --- NUEVO: Observar el estado de carga para mostrar/esconder el ProgressBar ---
+        lifecycleScope.launch {
+            viewModel.isLoadingVoluntarios.collect { isLoading ->
+                if (isLoading) {
+                    progressBar.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
+                } else {
+                    progressBar.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        // Observar los turnos según el estado
         lifecycleScope.launch {
             when (estado) {
                 "pendiente" -> {
@@ -70,6 +88,7 @@ class TurnosListFragment : Fragment() {
             }
         }
 
+        // También actualizar cuando cambie el mapa de voluntarios (por si acaso)
         lifecycleScope.launch {
             viewModel.voluntariosMap.collect { mapa ->
                 val turnos = when (estado) {
