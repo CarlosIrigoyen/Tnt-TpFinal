@@ -32,9 +32,7 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
     ): Alimento? {
 
         return try {
-            val doc = db.collection("usuarios")
-                .document(uid)
-                .collection("encuestas")
+            val doc = db.collection("encuestas")
                 .document(encuestaId)
                 .collection("alimentos")
                 .document(nombre)
@@ -70,9 +68,7 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
 
     suspend fun getAlimentosPorEncuestaFirebase(uid: String, encuestaId: String): List<Alimento> {
         return try {
-            val snapshot = db.collection("usuarios")
-                .document(uid)
-                .collection("encuestas")
+            val snapshot = db.collection("encuestas")
                 .document(encuestaId)
                 .collection("alimentos")
                 .get()
@@ -117,9 +113,7 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
     ) {
         withContext(NonCancellable) {
             try {
-                val ref = db.collection("usuarios")
-                    .document(uid)
-                    .collection("encuestas")
+                val ref = db.collection("encuestas")
                     .document(encuestaId)
                     .collection("alimentos")
                     .document(alimento.nombre_alimento)
@@ -163,9 +157,8 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
 
     suspend fun getStatsAveragesForUserFirebase(uid: String): StatsAverages? {
         return try {
-            val encuestasSnapshot = db.collection("usuarios")
-                .document(uid)
-                .collection("encuestas")
+            val encuestasSnapshot = db.collection("encuestas")
+                .whereEqualTo("administradorid", uid)
                 .whereEqualTo("completa", true)
                 .get()
                 .await()
@@ -173,9 +166,7 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
             if (encuestasSnapshot.isEmpty) return null
 
             val totalesPorEncuesta = encuestasSnapshot.documents.map { encuestaDoc ->
-                val alimentosSnapshot = db.collection("usuarios")
-                    .document(uid)
-                    .collection("encuestas")
+                val alimentosSnapshot = db.collection("encuestas")
                     .document(encuestaDoc.id)
                     .collection("alimentos")
                     .get()
@@ -227,9 +218,8 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
 
     suspend fun getDailyTotalsByUserFirebase(uid: String): List<DailySurveyStats> {
         return try {
-            val encuestasSnapshot = db.collection("usuarios")
-                .document(uid)
-                .collection("encuestas")
+            val encuestasSnapshot = db.collection("encuestas")
+                .whereEqualTo("administradorid", uid)
                 .whereEqualTo("completa", true)
                 .get()
                 .await()
@@ -237,9 +227,7 @@ class RepositorioAlimentos(private val alimentoDao: AlimentoDAO) {
             if (encuestasSnapshot.isEmpty) return emptyList()
 
             encuestasSnapshot.documents.mapIndexed { index, encuestaDoc ->
-                val alimentosSnapshot = db.collection("usuarios")
-                    .document(uid)
-                    .collection("encuestas")
+                val alimentosSnapshot = db.collection("encuestas")
                     .document(encuestaDoc.id)
                     .collection("alimentos")
                     .get()

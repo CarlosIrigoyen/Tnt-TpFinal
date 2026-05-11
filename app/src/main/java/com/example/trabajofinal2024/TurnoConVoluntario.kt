@@ -4,4 +4,5 @@ data class TurnoConVoluntario(
     val turno: TurnoEntity,
     val nombreVoluntario: String,
     val apellidoVoluntario: String
+
 )

@@ -91,7 +91,8 @@ class TurnoRepository(
 
                 TurnoNombre(
                     id = doc.id,
-                    nombreVisible = "Turno a las $horario del día $dia - $nombreVoluntario"
+                    nombreVisible = "Turno a las $horario del día $dia - $nombreVoluntario",
+                    uidVoluntario = uidVoluntario
                 )
             }
         } catch (e: Exception) {

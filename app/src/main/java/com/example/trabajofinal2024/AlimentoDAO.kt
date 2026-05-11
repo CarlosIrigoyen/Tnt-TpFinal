@@ -65,7 +65,7 @@ interface AlimentoDAO {
                 SUM(alcohol) as enc_alcohol
             FROM alimentos
             WHERE encuesta IN (
-                SELECT encuestaId FROM encuestas WHERE user_uid = :uid AND completada = 1
+                SELECT encuestaId FROM encuestas WHERE administrador_uuid = :uid AND completada = 1
             )
             GROUP BY encuesta
         ) 
@@ -99,7 +99,7 @@ SELECT a.encuesta as encuestaId,
 FROM alimentos a
 INNER JOIN encuestas e
     ON a.encuesta = e.encuestaId
-WHERE e.user_uid = :uid /*AND e.completada = 1*/
+WHERE e.administrador_uuid = :uid /*AND e.completada = 1*/
 GROUP BY a.encuesta
 ORDER BY a.encuesta
 """)

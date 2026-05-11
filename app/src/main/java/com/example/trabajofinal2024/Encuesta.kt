@@ -28,8 +28,12 @@ data class Encuesta(
     var lan: Double = 0.0,
 
     // UID del usuario (soporte para Firebase Auth futuro)
-    @ColumnInfo(name = "user_uid")
-    var userUid: String = "",
+    @ColumnInfo(name = "voluntario_uuid")
+    var voluntarioid: String = "",
+
+    @ColumnInfo(name = "administrador_uuid")
+    var administradorid: String = "",
+
 
     // Índice del FoodCatalog donde se quedó (0..N)
     @ColumnInfo(name = "current_index")

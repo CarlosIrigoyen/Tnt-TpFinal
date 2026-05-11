@@ -38,9 +38,8 @@ class RepositorioEncuestas(
     suspend fun syncAllEncuestasFromFirebase(userUid: String) {
         try {
             Log.d("FIREBASE", "Sincronizando encuestas para usuario $userUid")
-            val snapshot = db.collection("usuarios")
-                .document(userUid)
-                .collection("encuestas")
+            val snapshot = db.collection("encuestas")
+                .whereEqualTo("administradorid", userUid)
                 .get()
                 .await()
 
@@ -48,7 +47,8 @@ class RepositorioEncuestas(
                 val encuestaId = doc.getLong("encuestaId")?.toInt() ?: return@mapNotNull null
                 Encuesta(
                     encuestaId = encuestaId,
-                    userUid = userUid,
+                    administradorid = doc.getString("administradorid") ?: "",
+                    voluntarioid = doc.getString("voluntarioid") ?: "",
                     domicilio = doc.getString("domicilio") ?: "",
                     ciudad = doc.getString("ciudad") ?: "",
                     lan = doc.getDouble("latitud") ?: 0.0,
@@ -80,9 +80,7 @@ class RepositorioEncuestas(
     private suspend fun syncAlimentosFromFirebase(encuesta: Encuesta, userUid: String) {
         try {
             val firestoreId = encuesta.firestoreId ?: return
-            val snapshot = db.collection("usuarios")
-                .document(userUid)
-                .collection("encuestas")
+            val snapshot = db.collection("encuestas")
                 .document(firestoreId)
                 .collection("alimentos")
                 .get()
@@ -128,9 +126,8 @@ class RepositorioEncuestas(
 
     fun listenEncuestasFromFirestore(userUid: String) {
         listenerRegistration?.remove()
-        listenerRegistration = db.collection("usuarios")
-            .document(userUid)
-            .collection("encuestas")
+        listenerRegistration = db.collection("encuestas")
+            .whereEqualTo("administradorid", userUid)
             .addSnapshotListener { snapshots, error ->
                 if (error != null) {
                     Log.e("FIREBASE", "Error en listener: ${error.message}")
@@ -163,9 +160,7 @@ class RepositorioEncuestas(
 
     suspend fun guardarAlimentoEnFirebase(encuesta: Encuesta, alimento: Alimento) {
         val firestoreId = encuesta.firestoreId ?: return
-        val ref = db.collection("usuarios")
-            .document(encuesta.userUid)
-            .collection("encuestas")
+        val ref = db.collection("encuestas")
             .document(firestoreId)
             .collection("alimentos")
             .document(alimento.getFirestoreId())
@@ -215,11 +210,7 @@ class RepositorioEncuestas(
     }
 
     private suspend fun subirEncuestaAFirebase(encuesta: Encuesta): String {
-        val userId = encuesta.userUid
-        require(userId.isNotEmpty()) { "El userUid está vacío." }
-        val docRef = db.collection("usuarios")
-            .document(userId)
-            .collection("encuestas")
+        val docRef = db.collection("encuestas")
             .add(
                 mapOf(
                     "domicilio" to encuesta.domicilio,
@@ -227,6 +218,8 @@ class RepositorioEncuestas(
                     "latitud" to encuesta.lan,
                     "longitud" to encuesta.lon,
                     "completa" to encuesta.completa,
+                    "administradorid" to encuesta.administradorid,
+                    "voluntarioid" to encuesta.voluntarioid,
                     "activa" to encuesta.activa,
                     "currentIndex" to encuesta.currentIndex,
                     "updatedAt" to encuesta.updatedAt,
@@ -248,9 +241,7 @@ class RepositorioEncuestas(
     fun getEncuestaFirebase(uid: String, encuestaId: String): LiveData<Encuesta?> {
         val liveData = MutableLiveData<Encuesta?>()
 
-        db.collection("usuarios")
-            .document(uid)
-            .collection("encuestas")
+        db.collection("encuestas")
             .document(encuestaId)
             .addSnapshotListener { doc, error ->
 
@@ -276,7 +267,8 @@ class RepositorioEncuestas(
                         currentIndex = doc.getLong("currentIndex")?.toInt() ?: 0,
                         updatedAt = doc.getLong("updatedAt"),
 
-                        userUid = uid
+                        administradorid = doc.getString("administradorid") ?: "",
+                        voluntarioid = doc.getString("voluntarioid") ?: ""
                     )
 
                     liveData.postValue(encuesta)
@@ -292,7 +284,7 @@ class RepositorioEncuestas(
 
     fun getEncuestasPorUsuario(uid: String): Flow<List<Encuesta>> = callbackFlow {
         val listener =
-            db.collection("usuarios").document(uid).collection("encuestas").orderBy("updatedAt")
+            db.collection("encuestas").whereEqualTo("administradorid", uid).orderBy("updatedAt")
                 .addSnapshotListener { snapshots, error ->
                     if (error != null) {
                         Log.e("FIREBASE", "Error en listener: ${error.message}")
@@ -313,7 +305,8 @@ class RepositorioEncuestas(
                             activa = doc.getBoolean("activa") ?: false,
                             currentIndex = doc.getLong("currentIndex")?.toInt() ?: 0,
                             updatedAt = doc.getLong("updatedAt") ?: 0,
-                            userUid = uid
+                            administradorid = doc.getString("administradorid") ?: "",
+                            voluntarioid = doc.getString("voluntarioid") ?: ""
                         )
                     } ?: emptyList()
                     trySend(lista)
@@ -338,9 +331,7 @@ class RepositorioEncuestas(
     suspend fun updateProgress(uid: String, encuestaId: String, index: Int) {
         withContext(NonCancellable) {
             try {
-                db.collection("usuarios")
-                    .document(uid)
-                    .collection("encuestas")
+                db.collection("encuestas")
                     .document(encuestaId)
                     .update(
                         mapOf(
@@ -380,9 +371,7 @@ class RepositorioEncuestas(
     ) { withContext(NonCancellable) {
 
         try {
-            db.collection("usuarios")
-                .document(uid)
-                .collection("encuestas")
+            db.collection("encuestas")
                 .document(encuestaId)
                 .update(
                     mapOf(
@@ -409,9 +398,7 @@ class RepositorioEncuestas(
 
     @WorkerThread
     suspend fun abandonEncuestaFirebase(uid: String, encuestaId: String) {
-        db.collection("usuarios")
-            .document(uid)
-            .collection("encuestas")
+        db.collection("encuestas")
             .document(encuestaId)
             .update(
                 mapOf(
@@ -425,9 +412,7 @@ class RepositorioEncuestas(
 
     @WorkerThread
     suspend fun reanudarEncuestaFirebase(uid: String, encuestaId: String) {
-        db.collection("usuarios")
-            .document(uid)
-            .collection("encuestas")
+        db.collection("encuestas")
             .document(encuestaId)
             .update(
                 mapOf(

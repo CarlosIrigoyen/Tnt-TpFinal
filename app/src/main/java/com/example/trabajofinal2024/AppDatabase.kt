@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Database(
     entities = [Alimento::class, Encuesta::class, TurnoEntity::class],
-    version = 6,
+    version = 7,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -23,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        val MIGRATION_5_6 = object : Migration(5, 6) {
+        val MIGRATION_5_6 = object : Migration(6, 7) {
             override fun migrate(database: SupportSQLiteDatabase) {
 
                 // 1. Agregar turnoId a la tabla encuestas

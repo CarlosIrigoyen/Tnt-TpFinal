@@ -27,10 +27,10 @@ interface EncuestaDAO {  // La INTERFAZ se llama EncuestaDAO
     @Query("SELECT * FROM encuestas WHERE encuestaId = :id LIMIT 1")
     suspend fun getEncuestaByIdOnce(id: Int): Encuesta?
 
-    @Query("SELECT * FROM encuestas WHERE user_uid = :uid ORDER BY encuestaId DESC")
+    @Query("SELECT * FROM encuestas WHERE administrador_uuid = :uid ORDER BY encuestaId DESC")
     fun getEncuestasPorUsuario(uid: String): Flow<List<Encuesta>>
 
-    @Query("SELECT * FROM encuestas WHERE user_uid = :uid AND completada = 0 AND activa = 1 ORDER BY encuestaId DESC")
+    @Query("SELECT * FROM encuestas WHERE administrador_uuid = :uid AND completada = 0 AND activa = 1 ORDER BY encuestaId DESC")
     fun getPendientesPorUsuario(uid: String): Flow<List<Encuesta>>
 
     @Query("UPDATE encuestas SET current_index = :index, updated_at = :updatedAt WHERE encuestaId = :id")
