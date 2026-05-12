@@ -162,7 +162,7 @@ class TurnoRepository(
         turnoDao.insert(turno.copy(firestoreId = docRef.id))
     }
 
-    // NUEVA FUNCIÓN: obtiene mapa de voluntarios con nombre, apellido, email y fecha de nacimiento
+    // NUEVA FUNCIÓN: obtiene mapa de voluntarios con nombre, apellido, email,fecha de nacimiento y telefono
     suspend fun obtenerMapaVoluntarios(): Map<String, VoluntarioInfo> {
         return try {
             val snapshot = firestore.collection("voluntarios").get().await()
@@ -171,7 +171,8 @@ class TurnoRepository(
                 val apellido = doc.getString("apellido") ?: ""
                 val email = doc.getString("email") ?: ""
                 val fechaNac = doc.getString("fechaNac") ?: ""
-                doc.id to VoluntarioInfo(nombre, apellido, email, fechaNac)
+                val telefono = doc.getString("telefono") ?: ""   // ← nuevo
+                doc.id to VoluntarioInfo(nombre, apellido, email, fechaNac, telefono)
             }
         } catch (e: Exception) {
             Log.e("TurnoRepository", "Error obteniendo voluntarios", e)

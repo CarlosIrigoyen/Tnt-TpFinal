@@ -39,6 +39,7 @@ class TurnosPendientesAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvNombreApellido: TextView = itemView.findViewById(R.id.tvNombreApellido)
         private val tvEmail: TextView = itemView.findViewById(R.id.tvEmail)
+        private val tvTelefono: TextView = itemView.findViewById(R.id.tvTelefono)   // nuevo
         private val tvFechaNac: TextView = itemView.findViewById(R.id.tvFechaNac)
         private val tvFechaTurno: TextView = itemView.findViewById(R.id.tvFechaTurno)
         private val tvHorario: TextView = itemView.findViewById(R.id.tvHorario)
@@ -50,11 +51,19 @@ class TurnosPendientesAdapter(
                 tvNombreApellido.text = "${info.nombre} ${info.apellido}"
                 tvEmail.text = "Email: ${info.email}"
                 tvFechaNac.text = "Fecha de nac.: ${info.fechaNacimiento}"
+                // Mostrar teléfono o mensaje de no disponible
+                tvTelefono.text = if (info.telefono.isNotEmpty()) {
+                    "Teléfono: ${info.telefono}"
+                } else {
+                    "Teléfono: no disponible"
+                }
             } else {
-                tvNombreApellido.text = "Voluntario ${turno.uidVoluntario.take(6)}"
-                tvEmail.text = "Email: no disponible"
-                tvFechaNac.text = "Fecha de nac.: no disponible"
+                tvNombreApellido.text = "Cargando voluntario..."
+                tvEmail.text = ""
+                tvFechaNac.text = ""
+                tvTelefono.text = ""   // vacío mientras carga
             }
+
             tvFechaTurno.text = "Fecha turno: ${turno.dia}"
             tvHorario.text = "Horario: ${turno.horario}"
 

@@ -4,5 +4,6 @@ data class VoluntarioInfo(
     val nombre: String,
     val apellido: String,
     val email: String,
-    val fechaNacimiento: String
+    val fechaNacimiento: String,
+    val telefono: String = ""
 )
