@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:layout_marginBottom="2dp"/>
-        <!-- Teléfono (nuevo) -->
+
         <TextView
             android:id="@+id/tvTelefono"
             android:layout_width="wrap_content"
@@ -50,13 +50,22 @@
             android:layout_marginTop="2dp"
             android:text="Teléfono: ..." />
 
-
         <TextView
             android:id="@+id/tvFechaNac"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:layout_marginBottom="6dp"/>
+
+        <!-- Nuevo TextView para el motivo de cancelación -->
+        <TextView
+            android:id="@+id/tvMotivo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="#D32F2F"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/tvFechaTurno"

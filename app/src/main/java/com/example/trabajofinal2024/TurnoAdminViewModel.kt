@@ -17,6 +17,7 @@ class TurnoAdminViewModel(
     private val _turnosPendientes = MutableStateFlow<List<TurnoEntity>>(emptyList())
     val turnosPendientes: StateFlow<List<TurnoEntity>> = _turnosPendientes.asStateFlow()
 
+    // Solo se almacenarán turnos confirmados con fecha futura o igual a hoy
     private val _turnosConfirmados = MutableStateFlow<List<TurnoEntity>>(emptyList())
     val turnosConfirmados: StateFlow<List<TurnoEntity>> = _turnosConfirmados.asStateFlow()
 
@@ -26,7 +27,6 @@ class TurnoAdminViewModel(
     private val _voluntariosMap = MutableStateFlow<Map<String, VoluntarioInfo>>(emptyMap())
     val voluntariosMap: StateFlow<Map<String, VoluntarioInfo>> = _voluntariosMap.asStateFlow()
 
-    // --- NUEVO: Estado de carga del mapa de voluntarios ---
     private val _isLoadingVoluntarios = MutableStateFlow(true)
     val isLoadingVoluntarios: StateFlow<Boolean> = _isLoadingVoluntarios.asStateFlow()
 
@@ -35,7 +35,10 @@ class TurnoAdminViewModel(
             repository.getTurnosByEstado("pendiente").collect { _turnosPendientes.value = it }
         }
         viewModelScope.launch {
-            repository.getTurnosByEstado("confirmado").collect { _turnosConfirmados.value = it }
+            repository.getTurnosByEstado("confirmado").collect { todos ->
+                val futuros = todos.filter { turno -> esFechaFuturaOActual(turno.dia) }
+                _turnosConfirmados.value = futuros
+            }
         }
         viewModelScope.launch {
             repository.getTurnosByEstado("rechazado").collect { _turnosRechazados.value = it }
@@ -48,6 +51,20 @@ class TurnoAdminViewModel(
         }
     }
 
+    private fun esFechaFuturaOActual(fechaStr: String): Boolean {
+        return try {
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val fechaTurno = sdf.parse(fechaStr) ?: return false
+            val hoy = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.time
+            !fechaTurno.before(hoy)
+        } catch (e: Exception) { false }
+    }
+
     fun updateTurno(turno: TurnoEntity) {
         viewModelScope.launch {
             repository.actualizarTurno(turno)
@@ -57,30 +74,7 @@ class TurnoAdminViewModel(
     fun startListening() = repository.startListening()
     fun stopListening() = repository.stopListening()
 
-    fun actualizarTurnosVencidos() {
-        viewModelScope.launch {
-            val hoy = Calendar.getInstance()
-            hoy.set(Calendar.HOUR_OF_DAY, 0)
-            hoy.set(Calendar.MINUTE, 0)
-            hoy.set(Calendar.SECOND, 0)
-            val confirmados = _turnosConfirmados.value
-            val vencidos = confirmados.filter { turno ->
-                try {
-                    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    val fechaTurno = sdf.parse(turno.dia) ?: return@filter false
-                    fechaTurno.before(hoy.time)
-                } catch (e: Exception) { false }
-            }
-            vencidos.forEach { turno ->
-                val actualizado = turno.copy(
-                    estado = "rechazado",
-                    descripcion = "Turno vencido (fecha pasada)",
-                    updatedAt = System.currentTimeMillis()
-                )
-                repository.actualizarTurno(actualizado)
-            }
-        }
-    }
+    // La función actualizarTurnosVencidos ha sido eliminada
 
     override fun onCleared() {
         super.onCleared()

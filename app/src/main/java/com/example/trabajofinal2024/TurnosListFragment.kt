@@ -54,7 +54,6 @@ class TurnosListFragment : Fragment() {
         )
         recyclerView.adapter = adapter
 
-        // --- NUEVO: Observar el estado de carga para mostrar/esconder el ProgressBar ---
         lifecycleScope.launch {
             viewModel.isLoadingVoluntarios.collect { isLoading ->
                 if (isLoading) {
@@ -67,7 +66,6 @@ class TurnosListFragment : Fragment() {
             }
         }
 
-        // Observar los turnos según el estado
         lifecycleScope.launch {
             when (estado) {
                 "pendiente" -> {
@@ -88,7 +86,6 @@ class TurnosListFragment : Fragment() {
             }
         }
 
-        // También actualizar cuando cambie el mapa de voluntarios (por si acaso)
         lifecycleScope.launch {
             viewModel.voluntariosMap.collect { mapa ->
                 val turnos = when (estado) {

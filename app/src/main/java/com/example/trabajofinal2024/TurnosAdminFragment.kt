@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +17,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -63,12 +61,12 @@ class TurnosAdminFragment : Fragment() {
             tab.text = when (position) {
                 0 -> "Pendientes"
                 1 -> "Asignados"
-                else -> "Historial"
+                else -> "Cancelados"   // Antes "Historial"
             }
         }.attach()
 
         turnoAdminViewModel.startListening()
-        turnoAdminViewModel.actualizarTurnosVencidos()
+        // Se ha eliminado la llamada a actualizarTurnosVencidos()
     }
 
     override fun onDestroyView() {
@@ -84,9 +82,6 @@ class TurnosAdminFragment : Fragment() {
         } catch (e: Exception) { false }
     }
 
-    // ===============================
-    // ASIGNAR TURNO (con notificación)
-    // ===============================
     fun mostrarDialogoAsignar(turno: TurnoEntity) {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_asignar_turno, null)
         val etFecha = dialogView.findViewById<EditText>(R.id.etFecha)
@@ -204,9 +199,6 @@ class TurnosAdminFragment : Fragment() {
             .show()
     }
 
-    // ===============================
-    // CANCELAR TURNO (con notificación)
-    // ===============================
     fun mostrarDialogoCancelar(turno: TurnoEntity) {
         if (turno.estado != "confirmado" || !isFechaFutura(turno.dia)) {
             Toast.makeText(requireContext(), "Este turno no se puede cancelar", Toast.LENGTH_SHORT).show()

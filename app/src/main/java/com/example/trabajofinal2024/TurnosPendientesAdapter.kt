@@ -39,10 +39,11 @@ class TurnosPendientesAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvNombreApellido: TextView = itemView.findViewById(R.id.tvNombreApellido)
         private val tvEmail: TextView = itemView.findViewById(R.id.tvEmail)
-        private val tvTelefono: TextView = itemView.findViewById(R.id.tvTelefono)   // nuevo
+        private val tvTelefono: TextView = itemView.findViewById(R.id.tvTelefono)
         private val tvFechaNac: TextView = itemView.findViewById(R.id.tvFechaNac)
         private val tvFechaTurno: TextView = itemView.findViewById(R.id.tvFechaTurno)
         private val tvHorario: TextView = itemView.findViewById(R.id.tvHorario)
+        private val tvMotivo: TextView = itemView.findViewById(R.id.tvMotivo)
         private val btnAsignar: Button = itemView.findViewById(R.id.btnAsignar)
         private val btnCancelar: Button = itemView.findViewById(R.id.btnCancelar)
 
@@ -51,7 +52,6 @@ class TurnosPendientesAdapter(
                 tvNombreApellido.text = "${info.nombre} ${info.apellido}"
                 tvEmail.text = "Email: ${info.email}"
                 tvFechaNac.text = "Fecha de nac.: ${info.fechaNacimiento}"
-                // Mostrar teléfono o mensaje de no disponible
                 tvTelefono.text = if (info.telefono.isNotEmpty()) {
                     "Teléfono: ${info.telefono}"
                 } else {
@@ -61,23 +61,36 @@ class TurnosPendientesAdapter(
                 tvNombreApellido.text = "Cargando voluntario..."
                 tvEmail.text = ""
                 tvFechaNac.text = ""
-                tvTelefono.text = ""   // vacío mientras carga
+                tvTelefono.text = ""
             }
 
             tvFechaTurno.text = "Fecha turno: ${turno.dia}"
             tvHorario.text = "Horario: ${turno.horario}"
 
-            btnAsignar.setOnClickListener { onAsignar(turno) }
-            btnAsignar.isEnabled = turno.estado == "pendiente"
+            // Botón Asignar: solo visible para pendientes
+            if (turno.estado == "pendiente") {
+                btnAsignar.visibility = View.VISIBLE
+                btnAsignar.isEnabled = true
+                btnAsignar.setOnClickListener { onAsignar(turno) }
+            } else {
+                btnAsignar.visibility = View.GONE
+            }
 
-            // Lógica del botón Cancelar (solo confirmados y fecha futura)
+            // Botón Cancelar: solo confirmados con fecha futura
             if (turno.estado == "confirmado" && isFechaFutura(turno.dia)) {
                 btnCancelar.visibility = View.VISIBLE
                 btnCancelar.isEnabled = true
                 btnCancelar.setOnClickListener { onCancelar(turno) }
             } else {
                 btnCancelar.visibility = View.GONE
-                btnCancelar.isEnabled = false
+            }
+
+            // Mostrar motivo si el turno está cancelado (estado "rechazado")
+            if (turno.estado == "rechazado" && turno.descripcion.isNotEmpty()) {
+                tvMotivo.visibility = View.VISIBLE
+                tvMotivo.text = "Motivo: ${turno.descripcion}"
+            } else {
+                tvMotivo.visibility = View.GONE
             }
         }
 
