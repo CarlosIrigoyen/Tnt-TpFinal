@@ -42,21 +42,18 @@ class MapBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Configurar OSMDroid
         Configuration.getInstance().userAgentValue = requireContext().packageName
 
         mapa = view.findViewById(R.id.mapaView)
         mapa.setTileSource(TileSourceFactory.MAPNIK)
         mapa.setMultiTouchControls(true)
 
-        // Centrar en Trelew
         val mapController = mapa.controller
         mapController.setZoom(17.0)
         mapController.setCenter(GeoPoint(latActual, lonActual))
 
 
 
-        // Marcador arrastrable
         marcador = Marker(mapa)
         marcador.position = GeoPoint(latActual, lonActual)
         marcador.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -97,7 +94,6 @@ class MapBottomSheet(
             }
         }
 
-        // También buscar al presionar Enter en el teclado
         busquedaInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 buscarBtn.performClick()
@@ -105,7 +101,6 @@ class MapBottomSheet(
             } else false
         }
 
-        // Confirmar
         view.findViewById<Button>(R.id.confirmarUbicacionBtn).setOnClickListener {
             val domicilio = busquedaInput.text.toString().trim()
             if (domicilio.isBlank()) {
