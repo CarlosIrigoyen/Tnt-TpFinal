@@ -24,6 +24,17 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
 
     private val CIUDAD_FIJA = "Trelew"
 
+    private var latConfirmada = 0.0
+    private var lonConfirmada = 0.0
+    private var domicilioConfirmado = ""
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putDouble("lat", latConfirmada)
+        outState.putDouble("lon", lonConfirmada)
+        outState.putString("domicilio", domicilioConfirmado)
+    }
+
 
     private val encuestaViewModel: EncuestaViewModel by viewModels {
         EncuestaViewModel.EncuestaViewModelFactory((activity?.application as App).encuestaRepositorio)
@@ -35,14 +46,20 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         val turnoSpinner: Spinner = view.findViewById(R.id.turnoInput)
         val domicilioInput: EditText = view.findViewById(R.id.domicilioInput)
         val comenzarButton: Button = view.findViewById(R.id.comenzar)
         val volverButton: Button = view.findViewById(R.id.volver)
 
-        var latConfirmada = 0.0
-        var lonConfirmada = 0.0
-        var domicilioConfirmado = ""
+        savedInstanceState?.let {
+            latConfirmada = it.getDouble("lat", 0.0)
+            lonConfirmada = it.getDouble("lon", 0.0)
+            domicilioConfirmado = it.getString("domicilio", "") ?: ""
+            domicilioInput.setText(domicilioConfirmado)
+        }
+
+
 
         val listaTurnos = mutableListOf<TurnoNombre>()
 
@@ -71,11 +88,12 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
         domicilioInput.isFocusableInTouchMode = false
 
         domicilioInput.setOnClickListener {
-            val bottomSheet = MapBottomSheet(
+            val bottomSheet = MapBottomSheet.newInstance(
                 latInicial = if (latConfirmada != 0.0) latConfirmada else -43.2489,
                 lonInicial = if (lonConfirmada != 0.0) lonConfirmada else -65.3039,
                 domicilioInicial = domicilioConfirmado
-            ) { domicilio, lat, lon ->
+            )
+            bottomSheet.onUbicacionConfirmada = { domicilio, lat, lon ->
                 domicilioConfirmado = domicilio
                 latConfirmada = lat
                 lonConfirmada = lon
@@ -147,6 +165,14 @@ class EncuestaFragment : Fragment(R.layout.fragment_encuesta) {
                 Toast.makeText(context, "Error creando encuesta", Toast.LENGTH_SHORT).show()
                 comenzarButton.isEnabled = true
             }
+        }
+
+        val bottomSheetExistente = parentFragmentManager.findFragmentByTag("MapaBottomSheet") as? MapBottomSheet
+            bottomSheetExistente?.onUbicacionConfirmada = { domicilio, lat, lon ->
+            domicilioConfirmado = domicilio
+            latConfirmada = lat
+            lonConfirmada = lon
+            domicilioInput.setText(domicilio)
         }
 
         volverButton.setOnClickListener {

@@ -20,20 +20,33 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Overlay
 import java.util.Locale
 
-class MapBottomSheet(
-    private val latInicial: Double = -43.2489,
-    private val lonInicial: Double = -65.3039,
-    private val domicilioInicial: String = "",
-    private val onUbicacionConfirmada: (domicilio: String, lat: Double, lon: Double) -> Unit
-): BottomSheetDialogFragment() {
+class MapBottomSheet: BottomSheetDialogFragment() {
+
+    companion object {
+        fun newInstance(
+            latInicial: Double = -43.2489,
+            lonInicial: Double = -65.3039,
+            domicilioInicial: String = ""
+        ): MapBottomSheet {
+            return MapBottomSheet().apply {
+                arguments = Bundle().apply {
+                    putDouble("lat", latInicial)
+                    putDouble("lon", lonInicial)
+                    putString("domicilio", domicilioInicial)
+                }
+            }
+        }
+    }
+
+    var onUbicacionConfirmada: ((domicilio: String, lat: Double, lon: Double) -> Unit)? = null
+
 
     private lateinit var mapa: MapView
     private lateinit var marcador: Marker
-    private var latActual = latInicial
-
+    private var latActual = -43.2489
+    private var lonActual = -65.3039
     private lateinit var busquedaInput: EditText
 
-    private var lonActual = lonInicial
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_map_sheet, container, false)
@@ -41,6 +54,17 @@ class MapBottomSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (savedInstanceState != null) {
+            latActual = savedInstanceState.getDouble("lat")
+            lonActual = savedInstanceState.getDouble("lon")
+        } else {
+            latActual = arguments?.getDouble("lat") ?: -43.2489
+            lonActual = arguments?.getDouble("lon") ?: -65.3039
+        }
+
+        val domicilioInicial = savedInstanceState?.getString("domicilio")
+            ?: arguments?.getString("domicilio") ?: ""
 
         Configuration.getInstance().userAgentValue = requireContext().packageName
 
@@ -84,7 +108,8 @@ class MapBottomSheet(
         mapa.overlays.add(0, tapOverlay)
         mapa.invalidate()
 
-        val busquedaInput: EditText = view.findViewById(R.id.busquedaInput)
+        busquedaInput = view.findViewById(R.id.busquedaInput)
+
         val buscarBtn: Button = view.findViewById(R.id.buscarBtn)
 
         buscarBtn.setOnClickListener {
@@ -107,7 +132,7 @@ class MapBottomSheet(
                 Toast.makeText(requireContext(), "Ingresa una dirección", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            onUbicacionConfirmada(domicilio, latActual, lonActual)
+            onUbicacionConfirmada?.invoke(domicilio, latActual, lonActual)
             dismiss()
         }
     }
@@ -147,6 +172,13 @@ class MapBottomSheet(
         } catch (e: Exception) {
             Log.e("Mapa", "Error geocodificación inversa", e)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putDouble("lat", latActual)
+        outState.putDouble("lon", lonActual)
+        outState.putString("domicilio", busquedaInput.text.toString())
     }
 
     override fun onResume() {

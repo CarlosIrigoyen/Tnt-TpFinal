@@ -83,7 +83,7 @@ class EncuestasListFragment : Fragment() {
                                 lifecycleScope.launch {
                                     val encuestaId = encuesta.firestoreId ?: return@launch
                                     encuestaViewModel.reanudarEncuestaFirebase(uid, encuestaId)
-                                    Toast.makeText(requireContext(), "Encuesta #${encuesta.encuestaId} reanudada.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireContext(), "Encuesta reanudada.", Toast.LENGTH_SHORT).show()
                                     val bundle = Bundle().apply { putString("encuestaid", encuesta.firestoreId) }
                                     findNavController().navigate(R.id.action_encuestasList_to_foodFragment, bundle)
                                 }

@@ -116,16 +116,17 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
-
-        val user = FirebaseAuth.getInstance().currentUser
-        if (user != null) {
-            navController.navigate(
-                R.id.encuestasListFragment,
-                null,
-                NavOptions.Builder()
-                    .setPopUpTo(R.id.loginFragment, true)
-                    .build()
-            )
+        if (savedInstanceState == null) {
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null) {
+                navController.navigate(
+                    R.id.encuestasListFragment,
+                    null,
+                    NavOptions.Builder()
+                        .setPopUpTo(R.id.loginFragment, true)
+                        .build()
+                )
+            }
         }
     }
 

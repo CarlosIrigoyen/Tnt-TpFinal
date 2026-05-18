@@ -54,15 +54,19 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
     }
 
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let { encuestaId = it.getString(ARG_ENCUESTA_ID) }
         currentIndex = savedInstanceState?.getInt(STATE_INDEX) ?: 0
+        encuestaInicializada = savedInstanceState?.getBoolean("encuestaInicializada") ?: false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(STATE_INDEX, currentIndex)
+        outState.putBoolean("encuestaInicializada", encuestaInicializada)
     }
 
     override fun onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup?, savedInstanceState: Bundle?): android.view.View {
@@ -196,8 +200,6 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
 
 
     private fun configurarSpinner() {
-        binding.radioNunca.isChecked = true
-        foodItem?.frecuencia?.value = "Nunca"
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -259,17 +261,16 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
                         ).show()
                     }
 
-                    if (!encuestaInicializada) {
-                        encuestaInicializada = true
-                        currentIndex = encuesta.currentIndex
-                            .coerceIn(0, FoodCatalog.ALL.size - 1)
 
-                        setFoodAtIndex(currentIndex)
-
-                        binding.progresoText.text =
-                            "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
-
-                    }
+                if (!encuestaInicializada) {
+                    encuestaInicializada = true
+                    currentIndex = encuesta.currentIndex.coerceIn(0, FoodCatalog.ALL.size - 1)
+                    binding.progresoText.text = "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
+                    setFoodAtIndex(currentIndex)
+                } else {
+                    binding.progresoText.text = "Alimento ${currentIndex + 1} de ${FoodCatalog.ALL.size}"
+                    setFoodAtIndex(currentIndex)
+                }
             }
 
 
