@@ -1,6 +1,7 @@
 package com.example.trabajofinal2024
 
 import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.osmdroid.config.Configuration
@@ -46,6 +48,7 @@ class MapBottomSheet: BottomSheetDialogFragment() {
     private var latActual = -43.2489
     private var lonActual = -65.3039
     private lateinit var busquedaInput: EditText
+    private lateinit var sinResultadosText: TextView
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -54,6 +57,9 @@ class MapBottomSheet: BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        busquedaInput = view.findViewById(R.id.busquedaInput)
+        sinResultadosText = view.findViewById(R.id.sinResultadosText)
+
 
         if (savedInstanceState != null) {
             latActual = savedInstanceState.getDouble("lat")
@@ -108,7 +114,6 @@ class MapBottomSheet: BottomSheetDialogFragment() {
         mapa.overlays.add(0, tapOverlay)
         mapa.invalidate()
 
-        busquedaInput = view.findViewById(R.id.busquedaInput)
 
         val buscarBtn: Button = view.findViewById(R.id.buscarBtn)
 
@@ -138,11 +143,28 @@ class MapBottomSheet: BottomSheetDialogFragment() {
     }
 
     private fun buscarDireccion(direccion: String, view: View) {
+        val TRELEW_LONGITUD = -65.3039
+        val TRELEW_LATITUD = -43.2489
+        val RADIO_MAX_KM = 10.0
         try {
             val geocoder = Geocoder(requireContext(), Locale.getDefault())
             val resultados = geocoder.getFromLocationName(direccion, 1)
             if (!resultados.isNullOrEmpty()) {
                 val loc = resultados[0]
+
+                val distancia = FloatArray(1)
+                Location.distanceBetween(
+                    TRELEW_LATITUD, TRELEW_LONGITUD,
+                    loc.latitude, loc.longitude,
+                    distancia
+                )
+                val distanciaKm = distancia[0] / 1000
+
+                if (distanciaKm > RADIO_MAX_KM) {
+                    mostrarSinResultados()
+                    return
+                }
+
                 latActual = loc.latitude
                 lonActual = loc.longitude
 
@@ -152,7 +174,7 @@ class MapBottomSheet: BottomSheetDialogFragment() {
                 marcador.position = punto
                 mapa.invalidate()
             } else {
-                Toast.makeText(requireContext(), "No se encontró la dirección", Toast.LENGTH_SHORT).show()
+                mostrarSinResultados()
             }
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Error buscando dirección", Toast.LENGTH_SHORT).show()
@@ -172,6 +194,13 @@ class MapBottomSheet: BottomSheetDialogFragment() {
         } catch (e: Exception) {
             Log.e("Mapa", "Error geocodificación inversa", e)
         }
+    }
+
+    private fun mostrarSinResultados() {
+        sinResultadosText.visibility = View.VISIBLE
+        sinResultadosText.postDelayed({
+            sinResultadosText.visibility = View.GONE
+        }, 2000)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

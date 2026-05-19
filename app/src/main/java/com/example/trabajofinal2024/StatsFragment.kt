@@ -80,45 +80,62 @@ class StatsFragment : Fragment(R.layout.fragment_stats) {
 
         try {
             scatterChart.isNestedScrollingEnabled = true
-        } catch (_: Throwable) { }
+        } catch (_: Throwable) {
+        }
 
         btnBack.setOnClickListener {
             findNavController().popBackStack()
         }
 
-        val uid = currentUserUid
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
         if (uid == null) {
-            tvNumEncuestas.text = "Encuestas completadas: 0 (logueate)"
-            tvKcal.text = "Kcal promedio: —"
-            tvCarbs.text = "Carbohidratos promedio: —"
-            tvProteinas.text = "Proteínas promedio: —"
-            tvColesterol.text = "Colesterol promedio: —"
-            tvFibra.text = "Fibras promedio: —"
-            tvGrasas.text = "Grasas totales promedio: —"
-            tvGramosTotales.text = "Gramos totales promedio: —"
-            tvAlcohol.text = "Alcohol promedio: —"
+            findNavController().navigate(R.id.loginFragment)
             return
         }
 
         statsViewModel.getAveragesForUserFirebase(uid).observe(viewLifecycleOwner) { stats ->
             if (stats == null) {
-                tvKcal.setStatText("Kcal promedio", "0", "kcal")
-                tvCarbs.setStatText("Carbohidratos promedio", "0", "g")
-                tvProteinas.setStatText("Proteínas promedio", "0", "g")
-                tvColesterol.setStatText("Colesterol promedio", "0", "mg")
-                tvFibra.setStatText("Fibras promedio", "0", "g")
-                tvGrasas.setStatText("Grasas totales promedio", "0", "g")
-                tvGramosTotales.setStatText("Gramos totales promedio", "0", "g")
-                tvAlcohol.setStatText("Alcohol promedio", "0", "g")
+                tvKcal.setStatText(tvKcal.text.toString(), "0", "kcal")
+                tvCarbs.setStatText(tvCarbs.text.toString(), "0", "g")
+                tvProteinas.setStatText(tvProteinas.text.toString(), "0", "g")
+                tvColesterol.setStatText(tvColesterol.text.toString(), "0", "mg")
+                tvFibra.setStatText(tvFibra.text.toString(), "0", "g")
+                tvGrasas.setStatText(tvGrasas.text.toString(), "0", "g")
+                tvGramosTotales.setStatText(tvGramosTotales.text.toString(), "0", "g")
+                tvAlcohol.setStatText(tvAlcohol.text.toString(), "0", "g")
             } else {
-                tvKcal.setStatText(          "Kcal promedio",           stats.avg_kcal?.let { String.format("%.0f", it) } ?: "0",  "kcal")
-                tvCarbs.setStatText(         "Carbohidratos promedio",  stats.avg_carbohidratos?.let { String.format("%.1f", it) } ?: "0", "g")
-                tvProteinas.setStatText(     "Proteínas promedio",      stats.avg_proteinas?.let { String.format("%.1f", it) } ?: "0", "g")
-                tvColesterol.setStatText(    "Colesterol promedio",     stats.avg_colesterol?.let { String.format("%.1f", it) } ?: "0", "mg")
-                tvFibra.setStatText(         "Fibras promedio",         stats.avg_fibra?.let { String.format("%.1f", it) } ?: "0", "g")
-                tvGrasas.setStatText(        "Grasas totales promedio", stats.avg_grasas?.let { String.format("%.1f", it) } ?: "0", "g")
-                tvGramosTotales.setStatText( "Gramos totales promedio", stats.avg_gramos?.let { String.format("%.1f", it) } ?: "0", "g")
-                tvAlcohol.setStatText(       "Alcohol promedio",        stats.avg_alcohol?.let { String.format("%.1f", it) } ?: "0", "g")
+                tvKcal.setStatText(
+                    tvKcal.text.toString(),
+                    stats.avg_kcal?.let { String.format("%.0f", it) } ?: "0",
+                    "kcal")
+                tvCarbs.setStatText(
+                    tvCarbs.text.toString(),
+                    stats.avg_carbohidratos?.let { String.format("%.1f", it) } ?: "0",
+                    "g")
+                tvProteinas.setStatText(
+                    tvProteinas.text.toString(),
+                    stats.avg_proteinas?.let { String.format("%.1f", it) } ?: "0",
+                    "g")
+                tvColesterol.setStatText(
+                    tvColesterol.text.toString(),
+                    stats.avg_colesterol?.let { String.format("%.1f", it) } ?: "0",
+                    "mg")
+                tvFibra.setStatText(
+                    tvFibra.text.toString(),
+                    stats.avg_fibra?.let { String.format("%.1f", it) } ?: "0",
+                    "g")
+                tvGrasas.setStatText(
+                    tvGrasas.text.toString(),
+                    stats.avg_grasas?.let { String.format("%.1f", it) } ?: "0",
+                    "g")
+                tvGramosTotales.setStatText(
+                    tvGramosTotales.text.toString(),
+                    stats.avg_gramos?.let { String.format("%.1f", it) } ?: "0",
+                    "g")
+                tvAlcohol.setStatText(
+                    tvAlcohol.text.toString(),
+                    stats.avg_alcohol?.let { String.format("%.1f", it) } ?: "0",
+                    "g")
             }
         }
 
@@ -138,9 +155,9 @@ class StatsFragment : Fragment(R.layout.fragment_stats) {
             currentList = dailyList
             tvNumEncuestas.text = "Encuestas completadas: ${currentList.size}"
 
+        }
 
-
-            configurarGrafico(
+        configurarGrafico(
                 currentList,
                 { it.total_proteinas },
                 "Proteínas (g)",
@@ -148,8 +165,9 @@ class StatsFragment : Fragment(R.layout.fragment_stats) {
                 Color.parseColor("#1E88E5"),
                 50f,
                 120f
-            )
-        }
+        )
+
+
 
         chipGroupNutrientes.setOnCheckedStateChangeListener { _, checkedIds ->
 

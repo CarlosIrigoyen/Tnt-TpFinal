@@ -46,9 +46,6 @@ class AlimentoViewModel(private val repositorio: RepositorioAlimentos): ViewMode
         )
     }
 
-    suspend fun getAlimento(encuestaId: Int, nombre: String) =
-        repositorio.getAlimento(encuestaId, nombre)
-
     suspend fun getAlimentoFirebase(uid: String, encuestaId: String, nombre: String) =
         repositorio.getAlimentoFirebase(uid, encuestaId, nombre)
 

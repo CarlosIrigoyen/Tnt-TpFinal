@@ -41,7 +41,7 @@
                 android:id="@+id/tvNumEncuestas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Encuestas completadas: —"
+                android:text="Encuestas completadas: "
                 android:textSize="14sp"
                 android:layout_marginTop="8dp"/>
 
@@ -52,12 +52,11 @@
                 android:layout_marginTop="12dp"
                 android:background="?attr/colorControlHighlight" />
 
-            <!-- Estadísticas resumen -->
             <TextView
                 android:id="@+id/tvAvgKcal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Kcal promedio: —"
+                android:text="Promedio de kilocalorias: "
                 android:textSize="16sp"
                 android:layout_marginTop="12dp"/>
 
@@ -65,7 +64,7 @@
                 android:id="@+id/tvAvgCarbs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Carbohidratos promedio: —"
+                android:text="Promedio de carbohidratos: "
                 android:textSize="16sp"
                 android:layout_marginTop="8dp"/>
 
@@ -73,7 +72,7 @@
                 android:id="@+id/tvAvgProteinas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Proteínas promedio: —"
+                android:text="Promedio de proteinas: "
                 android:textSize="16sp"
                 android:layout_marginTop="8dp"/>
 
@@ -81,7 +80,7 @@
                 android:id="@+id/tvAvgColesterol"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Colesterol promedio: —"
+                android:text="Promedio de colesterol: "
                 android:textSize="16sp"
                 android:layout_marginTop="8dp"/>
 
@@ -89,7 +88,7 @@
                 android:id="@+id/tvAvgFibra"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Fibras promedio: —"
+                android:text="Promedio de fibra: "
                 android:textSize="16sp"
                 android:layout_marginTop="8dp"/>
 
@@ -97,7 +96,7 @@
                 android:id="@+id/tvAvgGrasas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Grasas totales promedio: —"
+                android:text="Promedio de grasas totales: "
                 android:textSize="16sp"
                 android:layout_marginTop="8dp"/>
 
@@ -105,7 +104,7 @@
                 android:id="@+id/tvAvgAlcohol"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Alcohol promedio: —"
+                android:text="Promedio de alcohol: "
                 android:textSize="16sp"
                 android:layout_marginTop="8dp"/>
 
@@ -113,11 +112,10 @@
                 android:id="@+id/tvAvgGramos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Gramos promedio: —"
+                android:text="Promedio de gramos: "
                 android:textSize="16sp"
                 android:layout_marginTop="8dp"/>
 
-            <!-- Chips seleccionables -->
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipGroupNutrientes"
                 android:layout_width="match_parent"

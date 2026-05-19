@@ -129,16 +129,13 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
             "Nunca" -> binding.radioNunca.isChecked = true
         }
 
-        // Restaurar cantidad del Spinner
         val cantidadBD = foodItem?.cantidad?.value ?: cantidadOpciones[0]
         val cantidadNormalizada = cantidadBD.trim().removeSuffix(".0")
         foodItem?.cantidad?.value = cantidadNormalizada
 
         val pos = cantidadOpciones.indexOf(cantidadNormalizada).coerceAtLeast(0)
-        // ⚡ Solo setSelection, no reconfigurar listener
         binding.spinnerOpciones.setSelection(pos, false)
 
-        // Restaurar número de veces
         binding.vecesInput.setText(foodItem?.numeroveces?.value ?: "1")
     }
 
