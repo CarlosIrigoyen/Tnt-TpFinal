@@ -3,6 +3,7 @@ package com.example.trabajofinal2024
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -100,6 +101,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_cerrar_sesion -> {
                     FirebaseAuth.getInstance().signOut()
                     googleSignInClient.signOut().addOnCompleteListener {
+                        Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show()
                         navController.navigate(
                             R.id.loginFragment,
                             null,
