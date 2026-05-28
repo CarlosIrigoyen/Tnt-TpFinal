@@ -12,7 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-import com.example.trabajofinal2024.setStatText
 
 class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
 
@@ -37,7 +36,6 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
         val encuestaNumero = arguments?.getInt("encuestaNumero", 0) ?: 0
 
 
-        // TextViews totales
         val tvSub: TextView = view.findViewById(R.id.tvSubtitulo)
         val tvKcalTotal: TextView = view.findViewById(R.id.tvKcalTotal)
         val tvCarboTotal: TextView = view.findViewById(R.id.tvCarboTotal)
@@ -48,13 +46,14 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
         val tvAlcoholTotal: TextView = view.findViewById(R.id.tvAlcoholTotal)
         val tvGramosTotal: TextView = view.findViewById(R.id.tvGramosTotal)
 
-        // TextViews promedios
         val tvKcalProm: TextView = view.findViewById(R.id.tvKcalPromedio)
         val tvCarboProm: TextView = view.findViewById(R.id.tvCarboPromedio)
         val tvProteProm: TextView = view.findViewById(R.id.tvProtePromedio)
-        val tvGrasasProm: TextView = view.findViewById(R.id.tvGrasasPromedio)
         val tvColesterolProm: TextView = view.findViewById(R.id.tvColesterolPromedio)
         val tvFibraProm: TextView = view.findViewById(R.id.tvFibraPromedio)
+        val tvGrasasProm: TextView = view.findViewById(R.id.tvGrasasPromedio)
+        val tvAlcoholProm: TextView = view.findViewById(R.id.tvAlcoholPromedio)
+        val tvGramosProm: TextView = view.findViewById(R.id.tvGramosPromedio)
 
         val btnVolver: Button = view.findViewById(R.id.btnVolver)
 
@@ -65,7 +64,6 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
         loader.visibility = View.VISIBLE
         content.visibility = View.GONE
 
-        // Cargar datos y calcular totales/promedios en coroutine
         viewLifecycleOwner.lifecycleScope.launch {
             try {
 
@@ -94,21 +92,94 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
                 val n = alimentos.size.coerceAtLeast(1)
                 fun dbl(v: Double) = ((v * 10.0).roundToInt() / 10.0)
 
-                tvKcalTotal.setStatText(tvKcalTotal.text.toString(), dbl(totalKcal).toString(), "kcal")
-                tvCarboTotal.setStatText(tvCarboTotal.text.toString(), dbl(totalCarbo).toString(), "g")
-                tvProteTotal.setStatText(tvProteTotal.text.toString(), dbl(totalProte).toString(), "g")
-                tvColesterolTotal.setStatText(tvColesterolTotal.text.toString(), dbl(totalColesterol).toString(), "mg")
-                tvFibraTotal.setStatText(tvFibraTotal.text.toString(), dbl(totalFibra).toString(), "g")
-                tvGrasasTotal.setStatText(tvGrasasTotal.text.toString(), dbl(totalGrasas).toString(), "g")
-                tvAlcoholTotal.setStatText(tvAlcoholTotal.text.toString(), dbl(totalAlcohol).toString(), "g")
-                tvGramosTotal.setStatText(tvGramosTotal.text.toString(), dbl(totalGramos).toString(), "g")
+                val kcalCarbo = totalCarbo * 4.0
+                val kcalProte = totalProte * 4.0
+                val kcalGrasas = totalGrasas * 9.0
+                val kcalAlcohol = totalAlcohol * 7.0
 
-                tvKcalProm.setStatText(tvKcalProm.text.toString(), dbl(totalKcal / n).toString(), "kcal")
-                tvCarboProm.setStatText(tvCarboProm.text.toString(), dbl(totalCarbo / n).toString(), "g")
-                tvProteProm.setStatText(tvProteProm.text.toString(), dbl(totalProte / n).toString(), "g")
-                tvGrasasProm.setStatText(tvGrasasProm.text.toString(), dbl(totalGrasas / n).toString(), "g")
-                tvColesterolProm.setStatText(tvColesterolProm.text.toString(), dbl(totalColesterol / n).toString(), "mg")
-                tvFibraProm.setStatText(tvFibraProm.text.toString(), dbl(totalFibra / n).toString(), "g")
+
+
+
+
+                tvKcalTotal.setStatText(
+                    tvKcalTotal.text.toString(),
+                    dbl(totalKcal).toString(),
+                    "kcal"
+                )
+                tvCarboTotal.setStatText(
+                    tvCarboTotal.text.toString(),
+                    dbl(totalCarbo).toString(),
+                    "g"
+                )
+                tvProteTotal.setStatText(
+                    tvProteTotal.text.toString(),
+                    dbl(totalProte).toString(),
+                    "g"
+                )
+                tvColesterolTotal.setStatText(
+                    tvColesterolTotal.text.toString(),
+                    dbl(totalColesterol).toString(),
+                    "mg"
+                )
+                tvFibraTotal.setStatText(
+                    tvFibraTotal.text.toString(),
+                    dbl(totalFibra).toString(),
+                    "g"
+                )
+                tvGrasasTotal.setStatText(
+                    tvGrasasTotal.text.toString(),
+                    dbl(totalGrasas).toString(),
+                    "g"
+                )
+                tvAlcoholTotal.setStatText(
+                    tvAlcoholTotal.text.toString(),
+                    dbl(totalAlcohol).toString(),
+                    "g"
+                )
+                tvGramosTotal.setStatText(
+                    tvGramosTotal.text.toString(),
+                    dbl(totalGramos).toString(),
+                    "g"
+                )
+
+                tvKcalProm.setStatText(tvKcalProm.text.toString(),
+                    dbl(totalKcal/n).toString(), "kcal")
+
+                tvCarboProm.setStatText(
+                    tvCarboProm.text.toString(),
+                    dbl(totalCarbo / n).toString(),
+                    "g"
+                )
+                tvProteProm.setStatText(
+                    tvProteProm.text.toString(),
+                    dbl(totalProte / n).toString(),
+                    "g"
+                )
+                tvGrasasProm.setStatText(
+                    tvGrasasProm.text.toString(),
+                    dbl(totalGrasas / n).toString(),
+                    "g"
+                )
+                tvColesterolProm.setStatText(
+                    tvColesterolProm.text.toString(),
+                    dbl(totalColesterol / n).toString(),
+                    "mg"
+                )
+                tvFibraProm.setStatText(
+                    tvFibraProm.text.toString(),
+                    dbl(totalFibra / n).toString(),
+                    "g"
+                )
+                tvAlcoholProm.setStatText(
+                    tvAlcoholProm.text.toString(),
+                    dbl(totalAlcohol / n).toString(),
+                    "g"
+                )
+                tvGramosProm.setStatText(
+                    tvGramosProm.text.toString(),
+                    dbl(totalGramos / n).toString(),
+                    "g"
+                )
                 loader.visibility = View.GONE
                 content.alpha = 0f
                 content.visibility = View.VISIBLE
@@ -121,9 +192,10 @@ class DetalleEncuestaFragment : Fragment(R.layout.fragment_detalle_encuesta) {
             }
         }
 
-        // Botón volver: vuelve a la pantalla anterior del NavController
         btnVolver.setOnClickListener {
             findNavController().popBackStack()
         }
+
+
     }
 }

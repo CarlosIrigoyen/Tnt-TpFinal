@@ -91,11 +91,12 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Promedios por alimento"
+                    android:text="Promedios diarios"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="4dp"/>
+
 
                 <TextView
                     android:id="@+id/tvKcalPromedio"
@@ -107,7 +108,7 @@
                     android:id="@+id/tvCarboPromedio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Promedio de carbohidratos promedio:"/>
+                    android:text="Promedio de carbohidratos diarios:"/>
 
                 <TextView
                     android:id="@+id/tvProtePromedio"
@@ -132,6 +133,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Promedio de fibras diarias:"/>
+
+                <TextView
+                    android:id="@+id/tvAlcoholPromedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Promedio de alcohol diario:"/>
+
+                <TextView
+                    android:id="@+id/tvGramosPromedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Promedio de gramos diario:"/>
+
+
 
 
                 <Button
