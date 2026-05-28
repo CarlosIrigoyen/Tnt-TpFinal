@@ -21,8 +21,8 @@ class TurnoAdminViewModel(
     private val _turnosConfirmados = MutableStateFlow<List<TurnoEntity>>(emptyList())
     val turnosConfirmados: StateFlow<List<TurnoEntity>> = _turnosConfirmados.asStateFlow()
 
-    private val _turnosRechazados = MutableStateFlow<List<TurnoEntity>>(emptyList())
-    val turnosRechazados: StateFlow<List<TurnoEntity>> = _turnosRechazados.asStateFlow()
+    private val _turnosCancelados = MutableStateFlow<List<TurnoEntity>>(emptyList())
+    val turnosCancelados: StateFlow<List<TurnoEntity>> = _turnosCancelados.asStateFlow()
 
     private val _voluntariosMap = MutableStateFlow<Map<String, VoluntarioInfo>>(emptyMap())
     val voluntariosMap: StateFlow<Map<String, VoluntarioInfo>> = _voluntariosMap.asStateFlow()
@@ -41,7 +41,7 @@ class TurnoAdminViewModel(
             }
         }
         viewModelScope.launch {
-            repository.getTurnosByEstado("rechazado").collect { _turnosRechazados.value = it }
+            repository.getTurnosByEstado("cancelado").collect { _turnosCancelados.value = it }
         }
         viewModelScope.launch {
             _isLoadingVoluntarios.value = true

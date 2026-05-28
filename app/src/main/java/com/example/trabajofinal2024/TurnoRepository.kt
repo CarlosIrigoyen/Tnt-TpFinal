@@ -25,7 +25,7 @@ class TurnoRepository(
     val turnosLiveData: LiveData<List<TurnoEntity>> = turnoDao.getAll().asLiveData()
     val turnosPendientesLiveData: LiveData<List<TurnoEntity>> = turnoDao.getByEstado("pendiente").asLiveData()
     val turnosConfirmadosLiveData: LiveData<List<TurnoEntity>> = turnoDao.getByEstado("confirmado").asLiveData()
-    val turnosRechazadosLiveData: LiveData<List<TurnoEntity>> = turnoDao.getByEstado("rechazado").asLiveData()
+    val turnosCanceladosLiveData: LiveData<List<TurnoEntity>> = turnoDao.getByEstado("cancelado").asLiveData()
 
     fun startListening() {
         listenerRegistration?.remove()

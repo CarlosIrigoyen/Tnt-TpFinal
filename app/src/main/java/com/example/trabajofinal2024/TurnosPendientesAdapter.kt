@@ -85,8 +85,8 @@ class TurnosPendientesAdapter(
                 btnCancelar.visibility = View.GONE
             }
 
-            // Mostrar motivo si el turno está cancelado (estado "rechazado")
-            if (turno.estado == "rechazado" && turno.descripcion.isNotEmpty()) {
+            // Mostrar motivo si el turno está cancelado (estado "cancelado")
+            if (turno.estado == "cancelado" && turno.descripcion.isNotEmpty()) {
                 tvMotivo.visibility = View.VISIBLE
                 tvMotivo.text = "Motivo: ${turno.descripcion}"
             } else {

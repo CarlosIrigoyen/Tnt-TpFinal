@@ -78,8 +78,8 @@ class TurnosListFragment : Fragment() {
                         adapter.submitList(turnos, viewModel.voluntariosMap.value)
                     }
                 }
-                "rechazado" -> {
-                    viewModel.turnosRechazados.collect { turnos ->
+                "cancelado" -> {
+                    viewModel.turnosCancelados.collect { turnos ->
                         adapter.submitList(turnos, viewModel.voluntariosMap.value)
                     }
                 }
@@ -91,7 +91,7 @@ class TurnosListFragment : Fragment() {
                 val turnos = when (estado) {
                     "pendiente" -> viewModel.turnosPendientes.value
                     "confirmado" -> viewModel.turnosConfirmados.value
-                    else -> viewModel.turnosRechazados.value
+                    else -> viewModel.turnosCancelados.value
                 }
                 adapter.submitList(turnos, mapa)
             }

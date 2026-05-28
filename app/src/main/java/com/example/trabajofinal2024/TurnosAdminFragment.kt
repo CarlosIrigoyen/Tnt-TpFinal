@@ -49,7 +49,7 @@ class TurnosAdminFragment : Fragment() {
         val fragments = listOf(
             TurnosListFragment().apply { arguments = Bundle().apply { putString("estado", "pendiente") } },
             TurnosListFragment().apply { arguments = Bundle().apply { putString("estado", "confirmado") } },
-            TurnosListFragment().apply { arguments = Bundle().apply { putString("estado", "rechazado") } }
+            TurnosListFragment().apply { arguments = Bundle().apply { putString("estado", "cancelado") } }
         )
 
         viewPager.adapter = object : FragmentStateAdapter(this) {
@@ -218,7 +218,7 @@ class TurnosAdminFragment : Fragment() {
                     return@setPositiveButton
                 }
                 val turnoActualizado = turno.copy(
-                    estado = "rechazado",
+                    estado = "cancelado",
                     descripcion = motivo,
                     updatedAt = System.currentTimeMillis()
                 )
