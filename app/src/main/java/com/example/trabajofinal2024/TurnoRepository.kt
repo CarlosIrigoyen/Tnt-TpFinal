@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class TurnoRepository(
@@ -69,9 +70,6 @@ class TurnoRepository(
     suspend fun getTurnosConfirmados(): List<TurnoNombre> {
         return try {
 
-            val hoy = LocalDate.now()
-            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-
             val turnos = FirebaseFirestore.getInstance()
                 .collection("turnos")
                 .whereEqualTo("estado", "confirmado")
@@ -84,12 +82,13 @@ class TurnoRepository(
                 val horario = doc.getString("horario") ?: ""
                 val dia = doc.getString("dia") ?: ""
 
-                val fechaTurno = try {
-                    LocalDate.parse(dia, formatter)
+                val fechaHoraFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                val fechaHoraTurno = try {
+                    LocalDateTime.parse("$dia $horario", fechaHoraFormatter)
                 } catch (e: Exception) {
                     return@mapNotNull null
                 }
-                if (fechaTurno.isBefore(hoy)) return@mapNotNull null
+                if (fechaHoraTurno.isBefore(LocalDateTime.now())) return@mapNotNull null
 
                 val voluntario = FirebaseFirestore.getInstance()
                     .collection("voluntarios")
