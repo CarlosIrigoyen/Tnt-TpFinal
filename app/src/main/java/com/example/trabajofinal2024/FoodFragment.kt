@@ -233,7 +233,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
 
                     if (encuesta == null) {
                         Toast.makeText(requireContext(), "Encuesta no encontrada", Toast.LENGTH_SHORT).show()
-                        findNavController().popBackStack()
+                        findNavController().popBackStack(R.id.encuestasListFragment, false)
                         return@observe
                     }
                     encuestaCompletada = encuesta.completa
@@ -245,8 +245,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
                             "Esta encuesta ya fue completada.",
                             Toast.LENGTH_LONG
                         ).show()
-                        findNavController().popBackStack()
-
+                        findNavController().popBackStack(R.id.encuestasListFragment, false)
                         return@observe
                     }
 
@@ -352,8 +351,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
                         Toast.LENGTH_LONG
                     ).show()
 
-                    findNavController().popBackStack()
-
+                    findNavController().popBackStack(R.id.encuestasListFragment, false)
                 }
 
                 else {
@@ -382,7 +380,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
                         "Encuesta abandonada. Puedes reanudarla más tarde desde la lista.",
                         Toast.LENGTH_LONG
                     ).show()
-                    findNavController().popBackStack()
+                    findNavController().popBackStack(R.id.encuestasListFragment, false)
                 }
             }
         }

@@ -50,6 +50,9 @@ class TurnosListFragment : Fragment() {
             },
             onCancelar = { turno ->
                 (requireParentFragment() as? TurnosAdminFragment)?.mostrarDialogoCancelar(turno)
+            },
+            esCancelable = { turno ->
+                viewModel.esTurnoCancelable(turno.dia, turno.horario)
             }
         )
         recyclerView.adapter = adapter

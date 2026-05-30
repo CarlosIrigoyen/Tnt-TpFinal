@@ -51,7 +51,38 @@ class TurnoAdminViewModel(
         }
     }
 
-    private fun esFechaFuturaOActual(fechaStr: String): Boolean {
+    fun getHorariosOcupados(fecha: String): Set<String> {
+        return turnosConfirmados.value
+            .filter { it.dia == fecha }
+            .map { it.horario }
+            .toSet()
+    }
+
+    fun getFechasCompletas(): Set<String> {
+        val todosLosSlots = mutableListOf<String>()
+        for (hour in 8..15) {
+            for (minute in listOf(0, 20, 40)) {
+                todosLosSlots.add(String.format("%02d:%02d", hour, minute))
+            }
+        }
+        todosLosSlots.add("16:00")
+        val totalSlots = todosLosSlots.size
+
+        return turnosConfirmados.value
+            .groupBy { it.dia }
+            .filter { (_, turnos) -> turnos.size >= totalSlots }
+            .keys
+    }
+
+    fun esTurnoCancelable(dia: String, horario: String): Boolean {
+        return try {
+            val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+            val fechaHoraTurno = sdf.parse("$dia $horario") ?: return false
+            fechaHoraTurno.after(Date())
+        } catch (e: Exception) { false }
+    }
+
+    fun esFechaFuturaOActual(fechaStr: String): Boolean {
         return try {
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val fechaTurno = sdf.parse(fechaStr) ?: return false
@@ -74,7 +105,6 @@ class TurnoAdminViewModel(
     fun startListening() = repository.startListening()
     fun stopListening() = repository.stopListening()
 
-    // La función actualizarTurnosVencidos ha sido eliminada
 
     override fun onCleared() {
         super.onCleared()

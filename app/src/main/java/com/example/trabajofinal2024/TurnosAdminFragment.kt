@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -15,6 +17,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -61,12 +65,11 @@ class TurnosAdminFragment : Fragment() {
             tab.text = when (position) {
                 0 -> "Pendientes"
                 1 -> "Asignados"
-                else -> "Cancelados"   // Antes "Historial"
+                else -> "Cancelados"
             }
         }.attach()
 
         turnoAdminViewModel.startListening()
-        // Se ha eliminado la llamada a actualizarTurnosVencidos()
     }
 
     override fun onDestroyView() {
@@ -74,13 +77,6 @@ class TurnosAdminFragment : Fragment() {
         turnoAdminViewModel.stopListening()
     }
 
-    private fun isFechaFutura(fechaStr: String): Boolean {
-        return try {
-            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val fechaTurno = sdf.parse(fechaStr) ?: return false
-            fechaTurno.after(Date())
-        } catch (e: Exception) { false }
-    }
 
     fun mostrarDialogoAsignar(turno: TurnoEntity) {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_asignar_turno, null)
@@ -90,51 +86,180 @@ class TurnosAdminFragment : Fragment() {
         val etDescripcion = dialogView.findViewById<EditText>(R.id.etDescripcion)
 
         etFecha.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val datePicker = DatePickerDialog(requireContext(),
-                { _, year, month, dayOfMonth ->
-                    val cal = Calendar.getInstance()
-                    cal.set(year, month, dayOfMonth)
-                    if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
-                        cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-                        Toast.makeText(requireContext(), "Solo lunes a viernes", Toast.LENGTH_SHORT).show()
-                        return@DatePickerDialog
+            val fechasCompletas = turnoAdminViewModel.getFechasCompletas()
+
+            val constraintsBuilder = CalendarConstraints.Builder()
+                .setValidator(object : CalendarConstraints.DateValidator {
+                    override fun isValid(date: Long): Boolean {
+                        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                        cal.timeInMillis = date
+                        val dow = cal.get(Calendar.DAY_OF_WEEK)
+
+                        if (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY) return false
+
+                        val calHoy = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                            timeInMillis = MaterialDatePicker.todayInUtcMilliseconds()
+                            set(Calendar.HOUR_OF_DAY, 0)
+                            set(Calendar.MINUTE, 0)
+                            set(Calendar.SECOND, 0)
+                            set(Calendar.MILLISECOND, 0)
+                        }
+                        val calFecha = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                            timeInMillis = date
+                        }
+                        if (calFecha.before(calHoy)) return false
+
+                        val fechaStr = String.format(
+                            "%02d/%02d/%d",
+                            cal.get(Calendar.DAY_OF_MONTH),
+                            cal.get(Calendar.MONTH) + 1,
+                            cal.get(Calendar.YEAR)
+                        )
+
+                        return fechaStr !in fechasCompletas
                     }
-                    val hoy = Calendar.getInstance()
-                    hoy.set(Calendar.HOUR_OF_DAY, 0)
-                    hoy.set(Calendar.MINUTE, 0)
-                    hoy.set(Calendar.SECOND, 0)
-                    if (cal.before(hoy)) {
-                        Toast.makeText(requireContext(), "No se permiten fechas pasadas", Toast.LENGTH_SHORT).show()
-                        return@DatePickerDialog
-                    }
-                    val fecha = String.format("%02d/%02d/%d", dayOfMonth, month + 1, year)
-                    etFecha.setText(fecha)
-                },
-                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
-            )
-            datePicker.datePicker.minDate = System.currentTimeMillis()
-            datePicker.show()
+
+                    override fun describeContents() = 0
+                    override fun writeToParcel(dest: android.os.Parcel, flags: Int) {}
+                })
+
+            val picker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Seleccionar fecha")
+                .setCalendarConstraints(constraintsBuilder.build())
+                .build()
+
+            picker.addOnPositiveButtonClickListener { selection ->
+                val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                cal.timeInMillis = selection
+                val fecha = String.format(
+                    "%02d/%02d/%d",
+                    cal.get(Calendar.DAY_OF_MONTH),
+                    cal.get(Calendar.MONTH) + 1,
+                    cal.get(Calendar.YEAR)
+                )
+                etFecha.setText(fecha)
+                etHorario.isEnabled = true
+                etHorario.setText("")
+            }
+
+            picker.show(parentFragmentManager, "date_picker")
         }
 
         etHorario.setOnClickListener {
-            val now = Calendar.getInstance()
-            TimePickerDialog(requireContext(),
-                { _, hourOfDay, minute ->
-                    if (hourOfDay < 8 || hourOfDay > 16) {
-                        Toast.makeText(requireContext(), "Horario permitido: 08:00 a 16:00", Toast.LENGTH_SHORT).show()
-                        return@TimePickerDialog
+            val fechaSeleccionada = etFecha.text.toString().trim()
+            if (fechaSeleccionada.isEmpty()) {
+                Toast.makeText(requireContext(), "Primero seleccioná una fecha", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val ocupados = turnoAdminViewModel.getHorariosOcupados(fechaSeleccionada)
+
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val fechaHoy = sdf.format(Date())
+            val slotsPasados = if (fechaSeleccionada == fechaHoy) {
+                val ahora = Calendar.getInstance()
+                val horaActualInt = ahora.get(Calendar.HOUR_OF_DAY)
+                val minutoActualInt = ahora.get(Calendar.MINUTE)
+
+                val todosSlots = mutableListOf<String>()
+                for (hour in 8..15) {
+                    for (minute in listOf(0, 20, 40)) {
+                        todosSlots.add(String.format("%02d:%02d", hour, minute))
                     }
-                    if (hourOfDay == 16 && minute > 0) {
-                        Toast.makeText(requireContext(), "El último horario válido es 16:00", Toast.LENGTH_SHORT).show()
-                        return@TimePickerDialog
-                    }
-                    val roundedMinute = (minute / 20) * 20
-                    val horaFormateada = String.format("%02d:%02d", hourOfDay, roundedMinute)
-                    etHorario.setText(horaFormateada)
-                },
-                now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true
-            ).show()
+                }
+                todosSlots.add("16:00")
+
+                todosSlots.filter { slot ->
+                    val partes = slot.split(":")
+                    val slotHora = partes[0].toInt()
+                    val slotMinuto = partes[1].toInt()
+                    slotHora < horaActualInt || (slotHora == horaActualInt && slotMinuto <= minutoActualInt)
+                }.toSet()
+            } else {
+                emptySet()
+            }
+
+            val todosLosSlots = mutableListOf<String>()
+            for (hour in 8..15) {
+                for (minute in listOf(0, 20, 40)) {
+                    todosLosSlots.add(String.format("%02d:%02d", hour, minute))
+                }
+            }
+            todosLosSlots.add("16:00")
+
+            val slotsDisponibles = todosLosSlots.filter { it !in ocupados && it !in slotsPasados }
+
+            if (slotsDisponibles.isEmpty()) {
+                Toast.makeText(requireContext(), "No hay horarios disponibles para esa fecha", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val horasDisponibles = slotsDisponibles
+                .map { it.split(":")[0].toInt() }
+                .distinct()
+                .sorted()
+
+            var horaActual = horasDisponibles.first()
+
+            fun getMinutosParaHora(hora: Int): Array<String> {
+                return slotsDisponibles
+                    .filter { it.split(":")[0].toInt() == hora }
+                    .map { it.split(":")[1] }
+                    .toTypedArray()
+            }
+
+            val dialogView = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER
+                setPadding(48, 32, 48, 32)
+            }
+
+            val npHora = NumberPicker(requireContext()).apply {
+                minValue = 0
+                maxValue = horasDisponibles.size - 1
+                displayedValues = horasDisponibles.map { String.format("%02d", it) }.toTypedArray()
+                value = 0
+            }
+
+            val separador = android.widget.TextView(requireContext()).apply {
+                text = ":"
+                textSize = 28f
+                setPadding(16, 0, 16, 0)
+                gravity = android.view.Gravity.CENTER
+            }
+
+            var minutosActuales = getMinutosParaHora(horaActual)
+            val npMinuto = NumberPicker(requireContext()).apply {
+                minValue = 0
+                maxValue = minutosActuales.size - 1
+                displayedValues = minutosActuales
+                value = 0
+            }
+
+            npHora.setOnValueChangedListener { _, _, newIdx ->
+                horaActual = horasDisponibles[newIdx]
+                minutosActuales = getMinutosParaHora(horaActual)
+                npMinuto.displayedValues = null
+                npMinuto.minValue = 0
+                npMinuto.maxValue = minutosActuales.size - 1
+                npMinuto.displayedValues = minutosActuales
+                npMinuto.value = 0
+            }
+
+            dialogView.addView(npHora)
+            dialogView.addView(separador)
+            dialogView.addView(npMinuto)
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("Seleccionar horario")
+                .setView(dialogView)
+                .setPositiveButton("Confirmar") { _, _ ->
+                    val hora = horasDisponibles[npHora.value]
+                    val minuto = minutosActuales[npMinuto.value]
+                    etHorario.setText(String.format("%02d:%02d", hora, minuto.toInt()))
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
         }
 
         AlertDialog.Builder(requireContext())
@@ -152,8 +277,20 @@ class TurnosAdminFragment : Fragment() {
                 }
 
                 val fechaObj = try { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(fecha) } catch (e: Exception) { null }
-                if (fechaObj == null || fechaObj.before(Date())) {
-                    Toast.makeText(requireContext(), "Fecha inválida o pasada", Toast.LENGTH_SHORT).show()
+                if (fechaObj == null) {
+                    Toast.makeText(requireContext(), "Fecha inválida", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val hoy = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+
+                if (fechaObj.before(hoy)) {
+                    Toast.makeText(requireContext(), "Fecha pasada", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
                 val cal = Calendar.getInstance().apply { time = fechaObj }
@@ -200,7 +337,7 @@ class TurnosAdminFragment : Fragment() {
     }
 
     fun mostrarDialogoCancelar(turno: TurnoEntity) {
-        if (turno.estado != "confirmado" || !isFechaFutura(turno.dia)) {
+        if (turno.estado != "confirmado" || !turnoAdminViewModel.esTurnoCancelable(turno.dia, turno.horario)) {
             Toast.makeText(requireContext(), "Este turno no se puede cancelar", Toast.LENGTH_SHORT).show()
             return
         }

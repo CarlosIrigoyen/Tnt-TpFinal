@@ -11,7 +11,8 @@ import java.util.*
 
 class TurnosPendientesAdapter(
     private val onAsignar: (TurnoEntity) -> Unit,
-    private val onCancelar: (TurnoEntity) -> Unit
+    private val onCancelar: (TurnoEntity) -> Unit,
+    private val esCancelable: (TurnoEntity) -> Boolean
 ) : RecyclerView.Adapter<TurnosPendientesAdapter.ViewHolder>() {
 
     private var turnos = listOf<TurnoEntity>()
@@ -76,8 +77,7 @@ class TurnosPendientesAdapter(
                 btnAsignar.visibility = View.GONE
             }
 
-            // Botón Cancelar: solo confirmados con fecha futura
-            if (turno.estado == "confirmado" && isFechaFutura(turno.dia)) {
+            if (turno.estado == "confirmado"  && esCancelable(turno)) {
                 btnCancelar.visibility = View.VISIBLE
                 btnCancelar.isEnabled = true
                 btnCancelar.setOnClickListener { onCancelar(turno) }
