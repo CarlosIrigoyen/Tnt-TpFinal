@@ -116,7 +116,19 @@ class TurnosAdminFragment : Fragment() {
                             cal.get(Calendar.YEAR)
                         )
 
-                        return fechaStr !in fechasCompletas
+                        if (fechaStr in fechasCompletas) return false
+
+                        val calHoyLocal = Calendar.getInstance()
+                        val esHoy = cal.get(Calendar.DAY_OF_MONTH) == calHoyLocal.get(Calendar.DAY_OF_MONTH) &&
+                                cal.get(Calendar.MONTH) == calHoyLocal.get(Calendar.MONTH) &&
+                                cal.get(Calendar.YEAR) == calHoyLocal.get(Calendar.YEAR)
+
+                        if (esHoy) {
+                            val horaActual = calHoyLocal.get(Calendar.HOUR_OF_DAY)
+                            val minutoActual = calHoyLocal.get(Calendar.MINUTE)
+                            if (horaActual > 16 || (horaActual == 16 && minutoActual > 0)) return false
+                        }
+                        return true
                     }
 
                     override fun describeContents() = 0
