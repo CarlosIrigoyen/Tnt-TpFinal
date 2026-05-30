@@ -26,6 +26,8 @@ class RepositorioEncuestas(
 
     // LiveData para el mapa con actualización en tiempo real
     private val _encuestasFirestoreLiveData = MutableLiveData<List<EncuestaFirestore>>()
+    private val _cargando = MutableLiveData<Boolean>(true)
+    val cargando: LiveData<Boolean> = _cargando
     private var listenerRegistration: ListenerRegistration? = null
     val encuestasFirestoreLiveData: LiveData<List<EncuestaFirestore>> = _encuestasFirestoreLiveData
 
@@ -129,6 +131,7 @@ class RepositorioEncuestas(
         listenerRegistration = db.collection("encuestas")
             .whereEqualTo("administradorid", userUid)
             .addSnapshotListener { snapshots, error ->
+                _cargando.postValue(false)
                 if (error != null) {
                     Log.e("FIREBASE", "Error en listener: ${error.message}")
                     return@addSnapshotListener

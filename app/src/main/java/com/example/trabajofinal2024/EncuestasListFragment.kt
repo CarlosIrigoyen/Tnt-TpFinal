@@ -64,10 +64,13 @@ class EncuestasListFragment : Fragment() {
                         findNavController().navigate(R.id.loginFragment)
                     } else {
                         val encuestas by encuestaViewModel.getEncuestasPorUsuario(uid)
-                            .observeAsState(initial = null)
+                            .observeAsState(initial = emptyList())
+                        val cargando by encuestaViewModel.cargando
+                            .observeAsState(initial = true)
 
                         EncuestasContent(
                             encuestas = encuestas,
+                            cargando = cargando,
                             onNuevaEncuesta = {
                                 findNavController().navigate(R.id.action_encuestasList_to_encuestaFragment)
                             },
@@ -112,7 +115,8 @@ enum class FiltroEncuesta { TODAS, EN_PROGRESO, COMPLETADAS, ABANDONADAS }
 
 @Composable
 private fun EncuestasContent(
-    encuestas: List<Encuesta>?,
+    encuestas: List<Encuesta>,
+    cargando: Boolean,
     onNuevaEncuesta: () -> Unit,
     onResumeEncuesta: (Encuesta) -> Unit,
     onReanudar: (Encuesta) -> Unit,
@@ -121,9 +125,9 @@ private fun EncuestasContent(
 ) {
     var filtroSeleccionado by remember { mutableStateOf(FiltroEncuesta.TODAS) }
 
-    val encuestasFiltradas: List<IndexedValue<Encuesta>>? = encuestas
-        ?.withIndex()
-        ?.filter { (_, encuesta) ->
+    val encuestasFiltradas: List<IndexedValue<Encuesta>> = encuestas
+        .withIndex()
+        .filter { (_, encuesta) ->
             when (filtroSeleccionado) {
                 FiltroEncuesta.TODAS        -> true
                 FiltroEncuesta.EN_PROGRESO  -> encuesta.activa && !encuesta.completa
@@ -155,7 +159,8 @@ private fun EncuestasContent(
 
             Spacer(modifier = Modifier.height(12.dp))
             when {
-                encuestasFiltradas == null -> {
+
+                cargando -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center

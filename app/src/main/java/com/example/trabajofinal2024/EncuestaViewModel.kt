@@ -13,6 +13,8 @@ class EncuestaViewModel(private val repositorio: RepositorioEncuestas) : ViewMod
 
     val allEncuestas: LiveData<List<Encuesta>> = repositorio.allEncuestas.asLiveData()
 
+    val cargando: LiveData<Boolean> = repositorio.cargando
+
     // LiveData antiguo (ya no se usa, pero se mantiene por si acaso)
     private val _encuestasFirebase = MutableLiveData<List<EncuestaFirestore>>()
     val encuestasFirebase: LiveData<List<EncuestaFirestore>> = _encuestasFirebase
