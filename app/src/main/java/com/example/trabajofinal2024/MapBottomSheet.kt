@@ -151,6 +151,24 @@ class MapBottomSheet: BottomSheetDialogFragment() {
             val resultados = geocoder.getFromLocationName(direccion, 1)
             if (!resultados.isNullOrEmpty()) {
                 val loc = resultados[0]
+                val localidad = loc.locality?.lowercase() ?: ""
+                val subLocalidad = loc.subLocality?.lowercase() ?: ""
+                val esDeTrelew = localidad.contains("trelew") || subLocalidad.contains("trelew")
+
+                val tieneCalle = !loc.thoroughfare.isNullOrBlank()
+                val esInterseccion = busquedaInput.text.contains("y", ignoreCase = true)
+                        || busquedaInput.text.contains("&")
+                        || busquedaInput.text.contains("e/")
+
+                if (!esDeTrelew) {
+                    mostrarSinResultados()
+                    return
+                }
+
+                if (!tieneCalle && !esInterseccion) {
+                    mostrarSinResultados()
+                    return
+                }
 
                 val distancia = FloatArray(1)
                 Location.distanceBetween(
